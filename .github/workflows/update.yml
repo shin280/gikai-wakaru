@@ -18,32 +18,51 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  update:
+  fetch:
+    if: github.event_name != 'push'
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deploy.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-
       - run: pip install requests beautifulsoup4
 
       - name: 市のサイトから議決結果を取得
-        if: github.event_name != 'push'
         run: python scripts/fetch.py
 
+      - name: 取得したページを保管（読み取りに失敗したときの調査用）
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: raw-pages
+          path: data/raw
+          if-no-files-found: ignore
+          retention-days: 14
+
       - name: 取得した内容を保存（60日ルール対策も兼ねる）
-        if: github.event_name != 'push'
         run: |
           git config user.name "gikai-wakaru-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add data
           git diff --cached --quiet || git commit -m "データ更新 $(date +%F)"
           git push
+
+  deploy:
+    needs: fetch
+    if: always() && (needs.fetch.result == 'success' || needs.fetch.result == 'skipped')
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install requests beautifulsoup4
 
       - name: サイトを作成
         run: python scripts/build.py
