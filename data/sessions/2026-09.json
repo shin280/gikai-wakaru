@@ -7,32 +7,27 @@
   "pdfs": [
     {
       "session": "令和8年9月定例会",
-      "title": "提出議案(1)(PDF28KB",
+      "title": "提出議案(1)",
       "url": "https://www.city.hiratsuka.kanagawa.jp/common/200207381.pdf"
     },
     {
       "session": "令和8年9月定例会",
-      "title": ")",
-      "url": "https://www.city.hiratsuka.kanagawa.jp/common/200207383.pdf"
-    },
-    {
-      "session": "令和8年9月定例会",
-      "title": "提出議案(2)(PDF1MB)",
+      "title": "提出議案(2)",
       "url": "https://www.city.hiratsuka.kanagawa.jp/common/200207385.pdf"
     },
     {
       "session": "令和8年9月定例会",
-      "title": "令和8年度9月平塚市一般会計補正予算及び予算に関する説明書(PDF1MB)",
+      "title": "令和8年度9月平塚市一般会計補正予算及び予算に関する説明書",
       "url": "https://www.city.hiratsuka.kanagawa.jp/common/200207384.pdf"
     },
     {
       "session": "令和8年9月定例会",
-      "title": "令和8年度9月平塚市一般会計・特別会計・公営企業会計補正予算及び予算に関する説明書(PDF1MB)",
+      "title": "令和8年度9月平塚市一般会計・特別会計・公営企業会計補正予算及び予算に関する説明書",
       "url": "https://www.city.hiratsuka.kanagawa.jp/common/200207386.pdf"
     },
     {
       "session": "令和8年9月定例会",
-      "title": "提出追加議案(PDF82KB)",
+      "title": "提出追加議案",
       "url": "https://www.city.hiratsuka.kanagawa.jp/common/200209310.pdf"
     }
   ],
@@ -52,7 +47,7 @@
       "number": 1,
       "sub": null,
       "label": "認第1号",
-      "title": "決算の認定について",
+      "title": "決算の認定について〔令和7年度平塚市一般会計・特別会計決算〕",
       "result": "認定"
     },
     {
@@ -61,7 +56,7 @@
       "number": 2,
       "sub": null,
       "label": "認第2号",
-      "title": "決算の認定について",
+      "title": "決算の認定について〔令和7年度平塚市病院事業決算〕",
       "result": "認定"
     },
     {
@@ -70,7 +65,7 @@
       "number": 3,
       "sub": null,
       "label": "認第3号",
-      "title": "決算の認定について",
+      "title": "決算の認定について〔令和7年度平塚市下水道事業決算〕",
       "result": "認定"
     },
     {
@@ -232,7 +227,7 @@
       "number": 72,
       "sub": null,
       "label": "議案第72号",
-      "title": "工事請負契約の締結について",
+      "title": "工事請負契約の締結について〔平塚総合体育館第2体育室空調設備設置工事〕",
       "result": "可決"
     },
     {
@@ -241,7 +236,7 @@
       "number": 73,
       "sub": null,
       "label": "議案第73号",
-      "title": "工事請負変更契約の締結について",
+      "title": "工事請負変更契約の締結について〔松原公民館大規模改修工事(建築)〕",
       "result": "可決"
     },
     {
@@ -250,7 +245,7 @@
       "number": 74,
       "sub": null,
       "label": "議案第74号",
-      "title": "工事請負変更契約の締結について",
+      "title": "工事請負変更契約の締結について〔金田公民館大規模改修工事(建築)〕",
       "result": "可決"
     },
     {
@@ -259,7 +254,7 @@
       "number": 75,
       "sub": null,
       "label": "議案第75号",
-      "title": "製造請負契約の締結について",
+      "title": "製造請負契約の締結について〔消防指令システム及び消防救急デジタル無線設備〕",
       "result": "可決"
     },
     {
@@ -367,7 +362,7 @@
       "number": 3,
       "sub": null,
       "label": "請願第3号",
-      "title": "国に対し、ОTC類似薬の追加負担の実施を見送ることを求める意見書提出の請願",
+      "title": "国に対し、OTC類似薬の追加負担の実施を見送ることを求める意見書提出の請願",
       "result": "不採択"
     },
     {
@@ -444,5 +439,5 @@
     }
   ],
   "first_seen": "2026-11-12T12:40:00+09:00",
-  "updated": "2026-11-12T12:49:38+09:00"
+  "updated": "2026-11-12T12:51:30+09:00"
 }
