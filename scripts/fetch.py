@@ -29,7 +29,8 @@ SESSION_RE = re.compile(r"(令和\s*([0-9０-９元]+)\s*年)?\s*([0-9０-９]+)
 
 
 def nz(s: str) -> str:
-    return unicodedata.normalize("NFKC", s).strip()
+    # キリル文字のО（市のページに混ざっていることがある）を英字のOにそろえる
+    return unicodedata.normalize("NFKC", s).replace("О", "O").replace("о", "o").strip()
 
 
 def get(url: str) -> str:
@@ -84,8 +85,12 @@ def parse_results(html: str) -> dict:
                     result = rm.group(1)
                     w = (w[:rm.start()] + w[rm.end():]).strip()
                 w = w.strip(" 　:：|")
-                if w and not title and not RESULT_RE.fullmatch(w):
+                if w and title and w.startswith(("〔", "[")):
+                    title += w  # 〔平塚総合体育館…工事〕のような補足を件名につなげる
+                elif w and not title and not RESULT_RE.fullmatch(w):
                     title = w
+                elif title:
+                    break
             if not title:
                 continue
             title = re.sub(r"[（(](以上\d+案件.*?|提案説明.*?)[)）]$", "", title).strip()
@@ -114,7 +119,10 @@ def parse_bill_pdfs(html: str) -> list[dict]:
             current = nz(el.get_text())
         elif el.get("href", "").lower().endswith(".pdf") and current:
             href = requests.compat.urljoin(BILLS_URL, el["href"])
-            out.append({"session": current, "title": nz(el.get_text()), "url": href})
+            title = re.sub(r"\s*\(PDF[^)]*\)?\s*$", "", nz(el.get_text())).strip()
+            if len(title) < 2 or any(o["url"] == href for o in out):
+                continue
+            out.append({"session": current, "title": title, "url": href})
     return out
 
 
