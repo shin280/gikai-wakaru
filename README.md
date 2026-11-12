@@ -21,4 +21,4 @@
 
 ## 文章の書き方
 
-説明の文は [yomiyasu](https://github.com/nanaism/yomiyasu)（v3.0.0、MITライセンス）の決まりに沿って整えています。資料にないことを足さない、意味と言い切りの強さを変えない、を優先します。公開のたびに yomiyasu の lint で点検し、結果を GitHub Actions の実行結果に残します（見直し候補で、公開は止めません）。
+説明の文は `prompts/summary-rules.md` の決まりで書きます。この決まりは [yomiyasu](https://github.com/nanaism/yomiyasu)（v3.0.0、MITライセンス）の「意味を保つ」「資料にないことを足さない」考え方をもとにしています。AIが議案書を読んで説明を書くときも、この決まりを指示として渡します。
