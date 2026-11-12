@@ -16,7 +16,7 @@ GROUP_RE = re.compile(r"^(.+?)\s*[（(]\s*(\d+)\s*名\s*[)）]$")
 
 
 def nz(s):
-    return unicodedata.normalize("NFKC", s).strip()
+    return re.sub(r"\s+", " ", unicodedata.normalize("NFKC", s)).strip()
 
 
 def main() -> int:
@@ -33,26 +33,28 @@ def main() -> int:
         updated = f"{m.group(1)}-{int(m.group(2)):02d}-{int(m.group(3)):02d}"
 
     groups, cur = [], None
-    # 表なら行ごと、そうでなければ見出しと段落の順に読む
-    for el in main_el.find_all(["h2", "h3", "h4", "tr", "p", "li"]):
-        if el.name == "tr":
-            cells = [nz(c.get_text(" ")) for c in el.find_all(["th", "td"])]
-            cells = [c for c in cells if c]
-            if not cells:
-                continue
-            gm = GROUP_RE.match(cells[0])
-            if gm:
-                cur = {"name": gm.group(1), "count": int(gm.group(2)), "members": []}
-                groups.append(cur)
-                cells = cells[1:]
-            if cur and cells and re.fullmatch(r"[^\d（(]{1,6}\s+[^\d（(]{1,6}", cells[0]):
-                cur["members"].append({"name": cells[0], "roles": " ".join(cells[1:])})
-        else:
-            t = nz(el.get_text(" "))
-            gm = GROUP_RE.match(t)
-            if gm:
-                cur = {"name": gm.group(1), "count": int(gm.group(2)), "members": []}
-                groups.append(cur)
+    table = main_el.find("table")  # 最初の表が「会派等一覧」
+    for tr in table.find_all("tr") if table else []:
+        cells = [nz(c.get_text(" ")) for c in tr.find_all(["th", "td"])]
+        cells = [c for c in cells if c]
+        if not cells:
+            continue
+        gm = GROUP_RE.match(cells[0])
+        if gm:
+            cur = {"name": gm.group(1).replace(" ", ""), "count": int(gm.group(2)), "members": []}
+            groups.append(cur)
+            cells = cells[1:]
+        elif cells[0] == "無所属":
+            cur = {"name": "無所属", "count": 1, "members": [], "independent": True}
+            groups.append(cur)
+            cells = cells[1:]
+        if not cur or not cells:
+            continue
+        nm = re.match(r"^([^（(]+?)\s*[（(]([^)）]*)[)）]\s*(.*)$", cells[0])
+        if not nm:
+            continue
+        roles = " ".join(x for x in [nm.group(3)] + cells[1:] if x)
+        cur["members"].append({"name": nm.group(1).replace(" ", " "), "kana": nm.group(2), "roles": roles})
     groups = [g for g in groups if g["members"]]
     if not groups:
         print("会派の構成を読み取れませんでした。data/raw/members_latest.html を確認してください。", file=sys.stderr)

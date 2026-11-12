@@ -16,6 +16,9 @@
 
 ## データの出どころ
 
+- ひらつか議会だより「議案等の審議結果」（会派ごとの賛否） https://www.city.hiratsuka.kanagawa.jp/gikai/page-c_02220.html
+- 平塚市議会「会派・委員会の構成一覧」 https://www.city.hiratsuka.kanagawa.jp/gikai/page-c_02300.html
+
 - 平塚市議会「議案名と議案概要・議決結果」 https://www.city.hiratsuka.kanagawa.jp/gikai/page-c_02221.html
 - 平塚市「市議会提出（予定）議案」 https://www.city.hiratsuka.kanagawa.jp/keikaku/page-c_02457.html
 

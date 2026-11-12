@@ -99,6 +99,75 @@ def badge(result: str | None) -> str:
     return f'<span class="badge {cls}">{e(result)}</span>'
 
 
+def load_json(path: Path):
+    return json.loads(path.read_text(encoding="utf-8")) if path.exists() else None
+
+
+MEMBERS = None
+
+
+def vote_word(v: dict) -> str:
+    if not v:
+        return "記載なし"
+    if len(v) == 1 and list(v.values())[0] is None:
+        return list(v)[0]
+    return "・".join(f"{k}{n if n is not None else ''}" for k, n in v.items())
+
+
+def votes_for(session_key: str, item_id: str):
+    vf = load_json(DATA / "votes" / f"{session_key}.json")
+    if not vf or item_id not in vf["votes"]:
+        return None, None
+    return vf, vf["votes"][item_id]
+
+
+def vote_summary(vf: dict, v: dict) -> str:
+    """全会一致か、反対した会派はどこかを1行で。"""
+    names = {g["abbr"]: g["name"] for g in vf["groups"]}
+    against = [names.get(a, a) for a, x in v.items() if "反対" in x]
+    if not against:
+        return "全会一致"
+    return "反対：" + "、".join(against)
+
+
+def vote_headline(vf: dict, v: dict, result: str | None) -> str:
+    sm = vote_summary(vf, v)
+    if sm == "全会一致":
+        return f"全会一致で{result or ''}"
+    return f"賛成多数で{result}（{sm}）" if result in GOOD else f"{result or ''}（{sm}）"
+
+
+def members_of(group: dict) -> list[str]:
+    global MEMBERS
+    if MEMBERS is None:
+        MEMBERS = load_json(DATA / "members.json") or {"groups": []}
+    if group.get("independent"):
+        return [group["name"]]
+    for g in MEMBERS["groups"]:
+        if g["name"] == group["name"]:
+            return [m["name"] for m in g["members"]]
+    return []
+
+
+def render_votes(s: dict, it: dict) -> str:
+    vf, v = votes_for(s["key"], it["id"])
+    if not v:
+        return ""
+    rows = ""
+    for g in vf["groups"]:
+        if g["abbr"] not in v:
+            continue
+        word = vote_word(v[g["abbr"]])
+        cls = "ng" if "反対" in v[g["abbr"]] else ""
+        mem = "、".join(members_of(g)) if not g.get("independent") else "無所属"
+        label = f'{e(g["name"])}（{g["count"]}名）' if not g.get("independent") else e(g["name"])
+        rows += f'<div class="item"><span class="badge {cls}">{e(word)}</span><div><span class="t">{label}</span><span class="no">{e(mem)}</span></div></div>'
+    mu = (MEMBERS or {}).get("updated") or ""
+    src = vf["source"]
+    return f"""<section>{h2('会派ごとの賛否', 'Votes')}<p><b>{e(vote_headline(vf, v, it['result']))}</b></p>{rows}
+<p class="muted">賛否は「{e(src['title'])}」の審議結果一覧によります。所属議員は市議会の会派構成のページ（{e(mu)}時点）によるもので、採決のときと違う場合があります。</p></section>"""
+
+
 def load_sessions() -> list[dict]:
     ss = [json.loads(p.read_text(encoding="utf-8")) for p in (DATA / "sessions").glob("*.json")]
     return sorted(ss, key=lambda s: s["key"], reverse=True)
@@ -136,6 +205,7 @@ def render_bill(s: dict, it: dict, sm: dict) -> str:
 <div class="toggle"><button type="button" id="b-easy" aria-pressed="true">やさしく</button><button type="button" id="b-detail" aria-pressed="false">詳しく</button></div>
 <div class="ai">この説明はAIが市の資料から自動で作ったもので、人は確認していません。</div>
 <section>{h2('審議のステータス','Status')}<div class="steps"><div class="step done">市が提出</div><div class="step done">委員会で審査</div><div class="step done">本会議で{e(it['result'] or '報告')}</div></div></section>
+{render_votes(s, it)}
 <section>{h2('何が決まったの？','What was decided')}{pts}</section>
 {f'<section>{h2('数字で見ると','In numbers')}{calc}</section>' if calc else ''}
 {f'<section>{h2('なぜ必要なの？（市の説明）','Why')}{why}</section>' if why else ''}
@@ -161,13 +231,17 @@ def render_session(s: dict) -> str:
                 t = f'<a href="../b/{s["key"]}-{bill_slug(it["id"])}.html">{e(sm["headline"])}</a>'
             else:
                 t = e(it["title"])
-            rows += f'<div class="item">{badge(it["result"])}<div><span class="no">{e(it["label"])}</span><span class="t">{t}</span></div></div>'
+            vf, v = votes_for(s["key"], it["id"])
+            vs = f'<span class="no">{e(vote_summary(vf, v))}</span>' if v else ""
+            rows += f'<div class="item">{badge(it["result"])}<div><span class="no">{e(it["label"])}</span><span class="t">{t}</span>{vs}</div></div>'
         groups += f"<section>{h2(KIND_LABEL.get(kind, kind) + f'（{len(items)}件）', KIND_EN.get(kind, ''))}{rows}</section>"
     pdfs = "".join(f'<li><a href="{e(p["url"])}">{e(p["title"])}</a></li>' for p in s.get("pdfs", []))
+    vf = load_json(DATA / "votes" / f"{s['key']}.json")
+    dayori = f'<li><a href="{e(vf["source"]["pdf"])}">{e(vf["source"]["title"])}（審議結果・会派ごとの賛否）</a></li>' if vf else ""
     body = f"""<h1>{e(s['name'])}で決まったこと</h1>
 <p class="muted">全{len(s['items'])}件。リンクのあるものは、わかりやすい説明のページがあります。</p>
 {groups}
-<section>{h2('元の資料','Sources')}<ul><li><a href="{e(s['source'])}">平塚市議会 議決結果のページ</a></li>{pdfs}</ul></section>"""
+<section>{h2('元の資料','Sources')}<ul><li><a href="{e(s['source'])}">平塚市議会 議決結果のページ</a></li>{pdfs}{dayori}</ul></section>"""
     return page(s["name"] + "で決まったこと", body, depth=1)
 
 
