@@ -32,7 +32,13 @@ jobs:
         run: python scripts/fetch.py
 
       - name: 議会だよりから会派ごとの賛否を取得
-        run: python scripts/fetch_dayori.py
+        run: |
+          python scripts/fetch_dayori.py
+          python scripts/parse_dayori.py
+
+      - name: 会派の所属議員を取得
+        continue-on-error: true
+        run: python scripts/fetch_members.py
 
       - name: 取得したページを保管（読み取りに失敗したときの調査用）
         if: always()
