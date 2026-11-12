@@ -1,0 +1,443 @@
+{
+  "key": "2026-09",
+  "name": "令和8年9月定例会",
+  "year": 2026,
+  "month": 9,
+  "source": "https://www.city.hiratsuka.kanagawa.jp/gikai/page-c_02221.html",
+  "pdfs": [
+    {
+      "session": "令和8年9月定例会",
+      "title": "提出議案(1)",
+      "url": "https://www.city.hiratsuka.kanagawa.jp/common/200207381.pdf"
+    },
+    {
+      "session": "令和8年9月定例会",
+      "title": "提出議案(2)",
+      "url": "https://www.city.hiratsuka.kanagawa.jp/common/200207385.pdf"
+    },
+    {
+      "session": "令和8年9月定例会",
+      "title": "一般会計補正予算及び予算に関する説明書",
+      "url": "https://www.city.hiratsuka.kanagawa.jp/common/200207384.pdf"
+    },
+    {
+      "session": "令和8年9月定例会",
+      "title": "一般会計・特別会計・公営企業会計補正予算及び予算に関する説明書",
+      "url": "https://www.city.hiratsuka.kanagawa.jp/common/200207386.pdf"
+    },
+    {
+      "session": "令和8年9月定例会",
+      "title": "提出追加議案",
+      "url": "https://www.city.hiratsuka.kanagawa.jp/common/200209310.pdf"
+    }
+  ],
+  "items": [
+    {
+      "id": "議案58",
+      "kind": "議案",
+      "number": 58,
+      "sub": null,
+      "label": "議案第58号",
+      "title": "令和8年度平塚市一般会計補正予算",
+      "result": "可決"
+    },
+    {
+      "id": "議案59",
+      "kind": "議案",
+      "number": 59,
+      "sub": null,
+      "label": "議案第59号",
+      "title": "平塚市放課後児童健全育成事業の設備及び運営に関する基準を定める条例",
+      "result": "可決"
+    },
+    {
+      "id": "議案60",
+      "kind": "議案",
+      "number": 60,
+      "sub": null,
+      "label": "議案第60号",
+      "title": "平塚市特定教育・保育施設及び特定地域型保育事業の運営に関する基準等を定める条例",
+      "result": "可決"
+    },
+    {
+      "id": "議案61",
+      "kind": "議案",
+      "number": 61,
+      "sub": null,
+      "label": "議案第61号",
+      "title": "平塚市家庭的保育事業等の設備及び運営に関する基準を定める条例",
+      "result": "可決"
+    },
+    {
+      "id": "議案62",
+      "kind": "議案",
+      "number": 62,
+      "sub": null,
+      "label": "議案第62号",
+      "title": "平塚市特定乳児等通園支援事業の運営に関する基準等を定める条例",
+      "result": "可決"
+    },
+    {
+      "id": "議案63",
+      "kind": "議案",
+      "number": 63,
+      "sub": null,
+      "label": "議案第63号",
+      "title": "平塚市乳児等通園支援事業の設備及び運営に関する基準を定める条例",
+      "result": "可決"
+    },
+    {
+      "id": "議案64",
+      "kind": "議案",
+      "number": 64,
+      "sub": null,
+      "label": "議案第64号",
+      "title": "平塚市行政手続における特定の個人を識別するための番号の利用等に関する条例の一部を改正する条例",
+      "result": "可決"
+    },
+    {
+      "id": "議案65",
+      "kind": "議案",
+      "number": 65,
+      "sub": null,
+      "label": "議案第65号",
+      "title": "平塚市附属機関設置条例の一部を改正する条例",
+      "result": "可決"
+    },
+    {
+      "id": "議案66",
+      "kind": "議案",
+      "number": 66,
+      "sub": null,
+      "label": "議案第66号",
+      "title": "平塚市認可地縁団体印鑑条例の一部を改正する条例",
+      "result": "可決"
+    },
+    {
+      "id": "議案67",
+      "kind": "議案",
+      "number": 67,
+      "sub": null,
+      "label": "議案第67号",
+      "title": "平塚市一般職員の特殊勤務手当に関する条例の一部を改正する条例",
+      "result": "可決"
+    },
+    {
+      "id": "議案68",
+      "kind": "議案",
+      "number": 68,
+      "sub": null,
+      "label": "議案第68号",
+      "title": "地方税法第314条の7第1項第4号に掲げる寄附金を受け入れる特定非営利活動法人等を定める条例の一部を改正する条例",
+      "result": "可決"
+    },
+    {
+      "id": "議案69",
+      "kind": "議案",
+      "number": 69,
+      "sub": null,
+      "label": "議案第69号",
+      "title": "平塚市保育所設置条例の一部を改正する条例",
+      "result": "可決"
+    },
+    {
+      "id": "議案70",
+      "kind": "議案",
+      "number": 70,
+      "sub": null,
+      "label": "議案第70号",
+      "title": "平塚市廃棄物の減量化、資源化及び適正処理等に関する条例の一部を改正する条例",
+      "result": "可決"
+    },
+    {
+      "id": "議案71",
+      "kind": "議案",
+      "number": 71,
+      "sub": null,
+      "label": "議案第71号",
+      "title": "平塚市景観条例の一部を改正する条例",
+      "result": "可決"
+    },
+    {
+      "id": "議案72",
+      "kind": "議案",
+      "number": 72,
+      "sub": null,
+      "label": "議案第72号",
+      "title": "工事請負契約の締結について〔平塚総合体育館第2体育室空調設備設置工事〕",
+      "result": "可決"
+    },
+    {
+      "id": "議案73",
+      "kind": "議案",
+      "number": 73,
+      "sub": null,
+      "label": "議案第73号",
+      "title": "工事請負変更契約の締結について〔松原公民館大規模改修工事（建築）〕",
+      "result": "可決"
+    },
+    {
+      "id": "議案74",
+      "kind": "議案",
+      "number": 74,
+      "sub": null,
+      "label": "議案第74号",
+      "title": "工事請負変更契約の締結について〔金田公民館大規模改修工事（建築）〕",
+      "result": "可決"
+    },
+    {
+      "id": "議案75",
+      "kind": "議案",
+      "number": 75,
+      "sub": null,
+      "label": "議案第75号",
+      "title": "製造請負契約の締結について〔消防指令システム及び消防救急デジタル無線設備〕",
+      "result": "可決"
+    },
+    {
+      "id": "議案76",
+      "kind": "議案",
+      "number": 76,
+      "sub": null,
+      "label": "議案第76号",
+      "title": "物品購入契約の締結について",
+      "result": "可決"
+    },
+    {
+      "id": "議案77",
+      "kind": "議案",
+      "number": 77,
+      "sub": null,
+      "label": "議案第77号",
+      "title": "物品購入契約の締結について",
+      "result": "可決"
+    },
+    {
+      "id": "議案78",
+      "kind": "議案",
+      "number": 78,
+      "sub": null,
+      "label": "議案第78号",
+      "title": "損害の賠償について",
+      "result": "可決"
+    },
+    {
+      "id": "議案79",
+      "kind": "議案",
+      "number": 79,
+      "sub": null,
+      "label": "議案第79号",
+      "title": "市道路線の廃止について",
+      "result": "可決"
+    },
+    {
+      "id": "議案80",
+      "kind": "議案",
+      "number": 80,
+      "sub": null,
+      "label": "議案第80号",
+      "title": "市道路線の認定について",
+      "result": "可決"
+    },
+    {
+      "id": "議案81",
+      "kind": "議案",
+      "number": 81,
+      "sub": null,
+      "label": "議案第81号",
+      "title": "利益の処分について",
+      "result": "可決"
+    },
+    {
+      "id": "議案82",
+      "kind": "議案",
+      "number": 82,
+      "sub": null,
+      "label": "議案第82号",
+      "title": "令和8年度平塚市一般会計補正予算",
+      "result": "可決"
+    },
+    {
+      "id": "議案83",
+      "kind": "議案",
+      "number": 83,
+      "sub": null,
+      "label": "議案第83号",
+      "title": "令和8年度平塚市競輪事業特別会計補正予算",
+      "result": "可決"
+    },
+    {
+      "id": "議案84",
+      "kind": "議案",
+      "number": 84,
+      "sub": null,
+      "label": "議案第84号",
+      "title": "令和8年度平塚市水産物地方卸売市場事業特別会計補正予算",
+      "result": "可決"
+    },
+    {
+      "id": "議案85",
+      "kind": "議案",
+      "number": 85,
+      "sub": null,
+      "label": "議案第85号",
+      "title": "令和8年度平塚市介護保険事業特別会計補正予算",
+      "result": "可決"
+    },
+    {
+      "id": "議案86",
+      "kind": "議案",
+      "number": 86,
+      "sub": null,
+      "label": "議案第86号",
+      "title": "令和8年度平塚市病院事業会計補正予算",
+      "result": "可決"
+    },
+    {
+      "id": "議案87",
+      "kind": "議案",
+      "number": 87,
+      "sub": null,
+      "label": "議案第87号",
+      "title": "教育委員会委員の任命について",
+      "result": "同意"
+    },
+    {
+      "id": "議案88",
+      "kind": "議案",
+      "number": 88,
+      "sub": null,
+      "label": "議案第88号",
+      "title": "公平委員会委員の選任について",
+      "result": "同意"
+    },
+    {
+      "id": "議案89",
+      "kind": "議案",
+      "number": 89,
+      "sub": null,
+      "label": "議案第89号",
+      "title": "固定資産評価審査委員会委員の選任について",
+      "result": "同意"
+    },
+    {
+      "id": "議案90",
+      "kind": "議案",
+      "number": 90,
+      "sub": null,
+      "label": "議案第90号",
+      "title": "功労者の表彰について",
+      "result": "可決"
+    },
+    {
+      "id": "議案91",
+      "kind": "議案",
+      "number": 91,
+      "sub": null,
+      "label": "議案第91号",
+      "title": "名誉市民の称号贈呈について",
+      "result": "可決"
+    },
+    {
+      "id": "認1",
+      "kind": "認",
+      "number": 1,
+      "sub": null,
+      "label": "認第1号",
+      "title": "決算の認定について〔令和7年度平塚市一般会計・特別会計決算〕",
+      "result": "認定"
+    },
+    {
+      "id": "認2",
+      "kind": "認",
+      "number": 2,
+      "sub": null,
+      "label": "認第2号",
+      "title": "決算の認定について〔令和7年度平塚市病院事業決算〕",
+      "result": "認定"
+    },
+    {
+      "id": "認3",
+      "kind": "認",
+      "number": 3,
+      "sub": null,
+      "label": "認第3号",
+      "title": "決算の認定について〔令和7年度平塚市下水道事業決算〕",
+      "result": "認定"
+    },
+    {
+      "id": "報告9",
+      "kind": "報告",
+      "number": 9,
+      "sub": null,
+      "label": "報告第9号",
+      "title": "継続費の精算報告について",
+      "result": null
+    },
+    {
+      "id": "報告10",
+      "kind": "報告",
+      "number": 10,
+      "sub": null,
+      "label": "報告第10号",
+      "title": "健全化判断比率について",
+      "result": null
+    },
+    {
+      "id": "報告11",
+      "kind": "報告",
+      "number": 11,
+      "sub": null,
+      "label": "報告第11号",
+      "title": "公営企業の資金不足比率について",
+      "result": null
+    },
+    {
+      "id": "報告12",
+      "kind": "報告",
+      "number": 12,
+      "sub": null,
+      "label": "報告第12号",
+      "title": "専決処分の報告について",
+      "result": null
+    },
+    {
+      "id": "請願3",
+      "kind": "請願",
+      "number": 3,
+      "sub": null,
+      "label": "請願第3号",
+      "title": "国に対し、OTC類似薬の追加負担の実施を見送ることを求める意見書提出の請願",
+      "result": "不採択"
+    },
+    {
+      "id": "請願4-1",
+      "kind": "請願",
+      "number": 4,
+      "sub": 1,
+      "label": "請願第4号ー1",
+      "title": "「かなちゃんパス」への購入費助成および地域交通政策に対する請願",
+      "result": "不採択"
+    },
+    {
+      "id": "請願4-2",
+      "kind": "請願",
+      "number": 4,
+      "sub": 2,
+      "label": "請願第4号ー2",
+      "title": "「かなちゃんパス」への購入費助成および地域交通政策に対する請願",
+      "result": "不採択"
+    },
+    {
+      "id": "請願5",
+      "kind": "請願",
+      "number": 5,
+      "sub": null,
+      "label": "請願第5号",
+      "title": "委員会の動画をインターネット上で公開することを求める請願",
+      "result": "趣旨採択"
+    }
+  ],
+  "first_seen": "2026-11-12T12:40:00+09:00",
+  "updated": "2026-11-12T12:40:00+09:00"
+}
