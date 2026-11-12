@@ -18,3 +18,7 @@
 
 - 平塚市議会「議案名と議案概要・議決結果」 https://www.city.hiratsuka.kanagawa.jp/gikai/page-c_02221.html
 - 平塚市「市議会提出（予定）議案」 https://www.city.hiratsuka.kanagawa.jp/keikaku/page-c_02457.html
+
+## 文章の書き方
+
+説明の文は [yomiyasu](https://github.com/nanaism/yomiyasu)（v3.0.0、MITライセンス）の決まりに沿って整えています。資料にないことを足さない、意味と言い切りの強さを変えない、を優先します。公開のたびに yomiyasu の lint で点検し、結果を GitHub Actions の実行結果に残します（見直し候補で、公開は止めません）。

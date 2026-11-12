@@ -64,6 +64,12 @@ jobs:
           python-version: "3.12"
       - run: pip install requests beautifulsoup4
 
+      - name: 文章の点検（yomiyasu v3.0.0。結果は見直し候補で、公開は止めない）
+        continue-on-error: true
+        run: |
+          git clone -q --depth 1 --branch v3.0.0 https://github.com/nanaism/yomiyasu /tmp/yomiyasu
+          python scripts/export_text.py | python -I /tmp/yomiyasu/skills/yomiyasu/scripts/yomiyasu_lint.py --reader general - | tee -a "$GITHUB_STEP_SUMMARY"
+
       - name: サイトを作成
         run: python scripts/build.py
 
