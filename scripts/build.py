@@ -15,32 +15,45 @@ SITE_NAME = "ひらつか議会 わかる版"
 KIND_ORDER = ["議案", "認", "会議案", "請願", "陳情", "報告"]
 KIND_LABEL = {"議案": "議案", "認": "決算の認定", "会議案": "議員が出した議案・意見書", "請願": "請願",
               "陳情": "陳情", "報告": "市からの報告"}
+KIND_EN = {"議案": "Bills", "認": "Financial statements", "会議案": "Council proposals", "請願": "Petitions", "陳情": "Petitions", "報告": "Reports"}
 GOOD = {"可決", "原案可決", "修正可決", "同意", "承認", "認定", "採択", "趣旨採択"}
 BAD = {"否決", "不同意", "不承認", "不認定", "不採択"}
 
 e = html.escape
 
 CSS = """
-:root{--ink:#1d2328;--sub:#5b6670;--line:#dfe3e6;--bg:#f6f7f5;--card:#fff;--accent:#0f6b5c;--soft:#e3f1ee;--warn:#8a5a00;--warnbg:#fff4dc;--ng:#9b2c2c;--ngbg:#fbeaea}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Sans JP",system-ui,sans-serif;line-height:1.75;font-size:16px}
-a{color:var(--accent)}.wrap{max-width:720px;margin:0 auto;padding:0 16px 48px}
-header.site{background:#fff;border-bottom:1px solid var(--line)}header.site .wrap{padding-top:10px;padding-bottom:10px}
-.logo{font-weight:700;font-size:15px;text-decoration:none;color:var(--ink)}.logo span{color:var(--accent)}
-h1{font-size:23px;line-height:1.5;margin:18px 0 8px}h2{font-size:17px;margin:0 0 10px;padding-left:10px;border-left:4px solid var(--accent);line-height:1.4}h3{font-size:15px;margin:14px 0 4px}
-section{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px 12px;margin-top:14px}
-p{margin:0 0 10px}ul{margin:0 0 10px;padding-left:1.2em}li{margin-bottom:4px}.muted{color:var(--sub);font-size:13px}
-.item{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-top:1px solid var(--line)}.item:first-of-type{border-top:0}
-.badge{flex:none;font-size:12px;font-weight:700;padding:1px 9px;border-radius:99px;background:var(--soft);color:var(--accent);margin-top:3px;white-space:nowrap}
-.badge.ng{background:var(--ngbg);color:var(--ng)}.badge.none{background:#eceeed;color:var(--sub)}
+:root{--ink:#4a3a2a;--sub:#8a7560;--line:#e6d9c4;--bg:#f7f1e6;--card:#fffdf8;--wood:#c08a4f;--wood-d:#9a6a35;
+--leaf:#5f8a3e;--leafbg:#eaf1df;--warn:#8a5a00;--warnbg:#fff3d6;--ng:#b2453a;--ngbg:#fbe9e5}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Zen Maru Gothic","M PLUS Rounded 1c",system-ui,sans-serif;line-height:1.85;font-size:16px;
+background-image:radial-gradient(rgba(192,138,79,.07) 1px,transparent 1px);background-size:14px 14px}
+a{color:var(--wood-d);text-underline-offset:3px}
+.wrap{max-width:720px;margin:0 auto;padding:0 18px 56px}
+header.site{background:var(--card);border-bottom:3px solid var(--wood)}
+header.site .wrap{padding-top:14px;padding-bottom:12px;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.logo{font-weight:700;font-size:18px;text-decoration:none;color:var(--ink);letter-spacing:.04em}
+.logo span{color:var(--leaf)}
+.tagline{font-size:11px;color:var(--sub);letter-spacing:.12em}
+h1{font-size:24px;line-height:1.55;margin:26px 0 8px;letter-spacing:.02em}
+h2{font-size:19px;margin:0 0 14px;text-align:center;line-height:1.4;letter-spacing:.06em}
+h2 small{display:block;font-size:11px;font-weight:500;color:var(--wood);letter-spacing:.18em;margin-top:2px;text-transform:uppercase}
+h2::after{content:"";display:block;width:36px;height:3px;border-radius:2px;background:var(--leaf);margin:8px auto 0}
+h3{font-size:16px;margin:16px 0 4px;color:var(--wood-d)}
+section{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:22px 20px 14px;margin-top:18px;box-shadow:0 2px 0 var(--line)}
+p{margin:0 0 10px}ul{margin:0 0 10px;padding-left:1.2em}li{margin-bottom:6px}
+.muted{color:var(--sub);font-size:13px}
+.item{display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-top:1px dashed var(--line)}.item:first-of-type{border-top:0}
+.badge{flex:none;font-size:12px;font-weight:700;padding:2px 11px;border-radius:99px;background:var(--leafbg);color:var(--leaf);margin-top:3px;white-space:nowrap}
+.badge.ng{background:var(--ngbg);color:var(--ng)}.badge.none{background:#efe7da;color:var(--sub)}
 .item .no{font-size:12px;color:var(--sub);display:block}.item .t{display:block}
-.ai{background:var(--warnbg);border:1px solid #f0d9a8;color:var(--warn);border-radius:10px;padding:8px 12px;font-size:13px;margin-top:12px}
-.toggle{display:flex;background:#e9ecea;border-radius:10px;padding:4px;gap:4px;margin:10px 0 4px}
-.toggle button{flex:1;border:0;background:transparent;padding:8px;border-radius:7px;font:inherit;font-size:14px;color:var(--sub);cursor:pointer}
-.toggle button[aria-pressed=true]{background:#fff;color:var(--ink);font-weight:700}
+.ai{background:var(--warnbg);border:1px dashed #e3c27e;color:var(--warn);border-radius:14px;padding:10px 14px;font-size:13px;margin-top:14px}
+.toggle{display:flex;background:#efe5d4;border-radius:99px;padding:4px;gap:4px;margin:12px 0 4px}
+.toggle button{flex:1;border:0;background:transparent;padding:9px;border-radius:99px;font:inherit;font-size:14px;color:var(--sub);cursor:pointer}
+.toggle button[aria-pressed=true]{background:var(--wood);color:#fff;font-weight:700}
 .detail{display:none}body.is-detail .detail{display:block}body.is-detail .easy{display:none}
-.money{font-weight:700}.formal{font-size:13px;color:var(--sub)}
-details{border-top:1px solid var(--line);padding:8px 0}details:first-of-type{border-top:0}summary{cursor:pointer;font-weight:500}
-footer{font-size:12px;color:var(--sub);margin-top:22px}
+.money{font-weight:700;color:var(--wood-d)}.formal{font-size:13px;color:var(--sub)}
+details{border-top:1px dashed var(--line);padding:10px 0}details:first-of-type{border-top:0}summary{cursor:pointer;font-weight:700}
+footer{font-size:12px;color:var(--sub);margin-top:28px;padding-top:16px;border-top:3px solid var(--wood)}
 """
 
 TOGGLE_JS = """<script>
@@ -56,14 +69,18 @@ def page(title: str, body: str, depth: int = 0, desc: str = "") -> str:
     return f"""<!DOCTYPE html>
 <html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{e(title)}｜{SITE_NAME}</title><meta name="description" content="{e(desc or title)}">
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
 <style>{CSS}</style></head><body>
-<header class="site"><div class="wrap"><a class="logo" href="{root}index.html">ひらつか議会 <span>わかる版</span></a></div></header>
+<header class="site"><div class="wrap"><a class="logo" href="{root}index.html">ひらつか議会 <span>わかる版</span></a><span class="tagline">HIRATSUKA CITY COUNCIL, MADE EASY</span></div></header>
 <main class="wrap">{body}
 <footer><p>このサイトは、平塚市が公開している資料をもとに、プログラムとAIが自動で作っています。人による確認はしていないため、間違いが含まれる可能性があります。大事な判断の前には、各ページの「元の資料」で必ず確かめてください。</p>
 <p><a href="{report}">間違いを報告する</a> ・ <a href="https://github.com/{REPO}">このサイトのしくみ（GitHub）</a></p></footer>
 </main>{TOGGLE_JS}</body></html>
 """
+
+
+def h2(ja: str, en: str) -> str:
+    return f"<h2>{e(ja)}<small>{e(en)}</small></h2>"
 
 
 def badge(result: str | None) -> str:
@@ -109,13 +126,13 @@ def render_bill(s: dict, it: dict, sm: dict) -> str:
 <p class="formal">正式名称：{e(it['label'])} {e(it['title'])}</p>
 <div class="toggle"><button type="button" id="b-easy" aria-pressed="true">やさしく</button><button type="button" id="b-detail" aria-pressed="false">詳しく</button></div>
 <div class="ai">この説明はAIが市の資料から自動で作ったもので、人は確認していません。</div>
-<section><h2>何が決まったの？</h2>{pts}</section>
-{f'<section><h2>数字で見ると</h2>{calc}</section>' if calc else ''}
-{f'<section><h2>なぜ必要なの？（市の説明）</h2>{why}</section>' if why else ''}
-{f'<section><h2>だれに関係する？</h2><ul>{who}</ul></section>' if who else ''}
-{f'<section><h2>よくある質問</h2>{faq}</section>' if faq else ''}
-{f'<section><h2>資料からは分からないこと</h2><ul>{unk}</ul></section>' if unk else ''}
-<section><h2>元の資料</h2><ul>{src}<li><a href="{e(s['source'])}">平塚市議会 議決結果のページ</a></li></ul></section>
+<section>{h2('何が決まったの？','What was decided')}{pts}</section>
+{f'<section>{h2('数字で見ると','In numbers')}{calc}</section>' if calc else ''}
+{f'<section>{h2('なぜ必要なの？（市の説明）','Why')}{why}</section>' if why else ''}
+{f'<section>{h2('だれに関係する？','Who is affected')}<ul>{who}</ul></section>' if who else ''}
+{f'<section>{h2('よくある質問','FAQ')}{faq}</section>' if faq else ''}
+{f'<section>{h2('資料からは分からないこと','Not in the documents')}<ul>{unk}</ul></section>' if unk else ''}
+<section>{h2('元の資料','Sources')}<ul>{src}<li><a href="{e(s['source'])}">平塚市議会 議決結果のページ</a></li></ul></section>
 <p style="margin-top:14px"><a href="../s/{e(s['key'])}.html">← {e(s['name'])}の一覧に戻る</a></p>"""
     return page(sm["headline"], body, depth=1, desc=sm["headline"])
 
@@ -135,12 +152,12 @@ def render_session(s: dict) -> str:
             else:
                 t = e(it["title"])
             rows += f'<div class="item">{badge(it["result"])}<div><span class="no">{e(it["label"])}</span><span class="t">{t}</span></div></div>'
-        groups += f"<section><h2>{e(KIND_LABEL.get(kind, kind))}（{len(items)}件）</h2>{rows}</section>"
+        groups += f"<section>{h2(KIND_LABEL.get(kind, kind) + f'（{len(items)}件）', KIND_EN.get(kind, ''))}{rows}</section>"
     pdfs = "".join(f'<li><a href="{e(p["url"])}">{e(p["title"])}</a></li>' for p in s.get("pdfs", []))
     body = f"""<h1>{e(s['name'])}で決まったこと</h1>
 <p class="muted">全{len(s['items'])}件。リンクのあるものは、わかりやすい説明のページがあります。</p>
 {groups}
-<section><h2>元の資料</h2><ul><li><a href="{e(s['source'])}">平塚市議会 議決結果のページ</a></li>{pdfs}</ul></section>"""
+<section>{h2('元の資料','Sources')}<ul><li><a href="{e(s['source'])}">平塚市議会 議決結果のページ</a></li>{pdfs}</ul></section>"""
     return page(s["name"] + "で決まったこと", body, depth=1)
 
 
@@ -159,8 +176,8 @@ def render_index(sessions: list[dict], last_checked: str) -> str:
                 latest += f'<div class="item">{badge(it["result"])}<div><span class="no">{e(it["label"])}</span><a class="t" href="b/{s["key"]}-{bill_slug(it["id"])}.html">{e(sm["headline"])}</a></div></div>'
     body = f"""<h1>平塚市議会で決まったことを、わかりやすく</h1>
 <p>市議会で可決・否決されたことを、市の資料をもとに自動でまとめています。</p>
-{f'<section><h2>最近決まったこと</h2>{latest}</section>' if latest else ''}
-<section><h2>定例会ごとの一覧</h2>{rows or '<p>まだデータがありません。</p>'}</section>
+{f'<section>{h2('最近決まったこと','Latest')}{latest}</section>' if latest else ''}
+<section>{h2('定例会ごとの一覧','Sessions')}{rows or '<p>まだデータがありません。</p>'}</section>
 <p class="muted">最終確認：{e(last_checked)}</p>"""
     return page("平塚市議会で決まったことを、わかりやすく", body)
 
