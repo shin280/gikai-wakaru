@@ -22,38 +22,47 @@ BAD = {"否決", "不同意", "不承認", "不認定", "不採択"}
 e = html.escape
 
 CSS = """
-:root{--ink:#4a3a2a;--sub:#8a7560;--line:#e6d9c4;--bg:#f7f1e6;--card:#fffdf8;--wood:#c08a4f;--wood-d:#9a6a35;
---leaf:#5f8a3e;--leafbg:#eaf1df;--warn:#8a5a00;--warnbg:#fff3d6;--ng:#b2453a;--ngbg:#fbe9e5}
+:root{--red:#ff0033;--red-d:#c4002a;--redbg:#fff0f3;--ink:#16181d;--sub:#646a73;--line:#e7e9ee;--bg:#f4f5f7;--card:#fff;
+--ok:#c4002a;--okbg:#fff0f3;--ng:#3a3f47;--ngbg:#eceef1;--warn:#7a5a00;--warnbg:#fff7e0}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:"Zen Maru Gothic","M PLUS Rounded 1c",system-ui,sans-serif;line-height:1.85;font-size:16px;
-background-image:radial-gradient(rgba(192,138,79,.07) 1px,transparent 1px);background-size:14px 14px}
-a{color:var(--wood-d);text-underline-offset:3px}
-.wrap{max-width:720px;margin:0 auto;padding:0 18px 56px}
-header.site{background:var(--card);border-bottom:3px solid var(--wood)}
-header.site .wrap{padding-top:14px;padding-bottom:12px;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
-.logo{font-weight:700;font-size:18px;text-decoration:none;color:var(--ink);letter-spacing:.04em}
-.logo span{color:var(--leaf)}
-.tagline{font-size:11px;color:var(--sub);letter-spacing:.12em}
-h1{font-size:24px;line-height:1.55;margin:26px 0 8px;letter-spacing:.02em}
-h2{font-size:19px;margin:0 0 14px;text-align:center;line-height:1.4;letter-spacing:.06em}
-h2 small{display:block;font-size:11px;font-weight:500;color:var(--wood);letter-spacing:.18em;margin-top:2px;text-transform:uppercase}
-h2::after{content:"";display:block;width:36px;height:3px;border-radius:2px;background:var(--leaf);margin:8px auto 0}
-h3{font-size:16px;margin:16px 0 4px;color:var(--wood-d)}
-section{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:22px 20px 14px;margin-top:18px;box-shadow:0 2px 0 var(--line)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Sans JP",system-ui,sans-serif;line-height:1.8;font-size:16px;-webkit-font-smoothing:antialiased}
+a{color:var(--red-d)}
+.wrap{max-width:720px;margin:0 auto;padding:0 16px 56px}
+header.site{background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5}
+header.site .wrap{padding-top:12px;padding-bottom:12px;display:flex;align-items:center;gap:8px}
+.logo{font-weight:700;font-size:17px;text-decoration:none;color:var(--ink);display:flex;align-items:center;gap:8px}
+.logo::before{content:"";width:22px;height:16px;border-radius:5px;background:var(--red);
+-webkit-mask:none;box-shadow:inset 0 0 0 0 #fff}
+.logo span{color:var(--red)}
+.tagline{display:none}
+h1{font-size:24px;line-height:1.5;margin:20px 0 10px;font-weight:700}
+h2{font-size:18px;margin:0 0 12px;line-height:1.4;font-weight:700}
+h2 small{display:none}
+h3{font-size:16px;margin:16px 0 4px}
+section{background:var(--card);border-radius:16px;padding:20px 20px 12px;margin-top:14px;box-shadow:0 1px 2px rgba(16,24,40,.04),0 1px 8px rgba(16,24,40,.04)}
 p{margin:0 0 10px}ul{margin:0 0 10px;padding-left:1.2em}li{margin-bottom:6px}
 .muted{color:var(--sub);font-size:13px}
-.item{display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-top:1px dashed var(--line)}.item:first-of-type{border-top:0}
-.badge{flex:none;font-size:12px;font-weight:700;padding:2px 11px;border-radius:99px;background:var(--leafbg);color:var(--leaf);margin-top:3px;white-space:nowrap}
-.badge.ng{background:var(--ngbg);color:var(--ng)}.badge.none{background:#efe7da;color:var(--sub)}
-.item .no{font-size:12px;color:var(--sub);display:block}.item .t{display:block}
-.ai{background:var(--warnbg);border:1px dashed #e3c27e;color:var(--warn);border-radius:14px;padding:10px 14px;font-size:13px;margin-top:14px}
-.toggle{display:flex;background:#efe5d4;border-radius:99px;padding:4px;gap:4px;margin:12px 0 4px}
-.toggle button{flex:1;border:0;background:transparent;padding:9px;border-radius:99px;font:inherit;font-size:14px;color:var(--sub);cursor:pointer}
-.toggle button[aria-pressed=true]{background:var(--wood);color:#fff;font-weight:700}
+.item{display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-top:1px solid var(--line)}.item:first-of-type{border-top:0;padding-top:2px}
+.badge{flex:none;font-size:12px;font-weight:700;padding:2px 10px;border-radius:6px;background:var(--okbg);color:var(--ok);margin-top:3px;white-space:nowrap}
+.badge.ng{background:var(--ngbg);color:var(--ng)}.badge.none{background:#eef0f3;color:var(--sub)}
+.item .no{font-size:12px;color:var(--sub);display:block}.item .t{display:block;font-weight:500}
+.item a.t{text-decoration:none;color:var(--ink)}.item a.t::after{content:" →";color:var(--red)}
+.ai{background:var(--warnbg);color:var(--warn);border-radius:12px;padding:10px 14px;font-size:13px;margin-top:14px}
+.toggle{display:inline-flex;border:1px solid var(--line);background:#fff;border-radius:99px;padding:3px;gap:2px;margin:12px 0 4px}
+.toggle button{border:0;background:transparent;padding:7px 16px;border-radius:99px;font:inherit;font-size:13px;color:var(--sub);cursor:pointer}
+.toggle button[aria-pressed=true]{background:var(--red);color:#fff;font-weight:700}
 .detail{display:none}body.is-detail .detail{display:block}body.is-detail .easy{display:none}
-.money{font-weight:700;color:var(--wood-d)}.formal{font-size:13px;color:var(--sub)}
-details{border-top:1px dashed var(--line);padding:10px 0}details:first-of-type{border-top:0}summary{cursor:pointer;font-weight:700}
-footer{font-size:12px;color:var(--sub);margin-top:28px;padding-top:16px;border-top:3px solid var(--wood)}
+.money{font-weight:700}.formal{font-size:13px;color:var(--sub);margin:0}
+.meta{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:18px}
+.tag{font-size:12px;padding:2px 10px;border-radius:99px;background:#fff;border:1px solid var(--line);color:var(--sub)}
+.steps{display:flex;margin:4px 0 6px}
+.step{flex:1;text-align:center;font-size:12px;color:var(--sub);position:relative;padding-top:24px}
+.step::before{content:"";position:absolute;top:4px;left:50%;transform:translateX(-50%);width:16px;height:16px;border-radius:50%;background:#d6d9df;z-index:1}
+.step::after{content:"";position:absolute;top:11px;left:50%;width:100%;height:2px;background:#d6d9df}
+.step:last-child::after{display:none}
+.step.done{color:var(--ink);font-weight:700}.step.done::before{background:var(--red)}.step.done::after{background:var(--red)}
+details{border-top:1px solid var(--line);padding:10px 0}details:first-of-type{border-top:0}summary{cursor:pointer;font-weight:700}
+footer{font-size:12px;color:var(--sub);margin-top:28px}
 """
 
 TOGGLE_JS = """<script>
@@ -69,7 +78,7 @@ def page(title: str, body: str, depth: int = 0, desc: str = "") -> str:
     return f"""<!DOCTYPE html>
 <html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{e(title)}｜{SITE_NAME}</title><meta name="description" content="{e(desc or title)}">
-<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
 <style>{CSS}</style></head><body>
 <header class="site"><div class="wrap"><a class="logo" href="{root}index.html">ひらつか議会 <span>わかる版</span></a><span class="tagline">HIRATSUKA CITY COUNCIL, MADE EASY</span></div></header>
 <main class="wrap">{body}
@@ -121,11 +130,12 @@ def render_bill(s: dict, it: dict, sm: dict) -> str:
     unk = "".join(f"<li>{e(x)}</li>" for x in sm.get("unknowns", []))
     src = "".join(f'<li><a href="{e(x["url"])}">{e(x["title"])}</a></li>' for x in sm.get("sources", []))
     body = f"""
-<p class="muted" style="margin-top:16px">{badge(it['result'])} {e(s['name'])}</p>
+<div class="meta">{badge(it['result'])}<span class="tag">{e(s['name'])}</span><span class="tag">{e(KIND_LABEL.get(it['kind'], it['kind']))}</span></div>
 <h1 class="easy">{e(sm['headline'])}</h1><h1 class="detail">{e(sm.get('headline_detail') or sm['headline'])}</h1>
 <p class="formal">正式名称：{e(it['label'])} {e(it['title'])}</p>
 <div class="toggle"><button type="button" id="b-easy" aria-pressed="true">やさしく</button><button type="button" id="b-detail" aria-pressed="false">詳しく</button></div>
 <div class="ai">この説明はAIが市の資料から自動で作ったもので、人は確認していません。</div>
+<section>{h2('審議のステータス','Status')}<div class="steps"><div class="step done">市が提出</div><div class="step done">委員会で審査</div><div class="step done">本会議で{e(it['result'] or '報告')}</div></div></section>
 <section>{h2('何が決まったの？','What was decided')}{pts}</section>
 {f'<section>{h2('数字で見ると','In numbers')}{calc}</section>' if calc else ''}
 {f'<section>{h2('なぜ必要なの？（市の説明）','Why')}{why}</section>' if why else ''}
