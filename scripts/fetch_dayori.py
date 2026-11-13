@@ -16,7 +16,7 @@ ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "data" / "raw" / "dayori"
 LIST_URL = "https://www.city.hiratsuka.kanagawa.jp/gikai/page-c_02220.html"
 UA = "gikai-wakaru (+https://github.com/shin280/gikai-wakaru)"
-MAX_ISSUES = 4  # 新しい号から何号分を見るか
+MAX_ISSUES = 16  # 新しい号から何号分を見るか（約4年分）
 
 
 def get(url: str) -> requests.Response:
