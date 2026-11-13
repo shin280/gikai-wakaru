@@ -20,7 +20,14 @@ while queue and len(seen) < 8:
     if url in seen:
         continue
     seen.append(url)
+    import time
     r = s.get(url, timeout=60)
+    if r.status_code == 429:
+        print("429:", r.headers.get("Retry-After"), dict(r.headers))
+        time.sleep(int(r.headers.get("Retry-After", "60") or 60))
+        r = s.get(url, timeout=60)
+        print("再試行:", r.status_code)
+    time.sleep(3)
     r.encoding = r.apparent_encoding
     (OUT / f"{len(seen):02d}.html").write_text(f"<!-- {url} -->\n" + r.text, encoding="utf-8")
     for href in re.findall(r'href="([^"]+)"', r.text):
