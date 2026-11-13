@@ -16,6 +16,9 @@
 
 ## データの出どころ
 
+- 平塚市議会会議録検索システム（最終日の本会議の討論） https://www.city.hiratsuka.kanagawa.dbsr.jp/
+  - 相手のサーバーに負担をかけないよう、1回の実行で2定例会分までにしている
+
 - ひらつか議会だより「議案等の審議結果」（会派ごとの賛否） https://www.city.hiratsuka.kanagawa.jp/gikai/page-c_02220.html
 - 平塚市議会「会派・委員会の構成一覧」 https://www.city.hiratsuka.kanagawa.jp/gikai/page-c_02300.html
 

@@ -46,7 +46,9 @@ jobs:
 
       - name: 会議録（最終日の本会議）を取得
         continue-on-error: true
-        run: python scripts/fetch_minutes.py
+        run: |
+          python scripts/fetch_minutes.py
+          python scripts/parse_minutes.py
 
       - name: 会派の所属議員を取得
         continue-on-error: true

@@ -231,44 +231,91 @@ def tag_html(t: dict) -> str:
     return f'<span class="tg">{"".join(xs)}</span>' if xs else ""
 
 
-def render_bill(s: dict, it: dict, sm: dict) -> str:
+def debates_for(s: dict, it: dict) -> tuple[dict | None, list[dict]]:
+    mf = load_json(DATA / "minutes" / f"{s['key']}.json")
+    if not mf:
+        return None, []
+    return mf, [d for d in mf["debates"] if d["bill"] == it["id"]]
+
+
+def speaker_group(s: dict, d: dict) -> str:
+    """発言の最初の段落に会派名があればそれを使う（「○○を代表し」「○○の元島しんです」）。"""
+    vf = load_json(DATA / "votes" / f"{s['key']}.json")
+    for g in (vf or {}).get("groups", []):
+        if not g.get("independent") and g["name"] in d.get("intro", ""):
+            return g["name"]
+    return "無所属" if "無所属" in d.get("intro", "") else ""
+
+
+def render_debates(s: dict, it: dict) -> str:
+    mf, ds = debates_for(s, it)
+    if mf is None:
+        return ""
+    src = mf["source"]
+    if not ds:
+        return f"""<section>{h2('討論（賛成・反対の理由）', 'Debate')}<p>本会議での討論はありませんでした。</p>
+<p class="muted">出典：<a href="{e(src['url'])}">{e(src['title'])}（平塚市議会会議録）</a></p></section>"""
+    rows = ""
+    for d in ds:
+        g = speaker_group(s, d)
+        cls = "ng" if d["stance"] in ("反対",) else ""
+        rows += f"""<div class="item"><span class="badge {cls}">{e(d['stance'] or '討論')}</span><div>
+<span class="t">{e(d['speaker'])} 議員{f'（{e(g)}）' if g else ''}</span>
+<span class="no" style="font-size:14px;color:var(--ink);margin-top:4px">「{e(d['excerpt'])}」</span></div></div>"""
+    return f"""<section>{h2('討論（賛成・反対の理由）', 'Debate')}{rows}
+<p class="muted">本会議の討論の一部を、会議録の文のまま抜き出しています。全文は <a href="{e(src['url'])}">{e(src['title'])}（平塚市議会会議録）</a> で読めます。</p></section>"""
+
+
+def render_bill(s: dict, it: dict, sm: dict | None) -> str:
+    sm_ = sm or {}
+    headline = sm_.get("headline") or it["title"]
     pts = ""
-    for i, p in enumerate(sm.get("points", []), 1):
+    for i, p in enumerate(sm_.get("points", []), 1):
         amt = f'<p>予算：<span class="money">{e(p["amount"])}</span></p>' if p.get("amount") else ""
         det = f'<p class="detail">{e(p["detail"])}</p>' if p.get("detail") else ""
         pts += f'<h3>{i}. {e(p["title"])}</h3><p class="easy">{e(p["easy"])}</p>{det}{amt}'
-    calc = "".join(f"<p>{e(x)}</p>" for x in sm.get("numbers", []))
-    why = "".join(f"<p>{e(x)}</p>" for x in sm.get("why", []))
-    who = "".join(f"<li><b>{e(w['name'])}</b>：{e(w['desc'])}</li>" for w in sm.get("who", []))
-    faq = "".join(f"<details><summary>{e(q['q'])}</summary><p>{e(q['a'])}</p></details>" for q in sm.get("faq", []))
-    unk = "".join(f"<li>{e(x)}</li>" for x in sm.get("unknowns", []))
-    src = "".join(f'<li><a href="{e(x["url"])}">{e(x["title"])}</a></li>' for x in sm.get("sources", []))
+    calc = "".join(f"<p>{e(x)}</p>" for x in sm_.get("numbers", []))
+    why = "".join(f"<p>{e(x)}</p>" for x in sm_.get("why", []))
+    who = "".join(f"<li><b>{e(w['name'])}</b>：{e(w['desc'])}</li>" for w in sm_.get("who", []))
+    faq = "".join(f"<details><summary>{e(q['q'])}</summary><p>{e(q['a'])}</p></details>" for q in sm_.get("faq", []))
+    unk = "".join(f"<li>{e(x)}</li>" for x in sm_.get("unknowns", []))
+    src = "".join(f'<li><a href="{e(x["url"])}">{e(x["title"])}</a></li>' for x in sm_.get("sources", []))
+    vfile = load_json(DATA / "votes" / f"{s['key']}.json")
+    if vfile:
+        src += f'<li><a href="{e(vfile["source"]["pdf"])}">{e(vfile["source"]["title"])}（審議結果）</a></li>'
+    t = tags_for(item_text(it, sm))
+    tags = "".join(f'<span class="tag">{e(f)}</span>' for f in t["fields"]) + "".join(f'<span class="tag">📍{e(a)}</span>' for a in t["areas"])
+    if sm:
+        explain = f"""<div class="toggle"><button type="button" id="b-easy" aria-pressed="true">やさしく</button><button type="button" id="b-detail" aria-pressed="false">詳しく</button></div>
+<div class="ai">この説明はAIが市の資料から自動で作ったもので、人は確認していません。</div>"""
+    else:
+        explain = '<div class="ai">この議案のわかりやすい説明はまだありません。件名と賛否、討論だけを載せています。</div>'
     body = f"""
-<div class="meta">{badge(it['result'])}<span class="tag">{e(s['name'])}</span><span class="tag">{e(KIND_LABEL.get(it['kind'], it['kind']))}</span>{"".join(f'<span class="tag">{e(f)}</span>' for f in tags_for(item_text(it, sm))["fields"])}{"".join(f'<span class="tag">📍{e(a)}</span>' for a in tags_for(item_text(it, sm))["areas"])}</div>
-<h1 class="easy">{e(sm['headline'])}</h1><h1 class="detail">{e(sm.get('headline_detail') or sm['headline'])}</h1>
+<div class="meta">{badge(it['result'])}<span class="tag">{e(s['name'])}</span><span class="tag">{e(KIND_LABEL.get(it['kind'], it['kind']))}</span>{tags}</div>
+<h1 class="easy">{e(headline)}</h1><h1 class="detail">{e(sm_.get('headline_detail') or headline)}</h1>
 <p class="formal">正式名称：{e(it['label'])} {e(it['title'])}</p>
-<div class="toggle"><button type="button" id="b-easy" aria-pressed="true">やさしく</button><button type="button" id="b-detail" aria-pressed="false">詳しく</button></div>
-<div class="ai">この説明はAIが市の資料から自動で作ったもので、人は確認していません。</div>
-<section>{h2('審議のステータス','Status')}<div class="steps"><div class="step done">市が提出</div><div class="step done">委員会で審査</div><div class="step done">本会議で{e(it['result'] or '報告')}</div></div></section>
+{explain}
+<section>{h2('審議のステータス','Status')}<div class="steps"><div class="step done">提出</div><div class="step done">委員会で審査</div><div class="step done">本会議で{e(it['result'] or '報告')}</div></div></section>
 {render_votes(s, it)}
-<section>{h2('何が決まったの？','What was decided')}{pts}</section>
+{render_debates(s, it)}
+{f'<section>{h2('何が決まったの？','What was decided')}{pts}</section>' if pts else ''}
 {f'<section>{h2('数字で見ると','In numbers')}{calc}</section>' if calc else ''}
 {f'<section>{h2('なぜ必要なの？（市の説明）','Why')}{why}</section>' if why else ''}
 {f'<section>{h2('だれに関係する？','Who is affected')}<ul>{who}</ul></section>' if who else ''}
 {f'<section>{h2('よくある質問','FAQ')}{faq}</section>' if faq else ''}
 {f'<section>{h2('資料からは分からないこと','Not in the documents')}<ul>{unk}</ul></section>' if unk else ''}
-<section>{h2('元の資料','Sources')}<ul>{src}<li><a href="{e(s['source'])}">平塚市議会 議決結果のページ</a></li></ul></section>
+<section>{h2('元の資料','Sources')}<ul>{src}<li><a href="{e(s['source'])}">平塚市議会のページ</a></li></ul></section>
 <p style="margin-top:14px"><a href="../s/{e(s['key'])}.html">← {e(s['name'])}の一覧に戻る</a></p>"""
     slug = f'{s["key"]}-{bill_slug(it["id"])}'
     vf, v = votes_for(s["key"], it["id"])
     meta = f'{s["name"]}・{it["label"]}' + (f'・{vote_headline(vf, v, it["result"])}' if v else f'・{it["result"] or ""}')
-    ogp.make(OUT / "og" / "b" / f"{slug}.png", sm["headline"], meta, it["result"] or "")
+    ogp.make(OUT / "og" / "b" / f"{slug}.png", headline, meta, it["result"] or "")
     share_url = f"{SITE_URL}/b/{slug}.html"
     from urllib.parse import quote
     body += f"""<section>{h2('共有する', 'Share')}<div class="chips">
-<a class="chip" href="https://x.com/intent/post?text={quote(sm['headline'])}&url={quote(share_url)}">Xで共有</a>
+<a class="chip" href="https://x.com/intent/post?text={quote(headline)}&url={quote(share_url)}">Xで共有</a>
 <a class="chip" href="https://social-plugins.line.me/lineit/share?url={quote(share_url)}">LINEで送る</a></div></section>"""
-    return page(sm["headline"], body, depth=1, desc=meta, path=f"b/{slug}.html", og=f"og/b/{slug}.png")
+    return page(headline, body, depth=1, desc=meta, path=f"b/{slug}.html", og=f"og/b/{slug}.png")
 
 
 def render_session(s: dict) -> str:
@@ -280,15 +327,14 @@ def render_session(s: dict) -> str:
         rows = ""
         for it in items:
             sp = summary_path(s["key"], it["id"])
-            if sp.exists():
-                sm = json.loads(sp.read_text(encoding="utf-8"))
-                t = f'<a href="../b/{s["key"]}-{bill_slug(it["id"])}.html">{e(sm["headline"])}</a>'
-            else:
-                t = e(it["title"])
+            sm = load_json(sp)
+            t = f'<a class="t" href="../b/{s["key"]}-{bill_slug(it["id"])}.html">{e(sm["headline"] if sm else it["title"])}</a>'
             vf, v = votes_for(s["key"], it["id"])
             vs = f'<span class="no">{e(vote_summary(vf, v))}</span>' if v else ""
+            nd = len(debates_for(s, it)[1])
+            vs += f'<span class="no">討論 {nd}人</span>' if nd else ""
             vs += tag_html(tags_for(item_text(it, load_json(sp))))
-            rows += f'<div class="item">{badge(it["result"])}<div><span class="no">{e(it["label"])}</span><span class="t">{t}</span>{vs}</div></div>'
+            rows += f'<div class="item">{badge(it["result"])}<div><span class="no">{e(it["label"])}</span>{t}{vs}</div></div>'
         groups += f"<section>{h2(KIND_LABEL.get(kind, kind) + f'（{len(items)}件）', KIND_EN.get(kind, ''))}{rows}</section>"
     pdfs = "".join(f'<li><a href="{e(p["url"])}">{e(p["title"])}</a></li>' for p in s.get("pdfs", []))
     vf = load_json(DATA / "votes" / f"{s['key']}.json")
@@ -313,7 +359,7 @@ def build_search_index(sessions: list[dict]) -> list[dict]:
             out.append({"s": s["name"], "k": s["key"], "l": it["label"], "t": it["title"],
                         "h": sm["headline"] if sm else "", "r": it["result"] or "",
                         "v": vote_summary(vf, v) if v else "", "f": t["fields"], "a": t["areas"],
-                        "u": f'b/{s["key"]}-{bill_slug(it["id"])}.html' if sm else f's/{s["key"]}.html'})
+                        "u": f'b/{s["key"]}-{bill_slug(it["id"])}.html'})
     return out
 
 
@@ -418,10 +464,8 @@ def main():
     for s in sessions:
         (OUT / "s" / f"{s['key']}.html").write_text(render_session(s), encoding="utf-8")
         for it in s["items"]:
-            sp = summary_path(s["key"], it["id"])
-            if sp.exists():
-                sm = json.loads(sp.read_text(encoding="utf-8"))
-                (OUT / "b" / f"{s['key']}-{bill_slug(it['id'])}.html").write_text(render_bill(s, it, sm), encoding="utf-8")
+            sm = load_json(summary_path(s["key"], it["id"]))
+            (OUT / "b" / f"{s['key']}-{bill_slug(it['id'])}.html").write_text(render_bill(s, it, sm), encoding="utf-8")
     (OUT / "index.html").write_text(render_index(sessions, last), encoding="utf-8")
     (OUT / "about.html").write_text(render_about(), encoding="utf-8")
     (OUT / "feed.xml").write_text(render_feed(sessions), encoding="utf-8")

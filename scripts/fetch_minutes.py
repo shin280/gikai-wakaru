@@ -27,11 +27,11 @@ def get(url: str) -> str:
     for _ in range(3):
         r = S.get(url, timeout=60)
         if r.status_code == 429:
-            time.sleep(int(r.headers.get("Retry-After") or 60))
+            time.sleep(int(r.headers.get("Retry-After") or 120))
             continue
         r.raise_for_status()
         r.encoding = r.apparent_encoding
-        time.sleep(3)  # 相手のサーバーに負担をかけない
+        time.sleep(10)  # 相手のサーバーに負担をかけない（短い間隔だと429になる）
         return r.text
     raise RuntimeError(f"429が続きました: {url}")
 
@@ -43,12 +43,16 @@ def nz(s):
 def main() -> int:
     OUT.mkdir(parents=True, exist_ok=True)
     get(BASE)  # 最初の1回は429になりやすいので、ここで待つ
+    done = 0
     for sp in sorted((ROOT / "data" / "sessions").glob("*.json"), reverse=True):
         sess = json.loads(sp.read_text(encoding="utf-8"))
         key, y, m = sess["key"], sess["year"], sess["month"]
         d = OUT / key
         if (d / "index.json").exists():
             continue  # 取得済み
+        if done >= 2:
+            break  # 1回の実行で2定例会まで。残りは翌日以降に少しずつ取る
+        done += 1
         reiwa = y - 2018
         start = f"{y if m > 1 else y - 1}-{(m - 1) or 12:02d}-01"
         end = f"{y}-{m:02d}-{calendar.monthrange(y, m)[1]}"
@@ -72,6 +76,7 @@ def main() -> int:
             mm = re.search(r"第(\d+)日", doc["title"])
             return int(mm.group(1)) if mm else 0
         last = max(docs, key=day)
+        last["url"] = re.sub(r"dbsr\.jp/\d+\?", "dbsr.jp/100000?", last["url"])  # 検索ごとに変わる番号を固定する
         html = get(last["url"])
         (d / "last_day.html").write_text(html, encoding="utf-8")
         (d / "index.json").write_text(json.dumps({"last_day": last, "docs": docs}, ensure_ascii=False, indent=1), encoding="utf-8")
