@@ -36,6 +36,14 @@ jobs:
           python scripts/fetch_dayori.py
           python scripts/parse_dayori.py
 
+      - name: AIが議案書を読んで説明を書く（APIキーがあるときだけ）
+        continue-on-error: true
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          pip install -q anthropic pypdf
+          python scripts/summarize.py
+
       - name: 会派の所属議員を取得
         continue-on-error: true
         run: python scripts/fetch_members.py
