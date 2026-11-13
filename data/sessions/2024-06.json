@@ -1,0 +1,28 @@
+{
+  "key": "2024-06",
+  "name": "令和6年6月定例会",
+  "year": 2024,
+  "month": 6,
+  "source": "https://www.city.hiratsuka.kanagawa.jp/gikai/page-c_02370.html",
+  "pdfs": [],
+  "items": [
+    {
+      "id": "議案55",
+      "kind": "議案",
+      "number": 55,
+      "sub": null,
+      "label": "議案第55号",
+      "title": "人権擁護委員の推薦について",
+      "result": "同意"
+    },
+    {
+      "id": "議案2",
+      "kind": "議案",
+      "number": 2,
+      "sub": null,
+      "label": "議案第2号",
+      "title": "数改善と教育予算          ○4の増額、義務教育          欠1",
+      "result": "可決"
+    }
+  ]
+}
