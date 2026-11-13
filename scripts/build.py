@@ -166,23 +166,38 @@ def members_of(group: dict) -> list[str]:
     return []
 
 
+def members_match(vf: dict) -> bool:
+    """採決の時の会派構成（議会だよりの凡例の人数）が、今の会派構成のページと一致するか。"""
+    members_of({"name": ""})  # MEMBERS を読み込む
+    cur = {g["name"]: len(g["members"]) for g in MEMBERS["groups"] if not g.get("independent")}
+    indep = {m["name"].replace(" ", "") for g in MEMBERS["groups"] if g.get("independent") for m in g["members"]}
+    for g in vf["groups"]:
+        if g.get("independent"):
+            if g["name"].replace(" ", "") not in indep:
+                return False
+        elif cur.get(g["name"]) != g["count"]:
+            return False
+    return True
+
+
 def render_votes(s: dict, it: dict) -> str:
     vf, v = votes_for(s["key"], it["id"])
     if not v:
         return ""
+    show_members = members_match(vf)
     rows = ""
     for g in vf["groups"]:
         if g["abbr"] not in v:
             continue
         word = vote_word(v[g["abbr"]])
         cls = "ng" if "反対" in v[g["abbr"]] else ""
-        mem = "、".join(members_of(g)) if not g.get("independent") else "無所属"
+        mem = ("、".join(members_of(g)) if show_members else "") if not g.get("independent") else "無所属"
         label = f'{e(g["name"])}（{g["count"]}名）' if not g.get("independent") else e(g["name"])
         rows += f'<div class="item"><span class="badge {cls}">{e(word)}</span><div><span class="t">{label}</span><span class="no">{e(mem)}</span></div></div>'
     mu = (MEMBERS or {}).get("updated") or ""
     src = vf["source"]
     return f"""<section>{h2('会派ごとの賛否', 'Votes')}<p><b>{e(vote_headline(vf, v, it['result']))}</b></p>{rows}
-<p class="muted">賛否は「{e(src['title'])}」の審議結果一覧によります。所属議員は市議会の会派構成のページ（{e(mu)}時点）によるもので、採決のときと違う場合があります。</p></section>"""
+<p class="muted">賛否は「{e(src['title'])}」の審議結果一覧によります。{f"所属議員は市議会の会派構成のページ（{e(mu)}時点）によります。会派の人数は議会だよりの記載と一致していますが、採決のときと違う場合があります。" if show_members else "この定例会のときの会派構成は今と違うため、所属議員の名前は載せていません。"}</p></section>"""
 
 
 def load_sessions() -> list[dict]:

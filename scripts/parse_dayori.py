@@ -43,13 +43,14 @@ def parse_vote(cell: str) -> dict:
 
 
 def legend(text: str) -> list[dict]:
+    """「清……清風クラブ（８名）」「Ａ……佐藤由美子（無所属）」の凡例を読む。名前の中の空白は詰める。"""
     t = nz(text)
     out = []
-    for abbr, name, count in re.findall(r"(\S)\s*(?:…|\.)+\s*([^\s（(]+)\s*[（(](\d+名|無所属)[)）]", t):
+    pat = r"(\S)\s*(?:…|\.){2,}\s*([^（(\n]+?)\s*[（(]\s*(?:(\d+)\s*名|(無所属))\s*[)）]"
+    for abbr, name, count, indep in re.findall(pat, t):
+        name = re.sub(r"\s+", "", name)
         if all(o["abbr"] != abbr for o in out):
-            out.append({"abbr": abbr, "name": name,
-                        "count": int(count[:-1]) if count.endswith("名") else 1,
-                        "independent": count == "無所属"})
+            out.append({"abbr": abbr, "name": name, "count": int(count) if count else 1, "independent": bool(indep)})
     return out
 
 
@@ -106,6 +107,18 @@ def parse_text(text: str, abbrs: list[str]) -> tuple[list[dict], dict]:
     return items, votes
 
 
+def abbrs_from_text(text: str) -> list[str]:
+    """「件 名  結果  清 公 湘 …」の見出し行から会派の略称を並び順どおりに取る。"""
+    for l in text.split("\n"):
+        n = nz(l)
+        m = re.search(r"結果((?:\s+\S)+)", n)
+        if m:
+            toks = m.group(1).split()
+            if len(toks) >= 5 and all(len(t) == 1 for t in toks):
+                return toks
+    return []
+
+
 def session_key(title: str) -> tuple[str, str, int, int] | None:
     m = re.search(r"令和\s*(\d+)\s*年\s*(\d+)\s*月(定例会|臨時会)", nz(title))
     if not m:
@@ -154,9 +167,11 @@ def main():
                               "label": f"{k}第{num}号" + (f"ー{sub}" if sub else ""), "title": title, "result": res})
                 if abbrs and kind != "請願":
                     votes[iid] = {a: parse_vote(row[3 + i] or "") for i, a in enumerate(abbrs) if 3 + i < len(row)}
-        if broken and abbrs_seen:
+        if not abbrs_seen:
+            abbrs_seen = abbrs_from_text(text)
+        if (broken or not votes) and abbrs_seen:
             t_items, t_votes = parse_text(text, abbrs_seen)
-            if t_items:
+            if t_items and len([i for i in t_items if i["kind"] == "議案"]) >= len([i for i in items if i["kind"] == "議案"]):
                 print(f"第{iss['no']}号: 表がくずれていたので、テキストから{len(t_items)}件を読みました")
                 petitions = [i for i in items if i["kind"] == "請願"]
                 # 請願は表から（件名が「請願」で終わる行）。賛否は載っていない
@@ -179,6 +194,14 @@ def main():
                                     it["title"] = re.sub(r"\s+", "", nz(row[1]))
                 items, votes = t_items + petitions, t_votes
         if not votes:
+            continue
+        abbr_set = {g["abbr"] for g in leg}
+        gian = [i for i in items if i["kind"] == "議案"]
+        ok = (len(leg) >= 5 and len(gian) >= 5 and all(i["title"] for i in gian)
+              and all(set(v) == abbr_set for v in votes.values()))
+        if not ok:
+            print(f"第{iss['no']}号（{key}）: 読み取り結果が信頼できないので保存しません"
+                  f"（凡例{len(leg)}・議案{len(gian)}件・会派の一致{all(set(v) == abbr_set for v in votes.values())}）")
             continue
         rec = {"key": key, "source": {"title": iss["title"], "page": iss["page"], "pdf": iss["pdf"]},
                "groups": leg, "votes": votes}
