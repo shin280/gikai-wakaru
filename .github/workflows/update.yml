@@ -44,9 +44,9 @@ jobs:
           pip install -q anthropic pypdf
           python scripts/summarize.py
 
-      - name: 会議録システムの形を調べる（調査用・一時的）
+      - name: 会議録（最終日の本会議）を取得
         continue-on-error: true
-        run: python scripts/probe_minutes.py
+        run: python scripts/fetch_minutes.py
 
       - name: 会派の所属議員を取得
         continue-on-error: true
