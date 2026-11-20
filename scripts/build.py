@@ -102,7 +102,7 @@ footer{font-size:12px;color:var(--sub);margin-top:36px;padding-top:20px;border-t
 .card .no{display:block;font-size:12px;color:var(--sub);margin:8px 0 2px}.card .h{font-weight:700;line-height:1.6}.card .amt{display:block;margin-top:8px;font-weight:700;color:var(--red-d)}
 .fbtns{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:8px 0 10px}@media(min-width:640px){.fbtns{grid-template-columns:repeat(3,1fr)}}
 .fbtn{font:inherit;font-size:14px;font-weight:700;background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px 10px;text-align:left;cursor:pointer;color:var(--ink)}
-.fbtn i{font-style:normal;margin-right:6px}.fbtn.on{background:var(--red);border-color:var(--red);color:#fff}
+.fbtn::before{content:"";display:inline-block;width:12px;height:4px;margin-right:8px;vertical-align:middle;background:var(--grad);transform:skewX(-30deg)}.fbtn.on::before{background:#fff}.fbtn.on{background:var(--red);border-color:var(--red);color:#fff}
 .onlybox{display:flex;align-items:center;gap:8px;font-size:13px;margin:10px 0 0;cursor:pointer}.onlybox input{width:18px;height:18px;accent-color:var(--red)}
 body.onlysm .nosm{display:none}
 .bar{height:6px;background:#eee;border-radius:99px;overflow:hidden;margin-top:6px}.bar i{display:block;height:100%;background:var(--grad)}
@@ -110,8 +110,8 @@ body.onlysm .nosm{display:none}
 .terms dd.src{font-size:12px;color:var(--sub)}
 .pn{display:flex;justify-content:space-between;gap:10px;margin-top:16px;font-size:13px}.pn a{text-decoration:none}
 nav.bn{position:fixed;left:0;right:0;bottom:0;background:#fff;box-shadow:0 -1px 0 rgba(0,0,0,.06);display:flex;z-index:9;padding-bottom:env(safe-area-inset-bottom)}
-nav.bn a{flex:1;text-align:center;font-size:11px;color:var(--ink);text-decoration:none;padding:8px 0 7px;line-height:1.3}nav.bn a i{display:block;font-style:normal;font-size:18px}
-body{padding-bottom:64px}
+nav.bn a{flex:1;text-align:center;font-size:13px;font-weight:700;color:var(--ink);text-decoration:none;padding:16px 0 14px;line-height:1.2;position:relative;letter-spacing:.08em}nav.bn a::before{content:"";position:absolute;top:6px;left:50%;width:18px;height:3px;margin-left:-9px;background:var(--grad);transform:skewX(-30deg)}
+body{padding-bottom:60px}
 """
 
 TOGGLE_JS = """<script>
@@ -142,7 +142,7 @@ def page(title: str, body: str, depth: int = 0, desc: str = "", path: str = "", 
 <footer><p><b>運営：元島しん</b>（平塚市議会議員・しらさぎ・無所属クラブ所属）。会派ごとの賛否は、すべての会派を同じ形で、議会だよりの記載のとおりに載せています。<a href="{root}about.html">このサイトについて</a></p><p>このサイトは、平塚市が公開している資料をもとに、プログラムとAIが自動で作っています。人による確認はしていないため、間違いが含まれる可能性があります。大事な判断の前には、各ページの「元の資料」で必ず確かめてください。</p>
 <p><a href="{report}">間違いを報告する</a> ・ <a href="https://github.com/{REPO}">このサイトのしくみ（GitHub）</a></p></footer>
 </main>
-<nav class="bn"><a href="{root}index.html"><i>🏠</i>ホーム</a><a href="{root}index.html#q"><i>🔍</i>探す</a><a href="{root}index.html#sessions"><i>📅</i>定例会</a><a href="{root}yogo.html"><i>📖</i>用語</a></nav>{TOGGLE_JS}</body></html>
+<nav class="bn"><a href="{root}index.html">ホーム</a><a href="{root}index.html#find">探す</a><a href="{root}index.html#sessions">定例会</a><a href="{root}yogo.html">用語</a></nav>{TOGGLE_JS}</body></html>
 """
 
 
@@ -268,7 +268,7 @@ def item_text(it: dict, sm: dict | None) -> str:
 
 
 def tag_html(t: dict) -> str:
-    xs = [f"<span>{e(f)}</span>" for f in t["fields"]] + [f"<span>📍{e(a)}</span>" for a in t["areas"]]
+    xs = [f"<span>{e(f)}</span>" for f in t["fields"]] + [f"<span>地域：{e(a)}</span>" for a in t["areas"]]
     return f'<span class="tg">{"".join(xs)}</span>' if xs else ""
 
 
@@ -388,7 +388,7 @@ def render_bill(s: dict, it: dict, sm: dict | None) -> str:
     if vfile:
         src += f'<li><a href="{e(vfile["source"]["pdf"])}">{e(vfile["source"]["title"])}（審議結果）</a></li>'
     t = tags_for(item_text(it, sm))
-    tags = "".join(f'<span class="tag">{e(f)}</span>' for f in t["fields"]) + "".join(f'<span class="tag">📍{e(a)}</span>' for a in t["areas"])
+    tags = "".join(f'<span class="tag">{e(f)}</span>' for f in t["fields"]) + "".join(f'<span class="tag">地域：{e(a)}</span>' for a in t["areas"])
     if sm:
         explain = f"""<div class="toggle"><button type="button" id="b-easy" aria-pressed="true">やさしく</button><button type="button" id="b-detail" aria-pressed="false">詳しく</button></div>
 <div class="ai">この説明はAIが市の資料から自動で作ったもので、人は確認していません。</div>"""
@@ -529,9 +529,8 @@ def render_index(sessions: list[dict], last_checked: str) -> str:
     idx = build_search_index(sessions)
     fields = [f for f in __import__("tags").FIELDS if any(f in d["f"] for d in idx)]
     areas = sorted({a for d in idx for a in d["a"]})
-    ICONS = {'子育て・教育': '🧒', '福祉・医療': '🏥', '防災・消防': '🚒', 'まちづくり・道路': '🛣️', '環境・ごみ': '♻️', '産業・農業': '🌾', '施設・工事': '🏗️', '予算・決算': '💴', '人事・表彰': '🧑\u200d💼', '議会・行政のしくみ': '🏛️'}
-    chips = "".join(f'<button type="button" class="fbtn" data-f="{e(f)}"><i>{ICONS.get(f, "・")}</i>{e(f)}</button>' for f in fields)
-    achips = "".join(f'<button type="button" class="chip area" data-f="{e(a)}">📍{e(a)}</button>' for a in areas)
+    chips = "".join(f'<button type="button" class="fbtn" data-f="{e(f)}">{e(f)}</button>' for f in fields)
+    achips = "".join(f'<button type="button" class="chip area" data-f="{e(a)}">{e(a)}</button>' for a in areas)
     total = sum(len(x["items"]) for x in sessions)
     explained = sum(1 for x in sessions for i in x["items"] if summary_path(x["key"], i["id"]).exists())
     body = f"""<div class="hero"><div class="kw"><span>予算</span><span>条例</span><span>請願</span><span>会派ごとの賛否</span></div>
@@ -546,7 +545,7 @@ def render_index(sessions: list[dict], last_checked: str) -> str:
 <div id="latest">
 {f'<section>{h2('最近決まったこと','Latest')}<div class="cards">{cards}</div>{more}</section>' if cards else ''}
 <section id="sessions">{h2('定例会ごとの一覧','Sessions')}{rows or '<p>まだデータがありません。</p>'}</section>
-<p class="muted"><a href="yogo.html">📖 議会の言葉の説明（用語集）</a></p>
+<p class="muted"><a href="yogo.html">議会の言葉の説明（用語集）</a></p>
 </div>
 <p class="muted">最終確認：{e(last_checked)}</p>{SEARCH_JS}"""
     (OUT / "search.json").write_text(json.dumps(idx, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
