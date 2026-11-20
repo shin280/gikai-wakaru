@@ -1,0 +1,23 @@
+{
+  "headline": "開発で市に引き渡された道路など13路線を市道に認定",
+  "points": [
+    {
+      "title": "市道路線の認定について",
+      "easy": "開発行為によって市のものになった道路など13路線を、新しく市道として認定します。",
+      "detail": "市道路線の認定について。開発行為により市に帰属した道路等13路線。道路法第8条。"
+    }
+  ],
+  "unknowns": [
+    "路線の場所"
+  ],
+  "sources": [
+    {
+      "title": "平塚市 8月定例市長記者会見「令和7年9月市議会定例会の提出案件」",
+      "url": "https://www.city.hiratsuka.kanagawa.jp/press/page02_e00001_02998.html"
+    },
+    {
+      "title": "平塚市議会 令和7年の議決状況",
+      "url": "https://www.city.hiratsuka.kanagawa.jp/gikai/page-c_02373.html"
+    }
+  ]
+}

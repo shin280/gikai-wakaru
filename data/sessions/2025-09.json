@@ -1,0 +1,289 @@
+{
+  "key": "2025-09",
+  "name": "令和7年9月定例会",
+  "year": 2025,
+  "month": 9,
+  "source": "https://www.city.hiratsuka.kanagawa.jp/gikai/page-c_02373.html",
+  "pdfs": [],
+  "items": [
+    {
+      "id": "認1",
+      "kind": "認",
+      "number": 1,
+      "sub": null,
+      "label": "認第1号",
+      "title": "決算の認定について〔令和6年度平塚市一般会計・特別会計決算〕",
+      "result": "認定"
+    },
+    {
+      "id": "認2",
+      "kind": "認",
+      "number": 2,
+      "sub": null,
+      "label": "認第2号",
+      "title": "決算の認定について〔令和6年度平塚市病院事業決算〕",
+      "result": "認定"
+    },
+    {
+      "id": "認3",
+      "kind": "認",
+      "number": 3,
+      "sub": null,
+      "label": "認第3号",
+      "title": "決算の認定について〔令和6年度平塚市下水道事業決算〕",
+      "result": "認定"
+    },
+    {
+      "id": "議案52",
+      "kind": "議案",
+      "number": 52,
+      "sub": null,
+      "label": "議案第52号",
+      "title": "平塚市旅費支給条例",
+      "result": "可決"
+    },
+    {
+      "id": "議案53",
+      "kind": "議案",
+      "number": 53,
+      "sub": null,
+      "label": "議案第53号",
+      "title": "平塚市一般職員の勤務時間及び休暇等に関する条例の一部を改正する条例",
+      "result": "可決"
+    },
+    {
+      "id": "議案54",
+      "kind": "議案",
+      "number": 54,
+      "sub": null,
+      "label": "議案第54号",
+      "title": "平塚市職員の育児休業等に関する条例の一部を改正する条例",
+      "result": "可決"
+    },
+    {
+      "id": "議案55",
+      "kind": "議案",
+      "number": 55,
+      "sub": null,
+      "label": "議案第55号",
+      "title": "旭地区第2次住居表示整備事業の実施に伴う関係条例の整理に関する条例",
+      "result": "可決"
+    },
+    {
+      "id": "議案56",
+      "kind": "議案",
+      "number": 56,
+      "sub": null,
+      "label": "議案第56号",
+      "title": "平塚市民病院職員の給与の種類及び基準に関する条例の一部を改正する条例",
+      "result": "可決"
+    },
+    {
+      "id": "議案57",
+      "kind": "議案",
+      "number": 57,
+      "sub": null,
+      "label": "議案第57号",
+      "title": "工事請負契約の締結について〔（仮称）土沢認定こども園新築工事（建築）〕",
+      "result": "可決"
+    },
+    {
+      "id": "議案58",
+      "kind": "議案",
+      "number": 58,
+      "sub": null,
+      "label": "議案第58号",
+      "title": "工事請負変更契約の締結について〔なぎさふれあいセンター改修工事（建築）〕",
+      "result": "可決"
+    },
+    {
+      "id": "議案59",
+      "kind": "議案",
+      "number": 59,
+      "sub": null,
+      "label": "議案第59号",
+      "title": "工事請負変更契約の締結について〔なぎさふれあいセンター改修工事（電気）〕",
+      "result": "可決"
+    },
+    {
+      "id": "議案60",
+      "kind": "議案",
+      "number": 60,
+      "sub": null,
+      "label": "議案第60号",
+      "title": "工事請負変更契約の締結について〔なぎさふれあいセンター改修工事（機械）〕",
+      "result": "可決"
+    },
+    {
+      "id": "議案61",
+      "kind": "議案",
+      "number": 61,
+      "sub": null,
+      "label": "議案第61号",
+      "title": "工事請負変更契約の締結について〔平塚市保健センターGHP空調機修繕〕",
+      "result": "可決"
+    },
+    {
+      "id": "議案62",
+      "kind": "議案",
+      "number": 62,
+      "sub": null,
+      "label": "議案第62号",
+      "title": "物品購入契約の締結について",
+      "result": "可決"
+    },
+    {
+      "id": "議案63",
+      "kind": "議案",
+      "number": 63,
+      "sub": null,
+      "label": "議案第63号",
+      "title": "特定公園施設等譲渡変更契約の締結について",
+      "result": "可決"
+    },
+    {
+      "id": "議案64",
+      "kind": "議案",
+      "number": 64,
+      "sub": null,
+      "label": "議案第64号",
+      "title": "施設整備変更契約の締結について",
+      "result": "可決"
+    },
+    {
+      "id": "議案65",
+      "kind": "議案",
+      "number": 65,
+      "sub": null,
+      "label": "議案第65号",
+      "title": "市道路線の認定について",
+      "result": "可決"
+    },
+    {
+      "id": "議案66",
+      "kind": "議案",
+      "number": 66,
+      "sub": null,
+      "label": "議案第66号",
+      "title": "利益の処分について",
+      "result": "可決"
+    },
+    {
+      "id": "議案67",
+      "kind": "議案",
+      "number": 67,
+      "sub": null,
+      "label": "議案第67号",
+      "title": "令和7年度平塚市一般会計補正予算",
+      "result": "可決"
+    },
+    {
+      "id": "議案68",
+      "kind": "議案",
+      "number": 68,
+      "sub": null,
+      "label": "議案第68号",
+      "title": "令和7年度平塚市水産物地方卸売市場事業特別会計補正予算",
+      "result": "可決"
+    },
+    {
+      "id": "議案69",
+      "kind": "議案",
+      "number": 69,
+      "sub": null,
+      "label": "議案第69号",
+      "title": "令和7年度平塚市介護保険事業特別会計補正予算",
+      "result": "可決"
+    },
+    {
+      "id": "議案70",
+      "kind": "議案",
+      "number": 70,
+      "sub": null,
+      "label": "議案第70号",
+      "title": "教育長の任命について",
+      "result": "同意"
+    },
+    {
+      "id": "議案71",
+      "kind": "議案",
+      "number": 71,
+      "sub": null,
+      "label": "議案第71号",
+      "title": "教育委員会委員の任命について",
+      "result": "同意"
+    },
+    {
+      "id": "議案72",
+      "kind": "議案",
+      "number": 72,
+      "sub": null,
+      "label": "議案第72号",
+      "title": "公平委員会委員の選任について",
+      "result": "同意"
+    },
+    {
+      "id": "議案73",
+      "kind": "議案",
+      "number": 73,
+      "sub": null,
+      "label": "議案第73号",
+      "title": "固定資産評価審査委員会委員の選任について",
+      "result": "同意"
+    },
+    {
+      "id": "議案74",
+      "kind": "議案",
+      "number": 74,
+      "sub": null,
+      "label": "議案第74号",
+      "title": "人権擁護委員の推薦について",
+      "result": "同意"
+    },
+    {
+      "id": "報告8",
+      "kind": "報告",
+      "number": 8,
+      "sub": null,
+      "label": "報告第8号",
+      "title": "継続費の精算報告について",
+      "result": null
+    },
+    {
+      "id": "報告9",
+      "kind": "報告",
+      "number": 9,
+      "sub": null,
+      "label": "報告第9号",
+      "title": "健全化判断比率について",
+      "result": null
+    },
+    {
+      "id": "報告10",
+      "kind": "報告",
+      "number": 10,
+      "sub": null,
+      "label": "報告第10号",
+      "title": "公営企業の資金不足比率について",
+      "result": null
+    },
+    {
+      "id": "報告11",
+      "kind": "報告",
+      "number": 11,
+      "sub": null,
+      "label": "報告第11号",
+      "title": "専決処分の報告について",
+      "result": null
+    },
+    {
+      "id": "請願2",
+      "kind": "請願",
+      "number": 2,
+      "sub": null,
+      "label": "請願第2号",
+      "title": "「日米地位協定の抜本改定を求める意見書」を国に提出することを求める請願",
+      "result": "不採択"
+    }
+  ]
+}

@@ -1,0 +1,181 @@
+{
+  "key": "2025-06",
+  "name": "令和7年6月定例会",
+  "year": 2025,
+  "month": 6,
+  "source": "https://www.city.hiratsuka.kanagawa.jp/gikai/page-c_02373.html",
+  "pdfs": [],
+  "items": [
+    {
+      "id": "議案43",
+      "kind": "議案",
+      "number": 43,
+      "sub": null,
+      "label": "議案第43号",
+      "title": "功労者の表彰について",
+      "result": "可決"
+    },
+    {
+      "id": "議案44",
+      "kind": "議案",
+      "number": 44,
+      "sub": null,
+      "label": "議案第44号",
+      "title": "功労者の表彰について",
+      "result": "可決"
+    },
+    {
+      "id": "議案45",
+      "kind": "議案",
+      "number": 45,
+      "sub": null,
+      "label": "議案第45号",
+      "title": "功労者の表彰について",
+      "result": "可決"
+    },
+    {
+      "id": "議案46",
+      "kind": "議案",
+      "number": 46,
+      "sub": null,
+      "label": "議案第46号",
+      "title": "功労者の表彰について",
+      "result": "可決"
+    },
+    {
+      "id": "議案47",
+      "kind": "議案",
+      "number": 47,
+      "sub": null,
+      "label": "議案第47号",
+      "title": "平塚市市税条例の一部を改正する条例",
+      "result": "可決"
+    },
+    {
+      "id": "議案48",
+      "kind": "議案",
+      "number": 48,
+      "sub": null,
+      "label": "議案第48号",
+      "title": "令和7年度平塚市一般会計補正予算",
+      "result": "可決"
+    },
+    {
+      "id": "議案49",
+      "kind": "議案",
+      "number": 49,
+      "sub": null,
+      "label": "議案第49号",
+      "title": "令和7年度平塚市国民健康保険事業特別会計補正予算",
+      "result": "可決"
+    },
+    {
+      "id": "議案50",
+      "kind": "議案",
+      "number": 50,
+      "sub": null,
+      "label": "議案第50号",
+      "title": "令和7年度平塚市介護保険事業特別会計補正予算",
+      "result": "可決"
+    },
+    {
+      "id": "議案51",
+      "kind": "議案",
+      "number": 51,
+      "sub": null,
+      "label": "議案第51号",
+      "title": "人権擁護委員の推薦について",
+      "result": "同意"
+    },
+    {
+      "id": "報告3",
+      "kind": "報告",
+      "number": 3,
+      "sub": null,
+      "label": "報告第3号",
+      "title": "継続費の逓次繰越しの報告について",
+      "result": null
+    },
+    {
+      "id": "報告4",
+      "kind": "報告",
+      "number": 4,
+      "sub": null,
+      "label": "報告第4号",
+      "title": "繰越明許費の繰越しの報告について",
+      "result": null
+    },
+    {
+      "id": "報告5",
+      "kind": "報告",
+      "number": 5,
+      "sub": null,
+      "label": "報告第5号",
+      "title": "公営企業会計予算繰越しの報告について",
+      "result": null
+    },
+    {
+      "id": "報告6",
+      "kind": "報告",
+      "number": 6,
+      "sub": null,
+      "label": "報告第6号",
+      "title": "公益財団法人平塚市まちづくり財団の経営状況について",
+      "result": null
+    },
+    {
+      "id": "報告7",
+      "kind": "報告",
+      "number": 7,
+      "sub": null,
+      "label": "報告第7号",
+      "title": "公益財団法人平塚市生きがい事業団の経営状況について",
+      "result": null
+    },
+    {
+      "id": "会議案3",
+      "kind": "会議案",
+      "number": 3,
+      "sub": null,
+      "label": "会議案第3号",
+      "title": "平塚市議会委員会条例の一部を改正する条例",
+      "result": "可決"
+    },
+    {
+      "id": "会議案4",
+      "kind": "会議案",
+      "number": 4,
+      "sub": null,
+      "label": "会議案第4号",
+      "title": "女性差別撤廃条約選択議定書の批准を求める意見書",
+      "result": "可決"
+    },
+    {
+      "id": "会議案5",
+      "kind": "会議案",
+      "number": 5,
+      "sub": null,
+      "label": "会議案第5号",
+      "title": "子どもたちに豊かな学びを保障するために、教職員定数改善と教育予算の増額、義務教育費国庫負担制度の堅持・拡充を求める意見書",
+      "result": "可決"
+    },
+    {
+      "id": "請願5",
+      "kind": "請願",
+      "number": 5,
+      "sub": null,
+      "label": "令和6年請願第5号",
+      "title": "女性差別撤廃条約選択議定書の批准を求める意見書の提出を求める請願書",
+      "result": "採択"
+    },
+    {
+      "id": "請願1",
+      "kind": "請願",
+      "number": 1,
+      "sub": null,
+      "label": "請願第1号",
+      "title": "子どもたちに豊かな学びを保障するために、教職員定数改善と教育予算の増額、義務教育費国庫負担制度の堅持・拡充を求める請願",
+      "result": "採択"
+    }
+  ]
+}
