@@ -31,6 +31,31 @@ TERMS = [
     ("資金不足比率", "しきんぶそくひりつ", "病院や下水道などの企業会計について、資金不足の大きさを料金収入に対する割合で表したものです。", CHIBA, []),
 ]
 
+YOKOHAMA_K = ("横浜市「後期高齢者医療制度とは」", "https://www.city.yokohama.lg.jp/kurashi/koseki-zei-hoken/kouki/hokensho/default20200601114.html")
+CHIBA_KANSA = ("千葉市「監査委員」", "https://www.city.chiba.jp/kansa/gyoseikansa/kansaiin2.html")
+MOJ = ("法務省「法務省で働くひと・しごと紹介 Vol.20」", "https://www.moj.go.jp/KANBOU/KOHOSHI/no84/10.html")
+SOUMU = ("総務省「指定管理者制度」資料", "https://www.soumu.go.jp/main_content/000451041.pdf")
+NAGOYA = ("名古屋市「住居表示制度」", "https://www.city.nagoya.jp/kurashi/juutaku/1030361/1030363.html")
+CAS = ("内閣官房内閣人事局「令和2年12月期の期末・勤勉手当を国家公務員に支給」", "https://www.cas.go.jp/jp/gaiyou/jimu/jinjikyoku/pdf/r02_bonus_dec.pdf")
+GUNMA = ("群馬県「人事院勧告等の概要」", "https://www.pref.gunma.jp/uploaded/attachment/46494.pdf")
+TOCHIGI = ("栃木市「固定資産評価審査委員会」", "https://www.city.tochigi.lg.jp/uploaded/attachment/44975.pdf")
+YOKOTE = ("横手市「監査委員事務局（公平委員会）の方針書」", "https://www.city.yokote.lg.jp/_res/projects/default_project/_page_/001/007/241/kansaiinkaijimukyoku.pdf")
+SAITAMA_D = ("埼玉県「乳児等通園支援事業（こども誰でも通園制度）について」", "https://www.pref.saitama.lg.jp/b0616/kenko/jidofukushi/kosodateshien/daredemo.html")
+IBARAKI = ("茨城県警察「特定小型原動機付自転車（電動キックボード等）について」", "https://www.pref.ibaraki.jp/kenkei/a02_traffic/jikoboushi/tokuteikogatagentuki.html")
+TERMS += [
+    ("特定小型原動機付自転車", "とくていこがたげんどうきつきじてんしゃ", "電動キックボードなどのうち、速度や出力などの基準を満たす乗り物です。令和5年7月1日から、原動機付自転車の一つの種類として決められました。", IBARAKI, []),
+    ("後期高齢者医療", "こうきこうれいしゃいりょう", "75歳以上の人が入る医療保険です。75歳の誕生日に、それまでの医療保険から切り替わります。", YOKOHAMA_K, ["後期高齢者"]),
+    ("監査委員", "かんさいいん", "市のお金の事務がきちんと行われているかを、市長から独立した立場でチェックする人です。会社の監査役と同じような役割です。", CHIBA_KANSA, []),
+    ("人権擁護委員", "じんけんようごいいん", "市町村長が推薦し、法務大臣が頼んで活動する民間のボランティアです。地域の人の人権の相談にのったり、人権の大切さを伝えたりします。", MOJ, []),
+    ("指定管理者", "していかんりしゃ", "市の施設の管理や運営を、民間の会社なども含む団体に任せるしくみです。どこに任せるかは議会の議決で決めます。", SOUMU, []),
+    ("住居表示", "じゅうきょひょうじ", "住所をわかりやすくするための制度です。「町名＋○番＋○号」のような形で住所を表します。", NAGOYA, []),
+    ("期末手当・勤勉手当", "きまつてあて・きんべんてあて", "公務員のボーナスのことです。", CAS, ["期末手当", "勤勉手当"]),
+    ("人事院勧告", "じんじいんかんこく", "国家公務員の給料を、民間の会社の給料に合わせるために、人事院が出す勧告です。民間の給料との差をうめるように、給料やボーナスの見直しを求めます。", GUNMA, []),
+    ("固定資産評価審査委員会", "こていしさんひょうかしんさいいんかい", "固定資産税のもとになる土地や建物の値段に納得できない人からの申し出を審査する、独立した中立の機関です。", TOCHIGI, []),
+    ("公平委員会", "こうへいいいんかい", "審査を通じて、市の職員の利益を守り、人事が公正に行われるようにする機関です。", YOKOTE, []),
+    ("こども誰でも通園制度", "こどもだれでもつうえんせいど", "保育所などに通っていない0歳6か月から3歳未満の子どもが、親が働いているかどうかに関係なく、月10時間まで時間単位で通える制度です。正式には「乳児等通園支援事業」といいます。", SAITAMA_D, ["乳児等通園支援"]),
+]
+
 
 def slug(term: str) -> str:
     return "t" + str([t[0] for t in TERMS].index(term))
