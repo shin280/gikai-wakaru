@@ -505,7 +505,10 @@ def render_index(sessions: list[dict], last_checked: str) -> str:
     if sessions:
         s = sessions[0]
         shown = 0
-        for it in s["items"]:
+        def rank(it):
+            sm = load_json(summary_path(s["key"], it["id"])) or {}
+            return (0 if first_amount(sm) else 1, 0 if it["kind"] in ("議案", "請願") and "任命" not in it["title"] and "選任" not in it["title"] else 1)
+        for it in sorted(s["items"], key=rank):
             sm = load_json(summary_path(s["key"], it["id"]))
             if not sm:
                 continue
