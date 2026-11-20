@@ -17,7 +17,7 @@ DOMAIN = "gikai.tubehira.jp"
 # 独自ドメインがつながるまでは GitHub Pages のアドレス。つながったら https://gikai.tubehira.jp にする
 SITE_URL = "https://gikai.tubehira.jp"
 REPO = "shin280/gikai-wakaru"
-SITE_NAME = "ひらつか議会 わかる版"
+SITE_NAME = "猫でもわかる平塚市議会"
 
 KIND_ORDER = ["議案", "認", "会議案", "請願", "陳情", "報告"]
 KIND_LABEL = {"議案": "議案", "認": "決算の認定", "会議案": "議員が出した議案・意見書", "請願": "請願",
@@ -39,7 +39,7 @@ a{color:var(--red-d)}
 header.site{background:#fff;position:sticky;top:0;z-index:5;box-shadow:0 1px 0 rgba(0,0,0,.04)}
 header.site .wrap{padding-top:14px;padding-bottom:14px;display:flex;align-items:center;gap:8px}
 .logo{font-weight:700;font-size:17px;text-decoration:none;color:var(--ink);display:flex;align-items:center;gap:9px;letter-spacing:.06em}
-.logo::before{content:"";width:22px;height:16px;border-radius:4px;background:var(--grad);transform:skewX(-14deg)}
+.logo::before{content:"";width:22px;height:16px;border-radius:4px;background:var(--grad);transform:skewX(-14deg)}.logo .cat{width:30px;height:30px;flex:none}
 .logo span{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
 .tagline{display:none}
 .grad{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
@@ -112,7 +112,14 @@ body.onlysm .nosm{display:none}
 nav.bn{position:fixed;left:0;right:0;bottom:0;background:#fff;box-shadow:0 -1px 0 rgba(0,0,0,.06);display:flex;z-index:9;padding-bottom:env(safe-area-inset-bottom)}
 nav.bn a{flex:1;text-align:center;font-size:13px;font-weight:700;color:var(--ink);text-decoration:none;padding:16px 0 14px;line-height:1.2;position:relative;letter-spacing:.08em}nav.bn a::before{content:"";position:absolute;top:6px;left:50%;width:18px;height:3px;margin-left:-9px;background:var(--grad);transform:skewX(-30deg)}
 body{padding-bottom:60px}
+.herocat .cat{width:64px;height:64px;margin:0 auto 6px;display:block}
+.san{border:2px solid transparent;background:linear-gradient(#fff,#fff) padding-box,var(--grad) border-box;padding:18px 20px 12px}
+.san .sanh{display:flex;align-items:center;gap:8px;padding-top:0}.san .sanh::before{display:none}.san .sanh .cat{width:28px;height:28px}
+.san ol{list-style:none;margin:0;padding:0}.san li{padding:8px 0;border-top:1px solid var(--line);margin:0}.san li:first-child{border-top:0}
+.san li span{display:block;font-size:11px;color:var(--red-d);font-weight:700;letter-spacing:.1em}
 """
+
+CAT_SVG = ""  # 猫のキャラクターは画像ができたら差し込む（site/cat.png）
 
 TOGGLE_JS = """<script>
 (function(){var b=document.body,E=document.getElementById('b-easy'),D=document.getElementById('b-detail');if(!E)return;
@@ -137,7 +144,7 @@ def page(title: str, body: str, depth: int = 0, desc: str = "", path: str = "", 
 {meta}
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
 <style>{CSS}</style></head><body>
-<header class="site"><div class="wrap"><a class="logo" href="{root}index.html">ひらつか議会 <span>わかる版</span></a><span class="tagline">HIRATSUKA CITY COUNCIL, MADE EASY</span></div></header>
+<header class="site"><div class="wrap"><a class="logo" href="{root}index.html">{CAT_SVG}<span>猫でもわかる</span>平塚市議会</a><span class="tagline">HIRATSUKA CITY COUNCIL, MADE EASY</span></div></header>
 <main class="wrap">{body}
 <footer><p><b>運営：元島しん</b>（平塚市議会議員・しらさぎ・無所属クラブ所属）。会派ごとの賛否は、すべての会派を同じ形で、議会だよりの記載のとおりに載せています。<a href="{root}about.html">このサイトについて</a></p><p>このサイトは、平塚市が公開している資料をもとに、プログラムとAIが自動で作っています。人による確認はしていないため、間違いが含まれる可能性があります。大事な判断の前には、各ページの「元の資料」で必ず確かめてください。</p>
 <p><a href="{report}">間違いを報告する</a> ・ <a href="https://github.com/{REPO}">このサイトのしくみ（GitHub）</a></p></footer>
@@ -323,16 +330,26 @@ def ba_html(it, sm):
 
 
 def glance_html(s, it, sm):
+    """約3行まとめ：何が決まった・結果・だれに/お金。資料にあることだけで作る。"""
+    sm = sm or {}
     rows = []
+    first = ""
+    if sm.get("points"):
+        first = sm["points"][0].get("easy", "").split("。")[0]
+        first = first + "。" if first else ""
+    rows.append(("何が決まった", first or f'{it["label"]} {it["title"]}'))
     vf, v = votes_for(s["key"], it["id"])
-    rows.append(("結果", vote_headline(vf, v, it["result"]) if v else (it["result"] or "報告")))
-    amts = [p["amount"] for p in (sm or {}).get("points", []) if p.get("amount")]
-    if len(amts) == 1:
-        rows.append(("金額", amts[0]))
-    who = "、".join(w["name"] for w in (sm or {}).get("who", []))
+    rows.append(("結果", vote_headline(vf, v, it["result"]) if v else (it["result"] or "報告（議会での採決はありません）")))
+    amts = [p["amount"] for p in sm.get("points", []) if p.get("amount")]
+    who = "、".join(w["name"] for w in sm.get("who", []))
     if who:
         rows.append(("関係する人", who))
-    return '<div class="glance">' + "".join(f"<div><span>{e(a)}</span><b>{e(b)}</b></div>" for a, b in rows) + "</div>"
+    elif len(amts) == 1:
+        rows.append(("お金", amts[0]))
+    elif sm.get("unknowns"):
+        rows.append(("まだ分からないこと", sm["unknowns"][0]))
+    lis = "".join(f'<li><span>{e(a)}</span>{e(b)}</li>' for a, b in rows)
+    return f'<section class="san"><h2 class="sanh">{CAT_SVG}約3行まとめ</h2><ol>{lis}</ol></section>'
 
 
 def terms_html(it, sm):
@@ -534,8 +551,8 @@ def render_index(sessions: list[dict], last_checked: str) -> str:
     total = sum(len(x["items"]) for x in sessions)
     explained = sum(1 for x in sessions for i in x["items"] if summary_path(x["key"], i["id"]).exists())
     body = f"""<div class="hero"><div class="kw"><span>予算</span><span>条例</span><span>請願</span><span>会派ごとの賛否</span></div>
-<h1><span class="grad">平塚市議会</span>で<br>決まったことを、<br>わかりやすく</h1>
-<p>市議会で可決・否決されたことを、市の資料をもとにまとめています。</p></div>
+<h1><span class="grad">猫でもわかる</span><br>平塚市議会</h1>
+<p>議会って難しい言葉ばかり。<br>だから、猫でもわかる言葉に直しました。</p></div>
 <div class="stats"><div class="stat"><b class="grad">{len(sessions)}<small>回</small></b><span>定例会</span></div><div class="stat"><b class="grad">{total}<small>件</small></b><span>議決・報告</span></div><div class="stat"><b class="grad">{explained}<small>件</small></b><span>説明ページ</span></div></div>
 {ex}
 <section id="find">{h2('分野・地域で探す', 'Find')}<div class="fbtns">{chips}</div><div class="chips" style="justify-content:flex-start">{achips}</div>
@@ -549,8 +566,8 @@ def render_index(sessions: list[dict], last_checked: str) -> str:
 </div>
 <p class="muted">最終確認：{e(last_checked)}</p>{SEARCH_JS}"""
     (OUT / "search.json").write_text(json.dumps(idx, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
-    ogp.make(OUT / "og" / "index.png", "平塚市議会で決まったことを、わかりやすく", "議決結果・会派ごとの賛否・わかりやすい説明")
-    return page("平塚市議会で決まったことを、わかりやすく", body, desc="平塚市議会で可決・否決されたことと会派ごとの賛否を、市の資料をもとにわかりやすくまとめています。")
+    ogp.make(OUT / "og" / "index.png", "議会って難しい言葉ばかり。だから、猫でもわかる言葉に直しました。", "平塚市議会で決まったこと・会派ごとの賛否")
+    return page("議会って難しい言葉ばかり。だから、猫でもわかる言葉に直しました", body, desc="平塚市議会で可決・否決されたことと会派ごとの賛否を、市の資料をもとにわかりやすくまとめています。")
 
 
 def render_feed(sessions: list[dict]) -> str:
