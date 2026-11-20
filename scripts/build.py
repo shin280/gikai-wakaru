@@ -140,7 +140,7 @@ k.onclick=function(){var on=document.body.classList.toggle('kid');try{localStora
 </script>"""
 
 
-KIDNOTE = '<p class="kidnote">小学生モード：漢字にふりがなを付けて、大事なところだけ見せています。ふりがなはコンピューターが自動で付けているので、読みがちがうことがあります。</p>'
+KIDNOTE = '<p class="kidnote">小学生モード：漢字にふりがなを付けて、大事なところだけ見せています。ふりがなはコンピューターが自動で付けているので、読みがちがうことがあります。もとにもどすときは、ページの一番下のボタンをおしてください。</p>'
 
 
 def page(title: str, body: str, depth: int = 0, desc: str = "", path: str = "", og: str = "og/index.png") -> str:
