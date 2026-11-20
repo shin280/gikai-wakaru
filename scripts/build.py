@@ -10,7 +10,8 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from tags import tags_for  # noqa: E402
 import ogp  # noqa: E402
-import glossary  # noqa: E402
+import glossary
+import furigana  # noqa: E402
 DATA = ROOT / "data"
 OUT = ROOT / "site"
 DOMAIN = "gikai.tubehira.jp"
@@ -62,7 +63,7 @@ p{margin:0 0 10px}ul{margin:0 0 10px;padding-left:1.2em}li{margin-bottom:6px}
 .toggle{display:inline-flex;border:1px solid var(--line);background:#fff;border-radius:99px;padding:4px;gap:2px;margin:14px 0 4px}
 .toggle button{border:0;background:transparent;padding:8px 20px;border-radius:99px;font:inherit;font-size:13px;color:var(--sub);cursor:pointer;letter-spacing:.05em}
 .toggle button[aria-pressed=true]{background:var(--red);color:#fff;font-weight:700;box-shadow:0 4px 12px rgba(255,0,51,.25)}
-.detail{display:none}body.is-detail .detail{display:block}body.is-detail .easy{display:none}
+.detail{display:none}body.is-detail .detail{display:block}body.is-detail .easy{display:none}rt{display:none}body.kid rt{display:revert;font-size:.5em;font-weight:500;color:#555}body.kid main{font-size:118%;line-height:2.2}body.kid main h1{line-height:1.9}body.kid .kh,body.kid .detail,body.kid .toggle{display:none!important}body.kid .easy{display:block!important}.kidnote{display:none}body.kid .kidnote{display:block;background:#fff8e1;border-radius:10px;padding:10px 14px;margin:10px 0;font-size:14px}nav.bn button{flex:1;background:none;border:0;font:inherit;font-size:12px;font-weight:700;color:var(--ink);padding:16px 0 14px;line-height:1.2;position:relative;letter-spacing:0;cursor:pointer}nav.bn button::before{content:"";position:absolute;top:6px;left:50%;width:18px;height:3px;margin-left:-9px;background:var(--grad);transform:skewX(-30deg)}body.kid nav.bn button{color:var(--red)}
 .money{font-weight:700}.formal{font-size:13px;color:var(--sub);margin:0}
 .meta{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:20px}
 .tag{font-size:12px;padding:0 2px 2px;border-bottom:1.5px solid var(--ink);color:var(--ink);font-weight:500;margin-right:6px}
@@ -133,6 +134,8 @@ TOGGLE_JS = """<script>
 (function(){var b=document.body,E=document.getElementById('b-easy'),D=document.getElementById('b-detail');if(!E)return;
 function s(d){b.classList.toggle('is-detail',d);E.setAttribute('aria-pressed',!d);D.setAttribute('aria-pressed',d)}
 E.onclick=function(){s(false)};D.onclick=function(){s(true)}})();
+(function(){var k=document.getElementById('kidbtn');if(!k)return;function u(){var on=document.body.classList.contains('kid');k.textContent=on?'もどす':'小学生モード';k.setAttribute('aria-pressed',on)}
+k.onclick=function(){var on=document.body.classList.toggle('kid');try{localStorage.setItem('kid',on?'1':'0')}catch(e){}u();window.scrollTo(0,0)};u()})();
 (function(){var o=document.getElementById('only');if(!o)return;function f(){document.body.classList.toggle('onlysm',o.checked)}o.onchange=f;f()})();
 </script>"""
 
@@ -153,12 +156,13 @@ def page(title: str, body: str, depth: int = 0, desc: str = "", path: str = "", 
 <link rel="icon" href="{root}favicon.png" type="image/png"><link rel="apple-touch-icon" href="{root}apple-touch-icon.png">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
 <style>{CSS}</style></head><body>
+<script>try{{if(localStorage.getItem('kid')==='1')document.body.classList.add('kid')}}catch(e){{}}</script>
 <header class="site"><div class="wrap"><a class="logo" href="{root}index.html">{CAT_SVG.replace("{root}", root)}<span>猫でもわかる</span>平塚市議会</a><span class="tagline">HIRATSUKA CITY COUNCIL, MADE EASY</span></div></header>
-<main class="wrap">{body}
+<main class="wrap"><p class="kidnote">小学生モード：漢字にふりがなを付けて、大事なところだけ見せています。ふりがなはコンピューターが自動で付けているので、読みがちがうことがあります。</p>{furigana.add(body)}
 <footer><img class="footcat" src="{root}cat-sit-sm.png" alt=""><p><b>運営：元島しん</b>（平塚市議会議員・しらさぎ・無所属クラブ所属）。会派ごとの賛否は、すべての会派を同じ形で、議会だよりの記載のとおりに載せています。<a href="{root}about.html">このサイトについて</a>・<a href="{root}riyuu.html">このサイトを作った理由</a></p><p>このサイトは、平塚市が公開している資料をもとに、プログラムとAIが自動で作っています。大事な判断の前には、各ページの「元の資料」で必ず確かめてください。</p>
 <p><a href="{report}">間違いを報告する</a> ・ <a href="https://github.com/{REPO}">このサイトのしくみ（GitHub）</a></p></footer>
 </main>
-<nav class="bn"><a href="{root}index.html">ホーム</a><a href="{root}index.html#find">探す</a><a href="{root}index.html#sessions">定例会</a><a href="{root}yogo.html">用語</a></nav>{TOGGLE_JS}</body></html>
+<nav class="bn"><a href="{root}index.html">ホーム</a><a href="{root}index.html#find">探す</a><a href="{root}index.html#sessions">定例会</a><a href="{root}yogo.html">用語</a><button type="button" id="kidbtn" aria-pressed="false">小学生モード</button></nav>{TOGGLE_JS}</body></html>
 """
 
 
@@ -422,22 +426,22 @@ def render_bill(s: dict, it: dict, sm: dict | None) -> str:
         explain = '<div class="ai">この議案のわかりやすい説明はまだありません。件名と賛否、討論だけを載せています。</div>'
     body = f"""
 <div class="meta">{badge(it['result'])}<span class="tag">{e(s['name'])}</span><span class="tag">{e(KIND_LABEL.get(it['kind'], it['kind']))}</span>{tags}</div>
-{ba_html(it, sm)}
+<div class="kh">{ba_html(it, sm)}</div>
 <h1 class="easy" style="margin-top:6px">{e(headline)}</h1><h1 class="detail" style="margin-top:6px">{e(sm_.get('headline_detail') or headline)}</h1>
 {glance_html(s, it, sm)}
 {explain}
-<section>{h2('審議のステータス','Status')}<div class="steps"><div class="step done">提出</div><div class="step done">委員会で審査</div><div class="step done">本会議で{e(it['result'] or '報告')}</div></div></section>
-{render_votes(s, it)}
-{render_debates(s, it)}
+<section class="kh">{h2('審議のステータス','Status')}<div class="steps"><div class="step done">提出</div><div class="step done">委員会で審査</div><div class="step done">本会議で{e(it['result'] or '報告')}</div></div></section>
+<div class="kh">{render_votes(s, it)}
+{render_debates(s, it)}</div>
 {f'<section>{h2('何が決まったの？','What was decided')}{pts}</section>' if pts else ''}
-{f'<section>{h2('数字で見ると','In numbers')}{calc}</section>' if calc else ''}
-{f'<section>{h2('なぜ必要なの？（市の説明）','Why')}{why}</section>' if why else ''}
+{f'<section class="kh">{h2('数字で見ると','In numbers')}{calc}</section>' if calc else ''}
+{f'<section class="kh">{h2('なぜ必要なの？（市の説明）','Why')}{why}</section>' if why else ''}
 {f'<section>{h2('だれに関係する？','Who is affected')}<ul>{who}</ul></section>' if who else ''}
-{f'<section>{h2('よくある質問','FAQ')}{faq}</section>' if faq else ''}
-{f'<section style="position:relative"><img class="minicat" src="../cat-sit-sm.png" alt="">{h2('資料からは分からないこと','Not in the documents')}<ul>{unk}</ul></section>' if unk else ''}
-{terms_html(it, sm)}
-{related_html(s, it)}
-<section>{h2('元の資料','Sources')}<ul>{src}<li><a href="{e(s['source'])}">平塚市議会のページ</a></li></ul></section>
+{f'<section class="kh">{h2('よくある質問','FAQ')}{faq}</section>' if faq else ''}
+{f'<section class="kh" style="position:relative"><img class="minicat" src="../cat-sit-sm.png" alt="">{h2('資料からは分からないこと','Not in the documents')}<ul>{unk}</ul></section>' if unk else ''}
+<div class="kh">{terms_html(it, sm)}
+{related_html(s, it)}</div>
+<section class="kh">{h2('元の資料','Sources')}<ul>{src}<li><a href="{e(s['source'])}">平塚市議会のページ</a></li></ul></section>
 {prevnext_html(s, it)}
 <p style="margin-top:14px"><a href="../s/{e(s['key'])}.html">← {e(s['name'])}の一覧に戻る</a></p>"""
     slug = f'{s["key"]}-{bill_slug(it["id"])}'
