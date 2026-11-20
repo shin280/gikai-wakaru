@@ -18,6 +18,7 @@ DOMAIN = "gikai.tubehira.jp"
 SITE_URL = "https://gikai.tubehira.jp"
 REPO = "shin280/gikai-wakaru"
 SITE_NAME = "猫でもわかる平塚市議会"
+OG_VER = "neko1"  # SNS用画像を変えたら上げる（XやLINEの古い画像のキャッシュを避けるため）
 
 KIND_ORDER = ["議案", "認", "会議案", "請願", "陳情", "報告"]
 KIND_LABEL = {"議案": "議案", "認": "決算の認定", "会議案": "議員が出した議案・意見書", "請願": "請願",
@@ -135,7 +136,7 @@ def page(title: str, body: str, depth: int = 0, desc: str = "", path: str = "", 
     url = f"{SITE_URL}/{path}"
     meta = f"""<meta property="og:type" content="website"><meta property="og:site_name" content="{SITE_NAME}">
 <meta property="og:title" content="{e(title)}"><meta property="og:description" content="{e(desc or title)}">
-<meta property="og:url" content="{e(url)}"><meta property="og:image" content="{SITE_URL}/{og}">
+<meta property="og:url" content="{e(url)}"><meta property="og:image" content="{SITE_URL}/{og}?v={OG_VER}"><meta name="twitter:image" content="{SITE_URL}/{og}?v={OG_VER}">
 <meta name="twitter:card" content="summary_large_image"><link rel="canonical" href="{e(url)}">
 <link rel="alternate" type="application/rss+xml" title="{SITE_NAME}" href="{SITE_URL}/feed.xml">"""
     report = f"https://github.com/{REPO}/issues/new?title=" + e(f"間違いの報告：{title}")
