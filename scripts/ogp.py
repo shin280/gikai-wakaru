@@ -41,8 +41,8 @@ def make(path: Path, headline: str, meta: str, badge: str = "") -> None:
     d.rounded_rectangle((40, 40, W - 40, H - 40), radius=32, fill="white")
     # ロゴ
     d.rounded_rectangle((90, 90, 130, 118), radius=8, fill=RED)
-    d.text((146, 84), "中学生でもわかる", font=font("Bold", 30), fill=RED)
-    d.text((146 + d.textlength("中学生でもわかる", font=font("Bold", 30)), 84), "平塚市議会", font=font("Bold", 30), fill=INK)
+    d.text((146, 84), "ひらつか議会", font=font("Bold", 30), fill=INK)
+    d.text((146 + d.textlength("ひらつか議会 ", font=font("Bold", 30)), 84), "わかる版", font=font("Bold", 30), fill=RED)
     y = 165
     if badge:
         bf = font("Bold", 28)
