@@ -506,7 +506,7 @@ function show(){var pool=data.filter(function(d){return d.h});var d=pool[Math.fl
  var cls=/否決|不採択|不同意|不承認|不認定/.test(d.r)?'ng':'';
  r.classList.remove('pop');void r.offsetWidth;r.classList.add('pop');
  r.innerHTML='<img src="cat-face-sm.png" alt="" class="gcat"><div><span class="badge '+cls+'">'+esc(d.r||'報告')+'</span><span class="no">'+esc(d.s+' '+d.l)+'</span><a class="gh" href="'+esc(d.u)+'">'+esc(d.h)+'</a></div>';
- b.textContent='もう1回まわす'}
+ b.textContent='もう一度、猫に選んでもらう'}
 b.addEventListener('click',function(){if(data){show();return}b.disabled=true;
  fetch('search.json').then(function(x){return x.json()}).then(function(j){data=j;b.disabled=false;show()})});
 })();
@@ -577,10 +577,10 @@ def render_index(sessions: list[dict], last_checked: str) -> str:
 <p>議会って難しい言葉ばかり。<br>だから、猫でもわかる言葉に直しました。</p></div>
 <div class="stats"><div class="stat"><b class="grad">{len(sessions)}<small>回</small></b><span>定例会</span></div><div class="stat"><b class="grad">{total}<small>件</small></b><span>議決・報告</span></div><div class="stat"><b class="grad">{explained}<small>件</small></b><span>説明ページ</span></div></div>
 {ex}
-<section id="gacha" class="gacha">{h2('議案ガチャ', 'Random')}
-<p class="muted">どれから読めばいいか分からない人へ。ボタンを押すと、これまでの議案から1件をランダムに出します。</p>
-<div id="gres" class="gres"><img src="cat-face-sm.png" alt="" class="gcat"><span class="muted">まだ回していません</span></div>
-<button type="button" id="gbtn" class="gbtn">ガチャを回す</button></section>
+<section id="gacha" class="gacha">{h2('猫がえらんだ議案', 'Random')}
+<p class="muted">どれから読めばいいか分からない人へ。これまでの議案から、猫が1件えらびます。</p>
+<div id="gres" class="gres"><img src="cat-face-sm.png" alt="" class="gcat"><span class="muted">猫はまだ、えらんでいません</span></div>
+<button type="button" id="gbtn" class="gbtn">猫に選んでもらう</button></section>
 <section id="find">{h2('分野・地域で探す', 'Find')}<div class="fbtns">{chips}</div><div class="chips" style="justify-content:flex-start">{achips}</div>
 <input id="q" class="search" type="search" placeholder="キーワードで探す（例：保育、補聴器、公民館）" aria-label="キーワードで探す">
 <label class="onlybox"><input type="checkbox" id="onlyq" checked>説明があるものだけ</label></section>
