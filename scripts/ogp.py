@@ -42,8 +42,8 @@ def make(path: Path, headline: str, meta: str, badge: str = "") -> None:
     # ロゴ
     face = Image.open(Path(__file__).resolve().parent.parent / "assets" / "cat-face.png"); face.thumbnail((52, 52))
     img.paste(face, (84, 78), face)
-    d.text((146, 84), "誰でもわかる！", font=font("Bold", 30), fill=RED)
-    d.text((146 + d.textlength("誰でもわかる！", font=font("Bold", 30)), 84), "平塚市議会", font=font("Bold", 30), fill=INK)
+    d.text((146, 84), "猫でもわかる", font=font("Bold", 30), fill=RED)
+    d.text((146 + d.textlength("猫でもわかる", font=font("Bold", 30)), 84), "平塚市議会", font=font("Bold", 30), fill=INK)
     y = 165
     if badge:
         bf = font("Bold", 28)
