@@ -119,6 +119,12 @@ body{padding-bottom:60px}
 .san .sanh{display:flex;align-items:center;gap:8px;padding-top:0}.san .sanh::before{display:none}.san .sanh .cat{width:30px;height:30px;object-fit:contain}
 .san ol{list-style:none;margin:0;padding:0}.san li{padding:8px 0;border-top:1px solid var(--line);margin:0}.san li:first-child{border-top:0}
 .san li span{display:block;font-size:11px;color:var(--red-d);font-weight:700;letter-spacing:.1em}
+.gacha{text-align:center}.gacha h2::before{left:50%;margin-left:-17px}
+.gres{display:flex;gap:12px;align-items:center;text-align:left;background:var(--bg);border-radius:10px;padding:14px 16px;margin:10px 0 14px;min-height:72px}
+.gres .gcat{width:44px;height:44px;flex:none;object-fit:contain}.gres .badge{margin:0 6px 0 0}.gres .no{display:inline;font-size:12px;color:var(--sub)}
+.gres .gh{display:block;font-weight:700;color:var(--ink);text-decoration:none;margin-top:4px;line-height:1.6}.gres .gh::after{content:" →";color:var(--red)}
+.gbtn{font:inherit;font-weight:700;font-size:15px;color:#fff;background:var(--red);border:0;border-radius:99px;padding:12px 32px;cursor:pointer;letter-spacing:.08em;box-shadow:0 4px 14px rgba(255,0,51,.25)}
+.gbtn:active{transform:scale(.97)}.pop{animation:pop .35s ease}@keyframes pop{0%{transform:scale(.92);opacity:.3}100%{transform:scale(1);opacity:1}}
 """
 
 CAT_SVG = '<img class="cat" src="{root}cat-face-sm.png" alt="">'  # {root} はページの深さに合わせて置き換える
@@ -493,6 +499,19 @@ def build_search_index(sessions: list[dict]) -> list[dict]:
     return out
 
 
+GACHA_JS = """<script>
+(function(){var b=document.getElementById('gbtn'),r=document.getElementById('gres');if(!b)return;var data=null;
+function esc(x){return String(x).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+function show(){var pool=data.filter(function(d){return d.h});var d=pool[Math.floor(Math.random()*pool.length)];
+ var cls=/否決|不採択|不同意|不承認|不認定/.test(d.r)?'ng':'';
+ r.classList.remove('pop');void r.offsetWidth;r.classList.add('pop');
+ r.innerHTML='<img src="cat-face-sm.png" alt="" class="gcat"><div><span class="badge '+cls+'">'+esc(d.r||'報告')+'</span><span class="no">'+esc(d.s+' '+d.l)+'</span><a class="gh" href="'+esc(d.u)+'">'+esc(d.h)+'</a></div>';
+ b.textContent='もう1回まわす'}
+b.addEventListener('click',function(){if(data){show();return}b.disabled=true;
+ fetch('search.json').then(function(x){return x.json()}).then(function(j){data=j;b.disabled=false;show()})});
+})();
+</script>"""
+
 SEARCH_JS = """<script>
 (function(){
 var oq=document.getElementById('onlyq'),box=document.getElementById('q'),list=document.getElementById('results'),chips=[].slice.call(document.querySelectorAll('[data-f]'));
@@ -558,6 +577,10 @@ def render_index(sessions: list[dict], last_checked: str) -> str:
 <p>議会って難しい言葉ばかり。<br>だから、猫でもわかる言葉に直しました。</p></div>
 <div class="stats"><div class="stat"><b class="grad">{len(sessions)}<small>回</small></b><span>定例会</span></div><div class="stat"><b class="grad">{total}<small>件</small></b><span>議決・報告</span></div><div class="stat"><b class="grad">{explained}<small>件</small></b><span>説明ページ</span></div></div>
 {ex}
+<section id="gacha" class="gacha">{h2('議案ガチャ', 'Random')}
+<p class="muted">どれから読めばいいか分からない人へ。ボタンを押すと、これまでの議案から1件をランダムに出します。</p>
+<div id="gres" class="gres"><img src="cat-face-sm.png" alt="" class="gcat"><span class="muted">まだ回していません</span></div>
+<button type="button" id="gbtn" class="gbtn">ガチャを回す</button></section>
 <section id="find">{h2('分野・地域で探す', 'Find')}<div class="fbtns">{chips}</div><div class="chips" style="justify-content:flex-start">{achips}</div>
 <input id="q" class="search" type="search" placeholder="キーワードで探す（例：保育、補聴器、公民館）" aria-label="キーワードで探す">
 <label class="onlybox"><input type="checkbox" id="onlyq" checked>説明があるものだけ</label></section>
@@ -567,7 +590,7 @@ def render_index(sessions: list[dict], last_checked: str) -> str:
 <section id="sessions">{h2('定例会ごとの一覧','Sessions')}{rows or '<p>まだデータがありません。</p>'}</section>
 <p class="muted"><a href="yogo.html">議会の言葉の説明（用語集）</a></p>
 </div>
-<p class="muted">最終確認：{e(last_checked)}</p>{SEARCH_JS}"""
+<p class="muted">最終確認：{e(last_checked)}</p>{SEARCH_JS}{GACHA_JS}"""
     (OUT / "search.json").write_text(json.dumps(idx, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
     ogp.make(OUT / "og" / "index.png", "議会って難しい言葉ばかり。だから、猫でもわかる言葉に直しました。", "平塚市議会で決まったこと・会派ごとの賛否")
     return page("議会って難しい言葉ばかり。だから、猫でもわかる言葉に直しました", body, desc="平塚市議会で可決・否決されたことと会派ごとの賛否を、市の資料をもとにわかりやすくまとめています。")
