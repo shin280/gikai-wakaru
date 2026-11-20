@@ -424,7 +424,7 @@ def render_bill(s: dict, it: dict, sm: dict | None) -> str:
     tags = "".join(f'<span class="tag">{e(f)}</span>' for f in t["fields"]) + "".join(f'<span class="tag">地域：{e(a)}</span>' for a in t["areas"])
     if sm:
         explain = f"""<div class="toggle"><button type="button" id="b-easy" aria-pressed="true">やさしく</button><button type="button" id="b-detail" aria-pressed="false">詳しく</button></div>
-<div class="ai">この説明はAIが市の資料から自動で作ったもので、人は確認していません。</div>"""
+"""
     else:
         explain = '<div class="ai">この議案のわかりやすい説明はまだありません。件名と賛否、討論だけを載せています。</div>'
     body = f"""
