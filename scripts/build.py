@@ -14,7 +14,7 @@ DATA = ROOT / "data"
 OUT = ROOT / "site"
 DOMAIN = "gikai.tubehira.jp"
 # 独自ドメインがつながるまでは GitHub Pages のアドレス。つながったら https://gikai.tubehira.jp にする
-SITE_URL = "https://shin280.github.io/gikai-wakaru"
+SITE_URL = "https://gikai.tubehira.jp"
 REPO = "shin280/gikai-wakaru"
 SITE_NAME = "ひらつか議会 わかる版"
 
