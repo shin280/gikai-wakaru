@@ -10,6 +10,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from tags import tags_for  # noqa: E402
 import ogp  # noqa: E402
+import glossary  # noqa: E402
 DATA = ROOT / "data"
 OUT = ROOT / "site"
 DOMAIN = "gikai.tubehira.jp"
@@ -86,12 +87,38 @@ footer{font-size:12px;color:var(--sub);margin-top:36px;padding-top:20px;border-t
 .stat{background:#fff;border-radius:10px;padding:16px 8px;text-align:center;box-shadow:0 2px 14px rgba(0,0,0,.04)}
 .stat b{display:block;font-size:30px;line-height:1.2;font-weight:700;letter-spacing:.02em}.stat b small{font-size:13px;margin-left:2px;color:var(--ink);-webkit-text-fill-color:var(--ink)}
 .stat span{font-size:12px;color:var(--sub)}
+.ba{display:grid;gap:8px;margin:14px 0 4px}
+.ba .from{background:#fff;border:1px dashed #cfcfcf;border-radius:10px;padding:12px 14px;color:var(--sub);font-size:13px}
+.ba .from b,.ba .to b{display:block;font-size:11px;letter-spacing:.1em;margin-bottom:2px}
+.ba .arrow{text-align:center;font-size:20px;line-height:1;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.ba .to{background:#fff;border-radius:10px;padding:12px 14px;font-weight:700;font-size:17px;box-shadow:0 0 0 2px rgba(255,0,51,.18)}
+.ba .to b{color:var(--red-d)}
+.role{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px}.role div{background:var(--bg);border-radius:8px;padding:10px;font-size:12px;text-align:center}.role div b{display:block;font-size:14px}
+.glance{display:grid;gap:8px;margin:14px 0}.glance div{background:#fff;border-radius:10px;padding:10px 14px;box-shadow:0 2px 14px rgba(0,0,0,.04)}
+.glance span{display:block;font-size:11px;color:var(--sub);letter-spacing:.1em}.glance b{font-size:16px}
+.cards{display:grid;grid-template-columns:1fr;gap:12px;margin-top:6px}
+@media(min-width:640px){.cards{grid-template-columns:1fr 1fr}}
+.card{display:block;background:#fff;border-radius:10px;padding:16px 16px 14px;text-decoration:none;color:var(--ink);box-shadow:0 2px 14px rgba(0,0,0,.05);border-top:4px solid transparent;border-image:var(--grad) 1;border-image-slice:1 0 0 0}
+.card .no{display:block;font-size:12px;color:var(--sub);margin:8px 0 2px}.card .h{font-weight:700;line-height:1.6}.card .amt{display:block;margin-top:8px;font-weight:700;color:var(--red-d)}
+.fbtns{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:8px 0 10px}@media(min-width:640px){.fbtns{grid-template-columns:repeat(3,1fr)}}
+.fbtn{font:inherit;font-size:14px;font-weight:700;background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px 10px;text-align:left;cursor:pointer;color:var(--ink)}
+.fbtn i{font-style:normal;margin-right:6px}.fbtn.on{background:var(--red);border-color:var(--red);color:#fff}
+.onlybox{display:flex;align-items:center;gap:8px;font-size:13px;margin:10px 0 0;cursor:pointer}.onlybox input{width:18px;height:18px;accent-color:var(--red)}
+body.onlysm .nosm{display:none}
+.bar{height:6px;background:#eee;border-radius:99px;overflow:hidden;margin-top:6px}.bar i{display:block;height:100%;background:var(--grad)}
+.terms dt{font-weight:700;margin-top:14px}.terms dt small{font-weight:400;color:var(--sub);margin-left:6px}.terms dd{margin:2px 0 0}
+.terms dd.src{font-size:12px;color:var(--sub)}
+.pn{display:flex;justify-content:space-between;gap:10px;margin-top:16px;font-size:13px}.pn a{text-decoration:none}
+nav.bn{position:fixed;left:0;right:0;bottom:0;background:#fff;box-shadow:0 -1px 0 rgba(0,0,0,.06);display:flex;z-index:9;padding-bottom:env(safe-area-inset-bottom)}
+nav.bn a{flex:1;text-align:center;font-size:11px;color:var(--ink);text-decoration:none;padding:8px 0 7px;line-height:1.3}nav.bn a i{display:block;font-style:normal;font-size:18px}
+body{padding-bottom:64px}
 """
 
 TOGGLE_JS = """<script>
 (function(){var b=document.body,E=document.getElementById('b-easy'),D=document.getElementById('b-detail');if(!E)return;
 function s(d){b.classList.toggle('is-detail',d);E.setAttribute('aria-pressed',!d);D.setAttribute('aria-pressed',d)}
 E.onclick=function(){s(false)};D.onclick=function(){s(true)}})();
+(function(){var o=document.getElementById('only');if(!o)return;function f(){document.body.classList.toggle('onlysm',o.checked)}o.onchange=f;f()})();
 </script>"""
 
 
@@ -114,7 +141,8 @@ def page(title: str, body: str, depth: int = 0, desc: str = "", path: str = "", 
 <main class="wrap">{body}
 <footer><p><b>運営：元島しん</b>（平塚市議会議員・しらさぎ・無所属クラブ所属）。会派ごとの賛否は、すべての会派を同じ形で、議会だよりの記載のとおりに載せています。<a href="{root}about.html">このサイトについて</a></p><p>このサイトは、平塚市が公開している資料をもとに、プログラムとAIが自動で作っています。人による確認はしていないため、間違いが含まれる可能性があります。大事な判断の前には、各ページの「元の資料」で必ず確かめてください。</p>
 <p><a href="{report}">間違いを報告する</a> ・ <a href="https://github.com/{REPO}">このサイトのしくみ（GitHub）</a></p></footer>
-</main>{TOGGLE_JS}</body></html>
+</main>
+<nav class="bn"><a href="{root}index.html"><i>🏠</i>ホーム</a><a href="{root}index.html#q"><i>🔍</i>探す</a><a href="{root}index.html#sessions"><i>📅</i>定例会</a><a href="{root}yogo.html"><i>📖</i>用語</a></nav>{TOGGLE_JS}</body></html>
 """
 
 
@@ -279,6 +307,69 @@ def render_debates(s: dict, it: dict) -> str:
 <p class="muted">本会議の討論の一部を、会議録の文のまま抜き出しています。全文は <a href="{e(src['url'])}">{e(src['title'])}（平塚市議会会議録）</a> で読めます。</p></section>"""
 
 
+def first_amount(sm):
+    for p in (sm or {}).get("points", []):
+        if p.get("amount"):
+            return p["amount"]
+    return ""
+
+
+def ba_html(it, sm):
+    """むずかしい正式名称 → このサイトの見出し、を並べて見せる。"""
+    if not sm:
+        return f'<p class="formal">正式名称：{e(it["label"])} {e(it["title"])}</p>'
+    return f'''<div class="ba"><div class="from"><b>市の資料での名前</b>{e(it["label"])} {e(it["title"])}</div>
+<div class="arrow">▼</div><div class="to"><b>つまり</b>{e(sm["headline"])}</div></div>'''
+
+
+def glance_html(s, it, sm):
+    rows = []
+    vf, v = votes_for(s["key"], it["id"])
+    rows.append(("結果", vote_headline(vf, v, it["result"]) if v else (it["result"] or "報告")))
+    amt = first_amount(sm)
+    if amt:
+        rows.append(("お金", amt))
+    who = "、".join(w["name"] for w in (sm or {}).get("who", []))
+    if who:
+        rows.append(("関係する人", who))
+    return '<div class="glance">' + "".join(f"<div><span>{e(a)}</span><b>{e(b)}</b></div>" for a, b in rows) + "</div>"
+
+
+def terms_html(it, sm):
+    text = item_text(it, sm) + " " + " ".join((sm or {}).get("why", []) + (sm or {}).get("numbers", []))
+    ts = glossary.found_in(text + " " + (it["result"] or ""))
+    if not ts:
+        return ""
+    lis = "".join(f'<li><a href="../yogo.html#{glossary.slug(t[0])}"><b>{e(t[0])}</b></a>：{e(t[2][:60])}{"…" if len(t[2]) > 60 else ""}</li>' for t in ts)
+    return f"<section>{h2('このページに出てくる言葉', 'Glossary')}<ul>{lis}</ul></section>"
+
+
+def _core(title):
+    import re
+    t = re.sub(r"(を求める)?(請願|意見書|陳情)$", "", title)
+    return t
+
+
+def related_html(s, it):
+    core = _core(it["title"])
+    if len(core) < 12:
+        return ""
+    rel = [x for x in s["items"] if x["id"] != it["id"] and _core(x["title"]) == core]
+    if not rel:
+        return ""
+    lis = "".join(f'<li><a href="{s["key"]}-{bill_slug(x["id"])}.html">{e(x["label"])}（{e(x["result"] or "報告")}）</a></li>' for x in rel)
+    return f"<section>{h2('関係する議案・請願', 'Related')}<ul>{lis}</ul></section>"
+
+
+def prevnext_html(s, it):
+    ids = [x["id"] for x in s["items"]]
+    i = ids.index(it["id"])
+    pv = s["items"][i - 1] if i > 0 else None
+    nx = s["items"][i + 1] if i + 1 < len(ids) else None
+    a = lambda x, t: f'<a href="{s["key"]}-{bill_slug(x["id"])}.html">{t}</a>' if x else "<span></span>"
+    return f'<div class="pn">{a(pv, "← " + (pv["label"] if pv else ""))}{a(nx, (nx["label"] if nx else "") + " →")}</div>'
+
+
 def render_bill(s: dict, it: dict, sm: dict | None) -> str:
     sm_ = sm or {}
     headline = sm_.get("headline") or it["title"]
@@ -306,7 +397,8 @@ def render_bill(s: dict, it: dict, sm: dict | None) -> str:
     body = f"""
 <div class="meta">{badge(it['result'])}<span class="tag">{e(s['name'])}</span><span class="tag">{e(KIND_LABEL.get(it['kind'], it['kind']))}</span>{tags}</div>
 <h1 class="easy">{e(headline)}</h1><h1 class="detail">{e(sm_.get('headline_detail') or headline)}</h1>
-<p class="formal">正式名称：{e(it['label'])} {e(it['title'])}</p>
+{ba_html(it, sm)}
+{glance_html(s, it, sm)}
 {explain}
 <section>{h2('審議のステータス','Status')}<div class="steps"><div class="step done">提出</div><div class="step done">委員会で審査</div><div class="step done">本会議で{e(it['result'] or '報告')}</div></div></section>
 {render_votes(s, it)}
@@ -317,7 +409,10 @@ def render_bill(s: dict, it: dict, sm: dict | None) -> str:
 {f'<section>{h2('だれに関係する？','Who is affected')}<ul>{who}</ul></section>' if who else ''}
 {f'<section>{h2('よくある質問','FAQ')}{faq}</section>' if faq else ''}
 {f'<section>{h2('資料からは分からないこと','Not in the documents')}<ul>{unk}</ul></section>' if unk else ''}
+{terms_html(it, sm)}
+{related_html(s, it)}
 <section>{h2('元の資料','Sources')}<ul>{src}<li><a href="{e(s['source'])}">平塚市議会のページ</a></li></ul></section>
+{prevnext_html(s, it)}
 <p style="margin-top:14px"><a href="../s/{e(s['key'])}.html">← {e(s['name'])}の一覧に戻る</a></p>"""
     slug = f'{s["key"]}-{bill_slug(it["id"])}'
     vf, v = votes_for(s["key"], it["id"])
@@ -347,13 +442,15 @@ def render_session(s: dict) -> str:
             nd = len(debates_for(s, it)[1])
             vs += f'<span class="no">討論 {nd}人</span>' if nd else ""
             vs += tag_html(tags_for(item_text(it, load_json(sp))))
-            rows += f'<div class="item">{badge(it["result"])}<div><span class="no">{e(it["label"])}</span>{t}{vs}</div></div>'
+            rows += f'<div class="item{"" if sm else " nosm"}">{badge(it["result"])}<div><span class="no">{e(it["label"])}</span>{t}{vs}</div></div>'
         groups += f"<section>{h2(KIND_LABEL.get(kind, kind) + f'（{len(items)}件）', KIND_EN.get(kind, ''))}{rows}</section>"
     pdfs = "".join(f'<li><a href="{e(p["url"])}">{e(p["title"])}</a></li>' for p in s.get("pdfs", []))
     vf = load_json(DATA / "votes" / f"{s['key']}.json")
     dayori = f'<li><a href="{e(vf["source"]["pdf"])}">{e(vf["source"]["title"])}（審議結果・会派ごとの賛否）</a></li>' if vf else ""
+    nsm = sum(1 for i in s["items"] if summary_path(s["key"], i["id"]).exists())
     body = f"""<h1>{e(s['name'])}で決まったこと</h1>
-<p class="muted">全{len(s['items'])}件。リンクのあるものは、わかりやすい説明のページがあります。</p>
+<p class="muted">全{len(s['items'])}件のうち、わかりやすい説明があるのは{nsm}件です。</p>
+{'<label class="onlybox"><input type="checkbox" id="only" checked>説明があるものだけ表示</label>' if 0 < nsm < len(s['items']) else ''}
 {groups}
 <section>{h2('元の資料','Sources')}<ul><li><a href="{e(s['source'])}">平塚市議会 議決結果のページ</a></li>{pdfs}{dayori}</ul></section>"""
     against = sum(1 for i in s["items"] if (votes_for(s["key"], i["id"])[1] or {}) and vote_summary(*votes_for(s["key"], i["id"])) != "全会一致")
@@ -378,7 +475,7 @@ def build_search_index(sessions: list[dict]) -> list[dict]:
 
 SEARCH_JS = """<script>
 (function(){
-var box=document.getElementById('q'),list=document.getElementById('results'),chips=[].slice.call(document.querySelectorAll('[data-f]'));
+var oq=document.getElementById('onlyq'),box=document.getElementById('q'),list=document.getElementById('results'),chips=[].slice.call(document.querySelectorAll('[data-f]'));
 if(!box)return;var data=[],on=null;
 function esc(x){return String(x).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
 function draw(){var q=box.value.trim(),hits=[];
@@ -386,12 +483,12 @@ function draw(){var q=box.value.trim(),hits=[];
  document.getElementById('latest').style.display='none';
  data.forEach(function(d){var txt=[d.s,d.l,d.t,d.h,d.v,d.f.join(' '),d.a.join(' ')].join(' ');
   if(q&&q.split(/\\s+/).some(function(w){return txt.indexOf(w)<0}))return;
-  if(on&&d.f.indexOf(on)<0&&d.a.indexOf(on)<0)return;hits.push(d)});
+  if(on&&d.f.indexOf(on)<0&&d.a.indexOf(on)<0)return;if(oq&&oq.checked&&!d.h)return;hits.push(d)});
  list.innerHTML='<section><h2>'+hits.length+'件</h2>'+hits.slice(0,200).map(function(d){
   var cls=/否決|不採択|不同意|不承認|不認定/.test(d.r)?'ng':'';
   return '<div class="item"><span class="badge '+cls+'">'+esc(d.r||'報告')+'</span><div><span class="no">'+esc(d.s+' '+d.l)+'</span><a class="t" href="'+esc(d.u)+'">'+esc(d.h||d.t)+'</a>'+(d.v?'<span class="no">'+esc(d.v)+'</span>':'')+'</div></div>'}).join('')+'</section>'}
 fetch('search.json').then(function(r){return r.json()}).then(function(j){data=j;draw()});
-box.addEventListener('input',draw);
+box.addEventListener('input',draw);if(oq)oq.addEventListener('change',draw);
 chips.forEach(function(c){c.addEventListener('click',function(){on=(on===c.dataset.f)?null:c.dataset.f;chips.forEach(function(x){x.classList.toggle('on',x.dataset.f===on)});draw()})});
 })();
 </script>"""
@@ -401,32 +498,52 @@ def render_index(sessions: list[dict], last_checked: str) -> str:
     rows = ""
     for s in sessions:
         n = sum(1 for i in s["items"] if summary_path(s["key"], i["id"]).exists())
-        rows += f'<div class="item"><div><a href="s/{e(s["key"])}.html"><b>{e(s["name"])}</b></a><span class="no">全{len(s["items"])}件・説明ページ{n}件</span></div></div>'
-    latest = ""
+        pct = int(n * 100 / max(1, len(s["items"])))
+        rows += f'<div class="item"><div style="flex:1"><a href="s/{e(s["key"])}.html"><b>{e(s["name"])}</b></a><span class="no">全{len(s["items"])}件・説明あり{n}件</span><div class="bar"><i style="width:{pct}%"></i></div></div></div>'
+    cards = ""
+    example = None
     if sessions:
         s = sessions[0]
+        shown = 0
         for it in s["items"]:
-            sp = summary_path(s["key"], it["id"])
-            if sp.exists():
-                sm = json.loads(sp.read_text(encoding="utf-8"))
-                latest += f'<div class="item">{badge(it["result"])}<div><span class="no">{e(it["label"])}</span><a class="t" href="b/{s["key"]}-{bill_slug(it["id"])}.html">{e(sm["headline"])}</a></div></div>'
+            sm = load_json(summary_path(s["key"], it["id"]))
+            if not sm:
+                continue
+            amt = first_amount(sm)
+            if example is None or (amt and not first_amount(example[1])):
+                example = (it, sm)
+            if shown < 6:
+                cards += f'<a class="card" href="b/{s["key"]}-{bill_slug(it["id"])}.html">{badge(it["result"])}<span class="no">{e(s["name"])} {e(it["label"])}</span><span class="h">{e(sm["headline"])}</span>{f'<span class="amt">{e(amt)}</span>' if amt else ""}</a>'
+                shown += 1
+        more = f'<p style="margin-top:12px"><a href="s/{e(s["key"])}.html">{e(s["name"])}をすべて見る →</a></p>'
+    ex = ""
+    if example:
+        it, sm = example
+        ex = f'''<section>{h2('このサイトがやっていること', 'What we do')}
+<p>市の資料は、正式な名前や専門の言葉で書かれています。それを、何が決まったのかが一目でわかる言葉に直しています。</p>
+<div class="ba"><div class="from"><b>市の資料では</b>{e(it["label"])} {e(it["title"])}</div><div class="arrow">▼</div><div class="to"><b>このサイトでは</b>{e(sm["headline"])}</div></div>
+<div class="role"><div><b>何が決まった</b>ふだんの言葉で</div><div><b>だれが賛成した</b>全会派を同じ形で</div><div><b>元の資料</b>必ずリンク</div></div></section>'''
     idx = build_search_index(sessions)
     fields = [f for f in __import__("tags").FIELDS if any(f in d["f"] for d in idx)]
     areas = sorted({a for d in idx for a in d["a"]})
-    chips = "".join(f'<button type="button" class="chip" data-f="{e(f)}">{e(f)}</button>' for f in fields)
-    chips += "".join(f'<button type="button" class="chip area" data-f="{e(a)}">📍{e(a)}</button>' for a in areas)
+    ICONS = {'子育て・教育': '🧒', '福祉・医療': '🏥', '防災・消防': '🚒', 'まちづくり・道路': '🛣️', '環境・ごみ': '♻️', '産業・農業': '🌾', '施設・工事': '🏗️', '予算・決算': '💴', '人事・表彰': '🧑\u200d💼', '議会・行政のしくみ': '🏛️'}
+    chips = "".join(f'<button type="button" class="fbtn" data-f="{e(f)}"><i>{ICONS.get(f, "・")}</i>{e(f)}</button>' for f in fields)
+    achips = "".join(f'<button type="button" class="chip area" data-f="{e(a)}">📍{e(a)}</button>' for a in areas)
     total = sum(len(x["items"]) for x in sessions)
     explained = sum(1 for x in sessions for i in x["items"] if summary_path(x["key"], i["id"]).exists())
     body = f"""<div class="hero"><div class="kw"><span>予算</span><span>条例</span><span>請願</span><span>会派ごとの賛否</span></div>
 <h1><span class="grad">平塚市議会</span>で<br>決まったことを、<br>わかりやすく</h1>
 <p>市議会で可決・否決されたことを、市の資料をもとにまとめています。</p></div>
 <div class="stats"><div class="stat"><b class="grad">{len(sessions)}<small>回</small></b><span>定例会</span></div><div class="stat"><b class="grad">{total}<small>件</small></b><span>議決・報告</span></div><div class="stat"><b class="grad">{explained}<small>件</small></b><span>説明ページ</span></div></div>
+{ex}
+<section id="find">{h2('分野・地域で探す', 'Find')}<div class="fbtns">{chips}</div><div class="chips" style="justify-content:flex-start">{achips}</div>
 <input id="q" class="search" type="search" placeholder="キーワードで探す（例：保育、補聴器、公民館）" aria-label="キーワードで探す">
-<div class="chips">{chips}</div>
+<label class="onlybox"><input type="checkbox" id="onlyq" checked>説明があるものだけ</label></section>
 <div id="results"></div>
 <div id="latest">
-{f'<section>{h2('最近決まったこと','Latest')}{latest}</section>' if latest else ''}
-<section>{h2('定例会ごとの一覧','Sessions')}{rows or '<p>まだデータがありません。</p>'}</section>
+{f'<section>{h2('最近決まったこと','Latest')}<div class="cards">{cards}</div>{more}</section>' if cards else ''}
+<section id="sessions">{h2('定例会ごとの一覧','Sessions')}{rows or '<p>まだデータがありません。</p>'}</section>
+<p class="muted"><a href="yogo.html">📖 議会の言葉の説明（用語集）</a></p>
 </div>
 <p class="muted">最終確認：{e(last_checked)}</p>{SEARCH_JS}"""
     (OUT / "search.json").write_text(json.dumps(idx, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
@@ -468,6 +585,16 @@ def render_about() -> str:
     return page("このサイトについて", body, path="about.html")
 
 
+def render_glossary() -> str:
+    items = ""
+    for t in glossary.TERMS:
+        items += f'<dt id="{glossary.slug(t[0])}">{e(t[0])}<small>{e(t[1])}</small></dt><dd>{e(t[2])}</dd><dd class="src">出典：<a href="{e(t[3][1])}">{e(t[3][0])}</a></dd>'
+    body = f"""<h1>議会の言葉の説明</h1>
+<p class="muted">議案や結果によく出てくる言葉を、市議会や市役所が公開している用語解説をもとに、短く言い直しています。言葉の使い方は議会によって違うことがあるので、出典もあわせて見てください。</p>
+<section>{h2('用語集', 'Glossary')}<dl class="terms">{items}</dl></section>"""
+    return page("議会の言葉の説明（用語集）", body, path="yogo.html", desc="専決処分、継続費、趣旨採択など、議会でよく出てくる言葉の説明")
+
+
 def main():
     if OUT.exists():
         shutil.rmtree(OUT)
@@ -485,6 +612,7 @@ def main():
             (OUT / "b" / f"{s['key']}-{bill_slug(it['id'])}.html").write_text(render_bill(s, it, sm), encoding="utf-8")
     (OUT / "index.html").write_text(render_index(sessions, last), encoding="utf-8")
     (OUT / "about.html").write_text(render_about(), encoding="utf-8")
+    (OUT / "yogo.html").write_text(render_glossary(), encoding="utf-8")
     (OUT / "feed.xml").write_text(render_feed(sessions), encoding="utf-8")
     (OUT / "CNAME").write_text(DOMAIN + "\n")
     (OUT / ".nojekyll").write_text("")

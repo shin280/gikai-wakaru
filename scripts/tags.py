@@ -17,7 +17,7 @@ FIELDS = {
 
 def tags_for(text: str) -> dict:
     fields = [f for f, words in FIELDS.items() if any(w in text for w in words)]
-    areas = sorted({m for m in re.findall(r"([一-龥ァ-ヶー]{1,4})公民館", text) if m not in ("中央", "新中央", "各")})
+    areas = sorted({m for m in re.findall(r"([一-龥ァ-ヶー]{1,4})公民館", text) if m not in ("中央", "新中央", "各", "地区")})
     if "夕陽ケ丘" in text:
         areas.append("夕陽ケ丘")
     return {"fields": fields, "areas": areas}
