@@ -112,7 +112,7 @@ body.onlysm .nosm{display:none}
 nav.bn{position:fixed;left:0;right:0;bottom:0;background:#fff;box-shadow:0 -1px 0 rgba(0,0,0,.06);display:flex;z-index:9;padding-bottom:env(safe-area-inset-bottom)}
 nav.bn a{flex:1;text-align:center;font-size:13px;font-weight:700;color:var(--ink);text-decoration:none;padding:16px 0 14px;line-height:1.2;position:relative;letter-spacing:.08em}nav.bn a::before{content:"";position:absolute;top:6px;left:50%;width:18px;height:3px;margin-left:-9px;background:var(--grad);transform:skewX(-30deg)}
 body{padding-bottom:60px}
-.herocat{width:120px;height:auto;display:block;margin:0 auto 8px}
+.minicat{position:absolute;right:16px;top:12px;width:44px;height:auto}
 .san{border:2px solid transparent;background:linear-gradient(#fff,#fff) padding-box,var(--grad) border-box;padding:18px 20px 12px}
 .san .sanh{display:flex;align-items:center;gap:8px;padding-top:0}.san .sanh::before{display:none}.san .sanh .cat{width:30px;height:30px;object-fit:contain}
 .san ol{list-style:none;margin:0;padding:0}.san li{padding:8px 0;border-top:1px solid var(--line);margin:0}.san li:first-child{border-top:0}
@@ -540,7 +540,7 @@ def render_index(sessions: list[dict], last_checked: str) -> str:
     ex = ""
     if example:
         it, sm = example
-        ex = f'''<section>{h2('このサイトがやっていること', 'What we do')}
+        ex = f'''<section style="position:relative"><img class="minicat" src="cat-body-sm.png" alt="">{h2('このサイトがやっていること', 'What we do')}
 <p>市の資料は、正式な名前や専門の言葉で書かれています。それを、何が決まったのかが一目でわかる言葉に直しています。</p>
 <div class="ba"><div class="from"><b>市の資料では</b>{e(it["label"])} {e(it["title"])}</div><div class="arrow">▼</div><div class="to"><b>このサイトでは</b>{e(sm["headline"])}</div></div>
 <div class="role"><div><b>何が決まった</b>ふだんの言葉で</div><div><b>だれが賛成した</b>全会派を同じ形で</div><div><b>元の資料</b>必ずリンク</div></div></section>'''
@@ -552,7 +552,6 @@ def render_index(sessions: list[dict], last_checked: str) -> str:
     total = sum(len(x["items"]) for x in sessions)
     explained = sum(1 for x in sessions for i in x["items"] if summary_path(x["key"], i["id"]).exists())
     body = f"""<div class="hero"><div class="kw"><span>予算</span><span>条例</span><span>請願</span><span>会派ごとの賛否</span></div>
-<img class="herocat" src="cat-body-sm.png" alt="猫でもわかる平塚市議会の猫">
 <h1><span class="grad">猫でもわかる</span><br>平塚市議会</h1>
 <p>議会って難しい言葉ばかり。<br>だから、猫でもわかる言葉に直しました。</p></div>
 <div class="stats"><div class="stat"><b class="grad">{len(sessions)}<small>回</small></b><span>定例会</span></div><div class="stat"><b class="grad">{total}<small>件</small></b><span>議決・報告</span></div><div class="stat"><b class="grad">{explained}<small>件</small></b><span>説明ページ</span></div></div>
