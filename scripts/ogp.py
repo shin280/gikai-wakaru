@@ -21,7 +21,7 @@ def font(weight: str, size: int) -> ImageFont.FreeTypeFont:
 def wrap(draw: ImageDraw.ImageDraw, text: str, f, width: int, max_lines: int) -> list[str]:
     lines, cur = [], ""
     for ch in text:
-        if draw.textlength(cur + ch, font=f) > width:
+        if draw.textlength(cur + ch, font=f) > width and ch not in "。、」）！？ー・":
             lines.append(cur)
             cur = ch
             if len(lines) == max_lines:
@@ -40,7 +40,8 @@ def make(path: Path, headline: str, meta: str, badge: str = "") -> None:
     d = ImageDraw.Draw(img)
     d.rounded_rectangle((40, 40, W - 40, H - 40), radius=32, fill="white")
     # ロゴ
-    d.rounded_rectangle((90, 90, 130, 118), radius=8, fill=RED)
+    face = Image.open(Path(__file__).resolve().parent.parent / "assets" / "cat-face.png"); face.thumbnail((52, 52))
+    img.paste(face, (84, 78), face)
     d.text((146, 84), "猫でもわかる", font=font("Bold", 30), fill=RED)
     d.text((146 + d.textlength("猫でもわかる", font=font("Bold", 30)), 84), "平塚市議会", font=font("Bold", 30), fill=INK)
     y = 165
@@ -51,10 +52,12 @@ def make(path: Path, headline: str, meta: str, badge: str = "") -> None:
         d.text((108, y + 5), badge, font=bf, fill=(196, 0, 42))
         y += 72
     hf = font("Bold", 54)
-    for line in wrap(d, headline, hf, W - 180, 4 if not badge else 3):
+    for line in wrap(d, headline, hf, W - 330, 4 if not badge else 3):
         d.text((90, y), line, font=hf, fill=INK)
         y += 74
+    body = Image.open(Path(__file__).resolve().parent.parent / "assets" / "cat-body.png"); body.thumbnail((190, 190))
+    img.paste(body, (W - 70 - body.width, H - 60 - body.height), body)
     mf = font("Regular", 28)
-    d.text((90, H - 110), wrap(d, meta, mf, W - 180, 1)[0], font=mf, fill=SUB)
+    d.text((90, H - 110), wrap(d, meta, mf, W - 400, 1)[0], font=mf, fill=SUB)
     path.parent.mkdir(parents=True, exist_ok=True)
     img.save(path, optimize=True)
