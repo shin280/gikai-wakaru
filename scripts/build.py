@@ -63,7 +63,7 @@ p{margin:0 0 10px}ul{margin:0 0 10px;padding-left:1.2em}li{margin-bottom:6px}
 .toggle{display:inline-flex;border:1px solid var(--line);background:#fff;border-radius:99px;padding:4px;gap:2px;margin:14px 0 4px}
 .toggle button{border:0;background:transparent;padding:8px 20px;border-radius:99px;font:inherit;font-size:13px;color:var(--sub);cursor:pointer;letter-spacing:.05em}
 .toggle button[aria-pressed=true]{background:var(--red);color:#fff;font-weight:700;box-shadow:0 4px 12px rgba(255,0,51,.25)}
-.detail{display:none}body.is-detail .detail{display:block}body.is-detail .easy{display:none}rt{display:none}body.kid rt{display:revert;font-size:.5em;font-weight:500;color:#555}body.kid main{font-size:118%;line-height:2.2}body.kid main h1{line-height:1.9}body.kid .kh,body.kid .detail,body.kid .toggle{display:none!important}body.kid .easy{display:block!important}.kidnote{display:none}body.kid .kidnote{display:block;background:#fff8e1;border-radius:10px;padding:10px 14px;margin:10px 0;font-size:14px}nav.bn button{flex:1;background:none;border:0;font:inherit;font-size:12px;font-weight:700;color:var(--ink);padding:16px 0 14px;line-height:1.2;position:relative;letter-spacing:0;cursor:pointer}nav.bn button::before{content:"";position:absolute;top:6px;left:50%;width:18px;height:3px;margin-left:-9px;background:var(--grad);transform:skewX(-30deg)}body.kid nav.bn button{color:var(--red)}
+.detail{display:none}body.is-detail .detail{display:block}body.is-detail .easy{display:none}rt{display:none}body.kid rt{display:revert;font-size:.5em;font-weight:500;color:#555}body.kid main{font-size:118%;line-height:2.2}body.kid main h1{line-height:1.9}body.kid .kh,body.kid .detail,body.kid .toggle{display:none!important}body.kid .easy{display:block!important}.kidnote{display:none}body.kid .kidnote{display:block;background:#fff8e1;border-radius:10px;padding:10px 14px;margin:10px 0;font-size:14px}.kidwrap{text-align:center;margin:18px 0}#kidbtn{background:#fff;border:2px solid var(--red);border-radius:999px;font:inherit;font-size:15px;font-weight:700;color:var(--red);padding:10px 28px;cursor:pointer}body.kid #kidbtn{background:var(--red);color:#fff}
 .money{font-weight:700}.formal{font-size:13px;color:var(--sub);margin:0}
 .meta{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:20px}
 .tag{font-size:12px;padding:0 2px 2px;border-bottom:1.5px solid var(--ink);color:var(--ink);font-weight:500;margin-right:6px}
@@ -134,7 +134,7 @@ TOGGLE_JS = """<script>
 (function(){var b=document.body,E=document.getElementById('b-easy'),D=document.getElementById('b-detail');if(!E)return;
 function s(d){b.classList.toggle('is-detail',d);E.setAttribute('aria-pressed',!d);D.setAttribute('aria-pressed',d)}
 E.onclick=function(){s(false)};D.onclick=function(){s(true)}})();
-(function(){var k=document.getElementById('kidbtn');if(!k)return;function u(){var on=document.body.classList.contains('kid');k.textContent=on?'もどす':'小学生モード';k.setAttribute('aria-pressed',on)}
+(function(){var k=document.getElementById('kidbtn');if(!k)return;function u(){var on=document.body.classList.contains('kid');k.textContent=on?'小学生モードをやめる':'小学生モード';k.setAttribute('aria-pressed',on)}
 k.onclick=function(){var on=document.body.classList.toggle('kid');try{localStorage.setItem('kid',on?'1':'0')}catch(e){}u();window.scrollTo(0,0)};u()})();
 (function(){var o=document.getElementById('only');if(!o)return;function f(){document.body.classList.toggle('onlysm',o.checked)}o.onchange=f;f()})();
 </script>"""
@@ -163,9 +163,10 @@ def page(title: str, body: str, depth: int = 0, desc: str = "", path: str = "", 
 <header class="site"><div class="wrap"><a class="logo" href="{root}index.html">{CAT_SVG.replace("{root}", root)}<span>猫でもわかる</span>平塚市議会</a><span class="tagline">HIRATSUKA CITY COUNCIL, MADE EASY</span></div></header>
 <main class="wrap">{furigana.add(KIDNOTE + body)}
 <footer><img class="footcat" src="{root}cat-sit-sm.png" alt=""><p><b>運営：元島しん</b>（平塚市議会議員・しらさぎ・無所属クラブ所属）。会派ごとの賛否は、すべての会派を同じ形で、議会だよりの記載のとおりに載せています。<a href="{root}about.html">このサイトについて</a>・<a href="{root}riyuu.html">このサイトを作った理由</a></p><p>このサイトは、平塚市が公開している資料をもとに、プログラムとAIが自動で作っています。大事な判断の前には、各ページの「元の資料」で必ず確かめてください。</p>
+<p class="kidwrap"><button type="button" id="kidbtn" aria-pressed="false">小学生モード</button></p>
 <p><a href="{report}">間違いを報告する</a> ・ <a href="https://github.com/{REPO}">このサイトのしくみ（GitHub）</a></p></footer>
 </main>
-<nav class="bn"><a href="{root}index.html">ホーム</a><a href="{root}index.html#find">探す</a><a href="{root}index.html#sessions">定例会</a><a href="{root}yogo.html">用語</a><button type="button" id="kidbtn" aria-pressed="false">小学生モード</button></nav>{TOGGLE_JS}</body></html>
+<nav class="bn"><a href="{root}index.html">ホーム</a><a href="{root}index.html#find">探す</a><a href="{root}index.html#sessions">定例会</a><a href="{root}yogo.html">用語</a></nav>{TOGGLE_JS}</body></html>
 """
 
 
