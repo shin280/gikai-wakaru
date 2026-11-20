@@ -140,6 +140,9 @@ k.onclick=function(){var on=document.body.classList.toggle('kid');try{localStora
 </script>"""
 
 
+KIDNOTE = '<p class="kidnote">小学生モード：漢字にふりがなを付けて、大事なところだけ見せています。ふりがなはコンピューターが自動で付けているので、読みがちがうことがあります。</p>'
+
+
 def page(title: str, body: str, depth: int = 0, desc: str = "", path: str = "", og: str = "og/index.png") -> str:
     root = "../" * depth
     url = f"{SITE_URL}/{path}"
@@ -158,7 +161,7 @@ def page(title: str, body: str, depth: int = 0, desc: str = "", path: str = "", 
 <style>{CSS}</style></head><body>
 <script>try{{if(localStorage.getItem('kid')==='1')document.body.classList.add('kid')}}catch(e){{}}</script>
 <header class="site"><div class="wrap"><a class="logo" href="{root}index.html">{CAT_SVG.replace("{root}", root)}<span>猫でもわかる</span>平塚市議会</a><span class="tagline">HIRATSUKA CITY COUNCIL, MADE EASY</span></div></header>
-<main class="wrap"><p class="kidnote">小学生モード：漢字にふりがなを付けて、大事なところだけ見せています。ふりがなはコンピューターが自動で付けているので、読みがちがうことがあります。</p>{furigana.add(body)}
+<main class="wrap">{furigana.add(KIDNOTE + body)}
 <footer><img class="footcat" src="{root}cat-sit-sm.png" alt=""><p><b>運営：元島しん</b>（平塚市議会議員・しらさぎ・無所属クラブ所属）。会派ごとの賛否は、すべての会派を同じ形で、議会だよりの記載のとおりに載せています。<a href="{root}about.html">このサイトについて</a>・<a href="{root}riyuu.html">このサイトを作った理由</a></p><p>このサイトは、平塚市が公開している資料をもとに、プログラムとAIが自動で作っています。大事な判断の前には、各ページの「元の資料」で必ず確かめてください。</p>
 <p><a href="{report}">間違いを報告する</a> ・ <a href="https://github.com/{REPO}">このサイトのしくみ（GitHub）</a></p></footer>
 </main>
