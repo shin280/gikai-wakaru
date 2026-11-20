@@ -90,7 +90,7 @@ footer{font-size:12px;color:var(--sub);margin-top:36px;padding-top:20px;border-t
 .ba{display:grid;gap:8px;margin:14px 0 4px}
 .ba .from{background:#fff;border:1px dashed #cfcfcf;border-radius:10px;padding:12px 14px;color:var(--sub);font-size:13px}
 .ba .from b,.ba .to b{display:block;font-size:11px;letter-spacing:.1em;margin-bottom:2px}
-.ba .arrow{text-align:center;font-size:20px;line-height:1;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.ba .arrow{text-align:center;font-size:15px;font-weight:700;letter-spacing:.1em;line-height:1;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
 .ba .to{background:#fff;border-radius:10px;padding:12px 14px;font-weight:700;font-size:17px;box-shadow:0 0 0 2px rgba(255,0,51,.18)}
 .ba .to b{color:var(--red-d)}
 .role{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px}.role div{background:var(--bg);border-radius:8px;padding:10px;font-size:12px;text-align:center}.role div b{display:block;font-size:14px}
@@ -315,20 +315,20 @@ def first_amount(sm):
 
 
 def ba_html(it, sm):
-    """むずかしい正式名称 → このサイトの見出し、を並べて見せる。"""
+    """むずかしい正式名称 → このサイトの見出し（すぐ下のh1）、の順に見せる。"""
     if not sm:
         return f'<p class="formal">正式名称：{e(it["label"])} {e(it["title"])}</p>'
-    return f'''<div class="ba"><div class="from"><b>市の資料での名前</b>{e(it["label"])} {e(it["title"])}</div>
-<div class="arrow">▼</div><div class="to"><b>つまり</b>{e(sm["headline"])}</div></div>'''
+    return f'''<div class="ba" style="margin-bottom:0"><div class="from"><b>市の資料での名前</b>{e(it["label"])} {e(it["title"])}</div>
+<div class="arrow">▼ つまり</div></div>'''
 
 
 def glance_html(s, it, sm):
     rows = []
     vf, v = votes_for(s["key"], it["id"])
     rows.append(("結果", vote_headline(vf, v, it["result"]) if v else (it["result"] or "報告")))
-    amt = first_amount(sm)
-    if amt:
-        rows.append(("お金", amt))
+    amts = [p["amount"] for p in (sm or {}).get("points", []) if p.get("amount")]
+    if len(amts) == 1:
+        rows.append(("金額", amts[0]))
     who = "、".join(w["name"] for w in (sm or {}).get("who", []))
     if who:
         rows.append(("関係する人", who))
@@ -396,8 +396,8 @@ def render_bill(s: dict, it: dict, sm: dict | None) -> str:
         explain = '<div class="ai">この議案のわかりやすい説明はまだありません。件名と賛否、討論だけを載せています。</div>'
     body = f"""
 <div class="meta">{badge(it['result'])}<span class="tag">{e(s['name'])}</span><span class="tag">{e(KIND_LABEL.get(it['kind'], it['kind']))}</span>{tags}</div>
-<h1 class="easy">{e(headline)}</h1><h1 class="detail">{e(sm_.get('headline_detail') or headline)}</h1>
 {ba_html(it, sm)}
+<h1 class="easy" style="margin-top:6px">{e(headline)}</h1><h1 class="detail" style="margin-top:6px">{e(sm_.get('headline_detail') or headline)}</h1>
 {glance_html(s, it, sm)}
 {explain}
 <section>{h2('審議のステータス','Status')}<div class="steps"><div class="step done">提出</div><div class="step done">委員会で審査</div><div class="step done">本会議で{e(it['result'] or '報告')}</div></div></section>
