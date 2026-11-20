@@ -17,7 +17,7 @@ DOMAIN = "gikai.tubehira.jp"
 # 独自ドメインがつながるまでは GitHub Pages のアドレス。つながったら https://gikai.tubehira.jp にする
 SITE_URL = "https://gikai.tubehira.jp"
 REPO = "shin280/gikai-wakaru"
-SITE_NAME = "ひらつか議会 わかる版"
+SITE_NAME = "中学生でもわかる平塚市議会"
 
 KIND_ORDER = ["議案", "認", "会議案", "請願", "陳情", "報告"]
 KIND_LABEL = {"議案": "議案", "認": "決算の認定", "会議案": "議員が出した議案・意見書", "請願": "請願",
@@ -137,7 +137,7 @@ def page(title: str, body: str, depth: int = 0, desc: str = "", path: str = "", 
 {meta}
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
 <style>{CSS}</style></head><body>
-<header class="site"><div class="wrap"><a class="logo" href="{root}index.html">ひらつか議会 <span>わかる版</span></a><span class="tagline">HIRATSUKA CITY COUNCIL, MADE EASY</span></div></header>
+<header class="site"><div class="wrap"><a class="logo" href="{root}index.html"><span>中学生でもわかる</span>平塚市議会</a><span class="tagline">HIRATSUKA CITY COUNCIL, MADE EASY</span></div></header>
 <main class="wrap">{body}
 <footer><p><b>運営：元島しん</b>（平塚市議会議員・しらさぎ・無所属クラブ所属）。会派ごとの賛否は、すべての会派を同じ形で、議会だよりの記載のとおりに載せています。<a href="{root}about.html">このサイトについて</a></p><p>このサイトは、平塚市が公開している資料をもとに、プログラムとAIが自動で作っています。人による確認はしていないため、間違いが含まれる可能性があります。大事な判断の前には、各ページの「元の資料」で必ず確かめてください。</p>
 <p><a href="{report}">間違いを報告する</a> ・ <a href="https://github.com/{REPO}">このサイトのしくみ（GitHub）</a></p></footer>
@@ -534,8 +534,8 @@ def render_index(sessions: list[dict], last_checked: str) -> str:
     total = sum(len(x["items"]) for x in sessions)
     explained = sum(1 for x in sessions for i in x["items"] if summary_path(x["key"], i["id"]).exists())
     body = f"""<div class="hero"><div class="kw"><span>予算</span><span>条例</span><span>請願</span><span>会派ごとの賛否</span></div>
-<h1><span class="grad">平塚市議会</span>で<br>決まったことを、<br>わかりやすく</h1>
-<p>市議会で可決・否決されたことを、市の資料をもとにまとめています。</p></div>
+<h1><span class="grad">中学生でもわかる</span><br>平塚市議会</h1>
+<p>議会って難しい言葉ばかりで、何をやってるのかわからない。<br>だから、市議会で決まったことを、ふだんの言葉に直しています。</p></div>
 <div class="stats"><div class="stat"><b class="grad">{len(sessions)}<small>回</small></b><span>定例会</span></div><div class="stat"><b class="grad">{total}<small>件</small></b><span>議決・報告</span></div><div class="stat"><b class="grad">{explained}<small>件</small></b><span>説明ページ</span></div></div>
 {ex}
 <section id="find">{h2('分野・地域で探す', 'Find')}<div class="fbtns">{chips}</div><div class="chips" style="justify-content:flex-start">{achips}</div>
@@ -549,8 +549,8 @@ def render_index(sessions: list[dict], last_checked: str) -> str:
 </div>
 <p class="muted">最終確認：{e(last_checked)}</p>{SEARCH_JS}"""
     (OUT / "search.json").write_text(json.dumps(idx, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
-    ogp.make(OUT / "og" / "index.png", "平塚市議会で決まったことを、わかりやすく", "議決結果・会派ごとの賛否・わかりやすい説明")
-    return page("平塚市議会で決まったことを、わかりやすく", body, desc="平塚市議会で可決・否決されたことと会派ごとの賛否を、市の資料をもとにわかりやすくまとめています。")
+    ogp.make(OUT / "og" / "index.png", "議会って難しい言葉ばかり。だから、ふだんの言葉に直しました", "平塚市議会で決まったこと・会派ごとの賛否")
+    return page("議会で決まったことを、ふだんの言葉で", body, desc="平塚市議会で可決・否決されたことと会派ごとの賛否を、市の資料をもとにわかりやすくまとめています。")
 
 
 def render_feed(sessions: list[dict]) -> str:
