@@ -142,7 +142,7 @@ TOGGLE_JS = """<script>
 (function(){var b=document.body,E=document.getElementById('b-easy'),D=document.getElementById('b-detail');if(!E)return;
 function s(d){b.classList.toggle('is-detail',d);E.setAttribute('aria-pressed',!d);D.setAttribute('aria-pressed',d)}
 E.onclick=function(){s(false)};D.onclick=function(){s(true)}})();
-(function(){var k=document.getElementById('kidbtn');if(!k)return;function u(){var on=document.body.classList.contains('kid');k.textContent=on?'小学生モードをやめる':'小学生モード';k.setAttribute('aria-pressed',on)}
+(function(){var k=document.getElementById('kidbtn');if(!k)return;function u(){var on=document.body.classList.contains('kid');var m=document.querySelector('main'),n=document.querySelector('.kidnote');if(on&&!n&&m&&window.KIDNOTE){m.insertAdjacentHTML('afterbegin',KIDNOTE)}k.textContent=on?'小学生モードをやめる':'小学生モード';k.setAttribute('aria-pressed',on)}
 k.onclick=function(){var on=document.body.classList.toggle('kid');try{localStorage.setItem('kid',on?'1':'0')}catch(e){}u();window.scrollTo(0,0)};u()})();
 (function(){var o=document.getElementById('only');if(!o)return;function f(){document.body.classList.toggle('onlysm',o.checked)}o.onchange=f;f()})();
 </script>"""
@@ -216,12 +216,12 @@ def page(title: str, body: str, depth: int = 0, desc: str = "", path: str = "", 
 <style>{CSS}</style>{GC_TAG if GC_CODE else ''}</head><body>
 <script>try{{if(localStorage.getItem('kid')==='1')document.body.classList.add('kid')}}catch(e){{}}</script>
 <header class="site"><div class="wrap"><a class="logo" href="{root}index.html">{CAT_SVG.replace("{root}", root)}<span>猫でもわかる</span>平塚市議会</a><span class="tagline">HIRATSUKA CITY COUNCIL, MADE EASY</span></div></header>
-<main class="wrap">{furigana.add(KIDNOTE + body)}
+<main class="wrap">{furigana.add(body)}
 <footer><img class="footcat" src="{root}cat-sit-sm.png" alt=""><p><b>運営：元島しん</b>（平塚市議会議員・しらさぎ・無所属クラブ所属）。会派ごとの賛否は、すべての会派を同じ形で、議会だよりの記載のとおりに載せています。<a href="{root}about.html">このサイトについて</a>・<a href="{root}riyuu.html">このサイトを作った理由</a></p><p><a href="{root}kore.html">これから決まること</a>・<a href="{root}area/index.html">地区・地名から探す</a>・<a href="{root}sanka.html">自分も参加できる</a></p><p>このサイトは、平塚市が公開している資料をもとに、プログラムとAIが自動で作っています。大事な判断の前には、各ページの「元の資料」で必ず確かめてください。</p>
 <p class="kidwrap"><button type="button" id="kidbtn" aria-pressed="false">小学生モード</button></p>
 <p><a href="{report}">間違いを報告する</a>{(' ・ <a href="' + root + 'access.html">アクセス数</a>') if GC_CODE else ''} ・ <a href="https://github.com/{REPO}">このサイトのしくみ（GitHub）</a></p></footer>
 </main>
-<nav class="bn"><a href="{root}index.html">ホーム</a><a href="{root}index.html#find">探す</a><a href="{root}index.html#sessions">定例会</a><a href="{root}yogo.html">用語</a></nav>{TOGGLE_JS}</body></html>
+<nav class="bn"><a href="{root}index.html">ホーム</a><a href="{root}index.html#find">探す</a><a href="{root}index.html#sessions">定例会</a><a href="{root}yogo.html">用語</a></nav><script>var KIDNOTE={json.dumps(furigana.add(KIDNOTE), ensure_ascii=False).replace('</', '<\\/')};</script>{TOGGLE_JS}</body></html>
 """
 
 
@@ -849,7 +849,7 @@ def render_upcoming(up) -> str:
             lead += '<p class="muted">やさしい説明は準備中です。いまは市の説明をそのまま載せています。</p>'
         items = f'<section>{h2(f"出される予定の議案（{len(up["items"])}件）", "Bills")}{lead}{items}<p class="muted">出典：<a href="{e(up["press"])}">平塚市 記者発表「市議会定例会の提出案件」</a></p></section>'
     else:
-        items = f'<section>{h2("出される予定の議案", "Bills")}<p>市が議案の一覧を発表したら、ここに載せます。ふだんは定例会が始まる1週間ほど前に、市長の記者会見で発表されています。</p></section>'
+        items = f'<section>{h2("出される予定の議案", "Bills")}<p>市が議案の一覧を発表したら、ここに載せます。前回（令和8年9月定例会）は、定例会が始まる6日前に、市長の記者会見で発表されました。</p></section>'
     body = f"""<h1>これから決まること</h1>
 <p class="muted">次の定例会（{e(up['name'])}）で話し合われることです。{('会期は' + e(up['kaiki']) + 'です。') if up.get('kaiki') else ''}</p>
 {items}
