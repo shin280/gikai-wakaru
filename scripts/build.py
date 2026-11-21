@@ -17,8 +17,10 @@ OUT = ROOT / "site"
 DOMAIN = "gikai.tubehira.jp"
 # 独自ドメインがつながるまでは GitHub Pages のアドレス。つながったら https://gikai.tubehira.jp にする
 SITE_URL = "https://gikai.tubehira.jp"
-# アクセス数（GoatCounter）。アカウントのコード名を入れると、計測とアクセス数ページが有効になる
-GC_CODE = ""
+# アクセス数（Supabase の gikai-wakaru-access プロジェクト。公開用のキーなので、ページに載せてよい）
+SB_URL = "https://wwnerxasbcsvlvakmusg.supabase.co"
+SB_KEY = "sb_publishable_BNqndJC-OfKxqQDiri9fWA_7wnOKCX6"
+GC_CODE = SB_URL  # アクセス数の機能を有効にするかどうか
 REPO = "shin280/gikai-wakaru"
 SITE_NAME = "猫でもわかる平塚市議会"
 OG_VER = "neko2"  # SNS用画像を変えたら上げる（XやLINEの古い画像のキャッシュを避けるため）
@@ -87,6 +89,7 @@ footer{font-size:12px;color:var(--sub);margin-top:36px;padding-top:20px;border-t
 .hero .kw span{border-bottom:1.5px solid var(--ink);padding-bottom:1px}
 .hero h1{font-size:clamp(28px,7vw,44px);line-height:1.4;margin:0 0 16px;letter-spacing:.08em}
 .hero p{color:var(--sub);font-size:14px}
+.daily .drow{display:grid;grid-template-columns:44px 1fr 48px;gap:8px;align-items:center;font-size:12px;margin:3px 0}.daily i{display:block;height:10px;background:var(--grad);border-radius:3px}.daily b{text-align:right}
 .tbl{width:100%;border-collapse:collapse;font-size:14px}.tbl th,.tbl td{padding:10px 6px;border-bottom:1px solid #eee;text-align:left}.tbl td.num,.tbl th:last-child{text-align:right;white-space:nowrap;font-weight:700}
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:22px 0 8px}
 .stat{background:#fff;border-radius:10px;padding:16px 8px;text-align:center;box-shadow:0 2px 14px rgba(0,0,0,.04)}
@@ -144,6 +147,7 @@ k.onclick=function(){var on=document.body.classList.toggle('kid');try{localStora
 
 
 PAGES: list = []
+TITLES: dict = {}
 AUTHOR = {"@type": "Person", "name": "元島しん", "jobTitle": "平塚市議会議員", "url": f"{SITE_URL}/about.html"}
 
 
@@ -152,25 +156,33 @@ def crumbs(*items) -> dict:
         {"@type": "ListItem", "position": i, "name": n, "item": f"{SITE_URL}/{u}"} for i, (n, u) in enumerate([("ホーム", "")] + list(items), 1)]}
 
 
-GC_TAG = f'<script data-goatcounter="https://{GC_CODE}.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>'
+GC_TAG = ("<script>(function(){if(navigator.webdriver)return;var p=location.pathname;if(p==='/index.html')p='/';"
+          "try{var k='hv'+new Date().toISOString().slice(0,10)+p;if(localStorage.getItem(k))return;localStorage.setItem(k,'1')}catch(e){}"
+          f"fetch('{SB_URL}/rest/v1/rpc/hit',{{method:'POST',keepalive:true,headers:{{apikey:'{SB_KEY}','Content-Type':'application/json'}},body:JSON.stringify({{p:p}})}}).catch(function(){{}})"
+          "})();</script>")
 
 
 def render_access(sessions) -> str:
-    rows = [("トップページ", "/"), ("このサイトを作った理由", "/riyuu.html"), ("用語集", "/yogo.html")]
-    rows += [(f"{x['name']}の一覧", f"/s/{x['key']}.html") for x in sessions]
-    trs = "".join(f'<tr><td><a href="{u.lstrip("/") or "index.html"}">{e(n)}</a></td><td class="num" data-p="{e(u)}">…</td></tr>' for n, u in rows)
+    titles = json.dumps({k: v for k, v in TITLES.items()}, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
     body = f"""<h1>アクセス数</h1>
-<p class="muted">このサイトが何人に見られているかを、そのまま公開しています。数字は最大4時間ほど遅れて反映されます。</p>
-<section>{h2('見た人の数', 'Visitors')}<div class="stats">
-<div class="stat"><b id="c-total">…</b><span>これまで</span></div><div class="stat"><b id="c-month">…</b><span>この1か月</span></div><div class="stat"><b id="c-week">…</b><span>この1週間</span></div></div></section>
-<section>{h2('ページごと', 'By page')}<table class="tbl"><tr><th>ページ</th><th>見た人</th></tr>{trs}</table></section>
-<section>{h2('数え方', 'How')}<p>アクセス数は <a href="https://www.goatcounter.com/">GoatCounter</a> で数えています。Cookie（閲覧者を見分けるための記録）は使わず、名前やメールアドレスなど個人がわかる情報も集めていません。</p>
-<p><a href="https://{GC_CODE}.goatcounter.com/">くわしいグラフ（GoatCounter）</a></p></section>
+<p class="muted">このサイトがどれくらい見られているかを、そのまま公開しています。同じ人が同じ日に同じページを何度開いても、1回と数えます。</p>
+<section>{h2('見られた回数', 'Page views')}<div class="stats">
+<div class="stat"><b id="c-today">…</b><span>今日</span></div><div class="stat"><b id="c-week">…</b><span>この7日間</span></div><div class="stat"><b id="c-month">…</b><span>この30日間</span></div></div>
+<p class="muted" id="c-total"></p></section>
+<section>{h2('毎日の回数（30日間）', 'Daily')}<div id="c-daily" class="daily"></div></section>
+<section>{h2('よく見られているページ', 'Top pages')}<table class="tbl" id="c-top"><tr><th>ページ</th><th>回数</th></tr></table></section>
+<section>{h2('数え方', 'How')}<p>ページを開いたときに「どのページが、いつ開かれたか」だけを記録しています。IPアドレス、名前、メールアドレスなど、人を見分けられる情報は記録していません。Cookieも使っていません。</p></section>
 <script>
-(function(){{var B='https://{GC_CODE}.goatcounter.com/counter/';
-function g(p,q,el){{fetch(B+encodeURIComponent(p)+'.json'+(q||'')).then(function(r){{return r.ok?r.json():{{count:'0'}}}}).then(function(d){{el.textContent=d.count+'人'}}).catch(function(){{el.textContent='-'}})}}
-g('TOTAL','',document.getElementById('c-total'));g('TOTAL','?start=month',document.getElementById('c-month'));g('TOTAL','?start=week',document.getElementById('c-week'));
-[].forEach.call(document.querySelectorAll('[data-p]'),function(el){{g(el.getAttribute('data-p'),'',el)}})}})();
+(function(){{var T={titles};
+function n(x){{return Number(x).toLocaleString('ja-JP')}}
+function esc(t){{var d=document.createElement('div');d.textContent=t;return d.innerHTML}}
+fetch('{SB_URL}/rest/v1/rpc/stats',{{method:'POST',headers:{{apikey:'{SB_KEY}','Content-Type':'application/json'}},body:'{{}}'}}).then(function(r){{return r.json()}}).then(function(d){{
+document.getElementById('c-today').textContent=n(d.today);document.getElementById('c-week').textContent=n(d.week);document.getElementById('c-month').textContent=n(d.month);
+document.getElementById('c-total').textContent='数え始めた日（'+(d.since||'-')+'）からの合計：'+n(d.total)+'回';
+var mx=1;d.daily.forEach(function(x){{if(x.v>mx)mx=x.v}});
+document.getElementById('c-daily').innerHTML=d.daily.length?d.daily.map(function(x){{return '<div class="drow"><span>'+x.d.slice(5).replace('-','/')+'</span><i style="width:'+Math.max(2,x.v/mx*100)+'%"></i><b>'+n(x.v)+'</b></div>'}}).join(''):'<p class="muted">まだ記録がありません。</p>';
+document.getElementById('c-top').innerHTML+=d.top.map(function(x){{var u=x.p==='/'?'index.html':x.p.slice(1);return '<tr><td><a href="'+esc(u)+'">'+esc(T[x.p]||x.p)+'</a></td><td class="num">'+n(x.v)+'</td></tr>'}}).join('');
+}}).catch(function(){{document.getElementById('c-total').textContent='いま数字を読み込めません。時間をおいて開いてください。'}})}})();
 </script>"""
     return page("アクセス数", body, path="access.html", desc="猫でもわかる平塚市議会のアクセス数", ld=[crumbs(("アクセス数", "access.html"))])
 
@@ -180,6 +192,7 @@ KIDNOTE = '<p class="kidnote">小学生モード：漢字にふりがなを付�
 
 def page(title: str, body: str, depth: int = 0, desc: str = "", path: str = "", og: str = "og/index.png", ld: list | None = None, full_title: str = "") -> str:
     PAGES.append(path)
+    TITLES['/' + path if path else '/'] = title
     root = "../" * depth
     url = f"{SITE_URL}/{path}"
     meta = f"""<meta property="og:type" content="website"><meta property="og:site_name" content="{SITE_NAME}">
@@ -683,6 +696,7 @@ def render_about() -> str:
 <li>反対・賛成の理由は、会議録にある各会派の討論から、出典付きで載せる</li></ul></section>
 <section>{h2('しくみ', 'How it works')}
 <p>毎朝、プログラムが平塚市議会の議決結果のページ、ひらつか議会だより、会派構成のページ、会議録を読みに行き、新しい内容があればこのサイトを作り直します。議案のわかりやすい説明はAIが市の資料から書いています。</p>
+<p>どのページが何回見られたかを数えて、<a href="access.html">アクセス数のページ</a>で公開しています。記録するのはページと日付だけで、人を見分けられる情報は記録していません。</p>
 <p>説明を書くときの決まりと、プログラムはすべて公開しています。<a href="https://github.com/{REPO}">GitHub</a></p></section>
 <section>{h2('間違いを見つけたら', 'Report')}
 <p><a href="https://github.com/{REPO}/issues/new">こちらから報告</a>してください。</p></section>"""
