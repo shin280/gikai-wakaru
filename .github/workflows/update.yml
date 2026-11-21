@@ -31,6 +31,10 @@ jobs:
       - name: 市のサイトから議決結果を取得
         run: python scripts/fetch.py
 
+      - name: これから議会に出される議案を取得（市長記者会見の提出案件）
+        continue-on-error: true
+        run: python scripts/fetch_upcoming.py
+
       - name: 議会だよりから会派ごとの賛否を取得
         run: |
           python scripts/fetch_dayori.py
@@ -85,7 +89,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - run: pip install requests beautifulsoup4 pillow fugashi unidic-lite
+      - run: pip install requests beautifulsoup4 pillow fugashi unidic-lite qrcode
       - name: 日本語フォント（SNS用画像に使う）
         run: sudo apt-get install -y -qq fonts-noto-cjk >/dev/null
 

@@ -1,5 +1,6 @@
 """data/ のJSONから静的サイトを site/ に作る。"""
 import html
+import re
 import json
 import shutil
 import sys
@@ -90,6 +91,7 @@ footer{font-size:12px;color:var(--sub);margin-top:36px;padding-top:20px;border-t
 .hero h1{font-size:clamp(28px,7vw,44px);line-height:1.4;margin:0 0 16px;letter-spacing:.08em}
 .hero p{color:var(--sub);font-size:14px}
 .daily .drow{display:grid;grid-template-columns:44px 1fr 48px;gap:8px;align-items:center;font-size:12px;margin:3px 0}.daily i{display:block;height:10px;background:var(--grad);border-radius:3px}.daily b{text-align:right}
+.more .card b{display:block;font-size:16px}.more .card span{display:block;font-size:13px;color:var(--sub);margin-top:4px}.pc{display:inline-block;margin-left:10px;font-size:13px;color:#555}.pcnote{font-size:12px}.up{background:#fff;border-radius:10px;padding:12px 16px;margin:10px 0;box-shadow:0 2px 14px rgba(0,0,0,.04)}.up h3{margin:0 0 6px;font-size:16px}.up summary{font-size:13px;color:#555;cursor:pointer}
 .tbl{width:100%;border-collapse:collapse;font-size:14px}.tbl th,.tbl td{padding:10px 6px;border-bottom:1px solid #eee;text-align:left}.tbl td.num,.tbl th:last-child{text-align:right;white-space:nowrap;font-weight:700}
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:22px 0 8px}
 .stat{background:#fff;border-radius:10px;padding:16px 8px;text-align:center;box-shadow:0 2px 14px rgba(0,0,0,.04)}
@@ -181,7 +183,7 @@ document.getElementById('c-today').textContent=n(d.today);document.getElementByI
 document.getElementById('c-total').textContent='数え始めた日（'+(d.since||'-')+'）からの合計：'+n(d.total)+'回';
 var mx=1;d.daily.forEach(function(x){{if(x.v>mx)mx=x.v}});
 document.getElementById('c-daily').innerHTML=d.daily.length?d.daily.map(function(x){{return '<div class="drow"><span>'+x.d.slice(5).replace('-','/')+'</span><i style="width:'+Math.max(2,x.v/mx*100)+'%"></i><b>'+n(x.v)+'</b></div>'}}).join(''):'<p class="muted">まだ記録がありません。</p>';
-document.getElementById('c-top').innerHTML+=d.top.map(function(x){{var u=x.p==='/'?'index.html':x.p.slice(1);return '<tr><td><a href="'+esc(u)+'">'+esc(T[x.p]||x.p)+'</a></td><td class="num">'+n(x.v)+'</td></tr>'}}).join('');
+document.getElementById('c-top').innerHTML+=d.top.map(function(x){{var u=x.p==='/'?'index.html':x.p.slice(1);return '<tr><td><a href="'+esc(u)+'">'+esc(T[x.p]||T[(function(){{try{{return decodeURIComponent(x.p)}}catch(e){{return x.p}}}})()]||x.p)+'</a></td><td class="num">'+n(x.v)+'</td></tr>'}}).join('');
 }}).catch(function(){{document.getElementById('c-total').textContent='いま数字を読み込めません。時間をおいて開いてください。'}})}})();
 </script>"""
     return page("アクセス数", body, path="access.html", desc="猫でもわかる平塚市議会のアクセス数", ld=[crumbs(("アクセス数", "access.html"))])
@@ -194,7 +196,8 @@ def page(title: str, body: str, depth: int = 0, desc: str = "", path: str = "", 
     PAGES.append(path)
     TITLES['/' + path if path else '/'] = title
     root = "../" * depth
-    url = f"{SITE_URL}/{path}"
+    from urllib.parse import quote as _q
+    url = f"{SITE_URL}/{_q(path)}"
     meta = f"""<meta property="og:type" content="website"><meta property="og:site_name" content="{SITE_NAME}">
 <meta property="og:title" content="{e(title)}"><meta property="og:description" content="{e(desc or title)}">
 <meta property="og:url" content="{e(url)}"><meta property="og:image" content="{SITE_URL}/{og}?v={OG_VER}"><meta name="twitter:image" content="{SITE_URL}/{og}?v={OG_VER}">
@@ -214,7 +217,7 @@ def page(title: str, body: str, depth: int = 0, desc: str = "", path: str = "", 
 <script>try{{if(localStorage.getItem('kid')==='1')document.body.classList.add('kid')}}catch(e){{}}</script>
 <header class="site"><div class="wrap"><a class="logo" href="{root}index.html">{CAT_SVG.replace("{root}", root)}<span>猫でもわかる</span>平塚市議会</a><span class="tagline">HIRATSUKA CITY COUNCIL, MADE EASY</span></div></header>
 <main class="wrap">{furigana.add(KIDNOTE + body)}
-<footer><img class="footcat" src="{root}cat-sit-sm.png" alt=""><p><b>運営：元島しん</b>（平塚市議会議員・しらさぎ・無所属クラブ所属）。会派ごとの賛否は、すべての会派を同じ形で、議会だよりの記載のとおりに載せています。<a href="{root}about.html">このサイトについて</a>・<a href="{root}riyuu.html">このサイトを作った理由</a></p><p>このサイトは、平塚市が公開している資料をもとに、プログラムとAIが自動で作っています。大事な判断の前には、各ページの「元の資料」で必ず確かめてください。</p>
+<footer><img class="footcat" src="{root}cat-sit-sm.png" alt=""><p><b>運営：元島しん</b>（平塚市議会議員・しらさぎ・無所属クラブ所属）。会派ごとの賛否は、すべての会派を同じ形で、議会だよりの記載のとおりに載せています。<a href="{root}about.html">このサイトについて</a>・<a href="{root}riyuu.html">このサイトを作った理由</a></p><p><a href="{root}kore.html">これから決まること</a>・<a href="{root}area/index.html">地区・地名から探す</a>・<a href="{root}sanka.html">自分も参加できる</a></p><p>このサイトは、平塚市が公開している資料をもとに、プログラムとAIが自動で作っています。大事な判断の前には、各ページの「元の資料」で必ず確かめてください。</p>
 <p class="kidwrap"><button type="button" id="kidbtn" aria-pressed="false">小学生モード</button></p>
 <p><a href="{report}">間違いを報告する</a>{(' ・ <a href="' + root + 'access.html">アクセス数</a>') if GC_CODE else ''} ・ <a href="https://github.com/{REPO}">このサイトのしくみ（GitHub）</a></p></footer>
 </main>
@@ -414,7 +417,8 @@ def glance_html(s, it, sm):
     if who:
         rows.append(("関係する人", who))
     elif len(amts) == 1:
-        rows.append(("お金", amts[0]))
+        pc = per_capita(amts[0])
+        rows.append(("お金", amts[0] + (f"（市民1人あたり {pc}）" if pc else "")))
     elif sm.get("unknowns"):
         rows.append(("まだ分からないこと", sm["unknowns"][0]))
     lis = "".join(f'<li><span>{e(a)}</span>{e(b)}</li>' for a, b in rows)
@@ -461,7 +465,8 @@ def render_bill(s: dict, it: dict, sm: dict | None) -> str:
     headline = sm_.get("headline") or it["title"]
     pts = ""
     for i, p in enumerate(sm_.get("points", []), 1):
-        amt = f'<p>予算：<span class="money">{e(p["amount"])}</span></p>' if p.get("amount") else ""
+        pc = per_capita(p.get("amount", ""))
+        amt = (f'<p>予算：<span class="money">{e(p["amount"])}</span>' + (f'<span class="pc">市民1人あたり {pc}</span>' if pc else '') + '</p>') if p.get("amount") else ""
         det = f'<p class="detail">{e(p["detail"])}</p>' if p.get("detail") else ""
         pts += f'<h3>{i}. {e(p["title"])}</h3><p class="easy">{e(p["easy"])}</p>{det}{amt}'
     calc = "".join(f"<p>{e(x)}</p>" for x in sm_.get("numbers", []))
@@ -474,7 +479,7 @@ def render_bill(s: dict, it: dict, sm: dict | None) -> str:
     if vfile:
         src += f'<li><a href="{e(vfile["source"]["pdf"])}">{e(vfile["source"]["title"])}（審議結果）</a></li>'
     t = tags_for(item_text(it, sm))
-    tags = "".join(f'<span class="tag">{e(f)}</span>' for f in t["fields"]) + "".join(f'<span class="tag">地域：{e(a)}</span>' for a in t["areas"])
+    tags = "".join(f'<span class="tag">{e(f)}</span>' for f in t["fields"]) + "".join(f'<a class="tag" href="../area/{e(a)}.html">地域：{e(a)}</a>' for a in t["areas"])
     if sm:
         explain = f"""<div class="toggle"><button type="button" id="b-easy" aria-pressed="true">やさしく</button><button type="button" id="b-detail" aria-pressed="false">詳しく</button></div>
 """
@@ -489,7 +494,7 @@ def render_bill(s: dict, it: dict, sm: dict | None) -> str:
 <section class="kh">{h2('審議のステータス','Status')}<div class="steps"><div class="step done">提出</div><div class="step done">委員会で審査</div><div class="step done">本会議で{e(it['result'] or '報告')}</div></div></section>
 <div class="kh">{render_votes(s, it)}
 {render_debates(s, it)}</div>
-{f'<section>{h2('何が決まったの？','What was decided')}{pts}</section>' if pts else ''}
+{f'<section>{h2('何が決まったの？','What was decided')}{pts}{PC_NOTE if 'class="pc"' in pts else ''}</section>' if pts else ''}
 {f'<section class="kh">{h2('数字で見ると','In numbers')}{calc}</section>' if calc else ''}
 {f'<section class="kh">{h2('なぜ必要なの？（市の説明）','Why')}{why}</section>' if why else ''}
 {f'<section>{h2('だれに関係する？','Who is affected')}<ul>{who}</ul></section>' if who else ''}
@@ -544,6 +549,7 @@ def render_session(s: dict) -> str:
     body = f"""<h1>{e(s['name'])}で決まったこと</h1>
 <p class="muted">全{len(s['items'])}件のうち、わかりやすい説明があるのは{nsm}件です。</p>
 {'<label class="onlybox"><input type="checkbox" id="only" checked>説明があるものだけ表示</label>' if 0 < nsm < len(s['items']) else ''}
+<p><a class="chip" href="../p/{e(s['key'])}.html">回覧板用に印刷する（A4・1枚）</a></p>
 {groups}
 <section>{h2('元の資料','Sources')}<ul><li><a href="{e(s['source'])}">平塚市議会 議決結果のページ</a></li>{pdfs}{dayori}</ul></section>"""
     against = sum(1 for i in s["items"] if (votes_for(s["key"], i["id"])[1] or {}) and vote_summary(*votes_for(s["key"], i["id"])) != "全会一致")
@@ -638,7 +644,7 @@ def render_index(sessions: list[dict], last_checked: str) -> str:
     fields = [f for f in __import__("tags").FIELDS if any(f in d["f"] for d in idx)]
     areas = sorted({a for d in idx for a in d["a"]})
     chips = "".join(f'<button type="button" class="fbtn" data-f="{e(f)}">{e(f)}</button>' for f in fields)
-    achips = "".join(f'<button type="button" class="chip area" data-f="{e(a)}">{e(a)}</button>' for a in areas)
+    achips = "".join(f'<a class="chip area" href="area/{e(a)}.html">{e(a)}</a>' for a in areas) + '<a class="chip area" href="area/index.html">地区・地名の一覧</a>'
     total = sum(len(x["items"]) for x in sessions)
     explained = sum(1 for x in sessions for i in x["items"] if summary_path(x["key"], i["id"]).exists())
     body = f"""<div class="hero"><div class="kw"><span>予算</span><span>条例</span><span>請願</span><span>会派ごとの賛否</span></div>
@@ -650,6 +656,7 @@ def render_index(sessions: list[dict], last_checked: str) -> str:
 <p class="muted">どれから読めばいいか分からない人へ。これまでの議案から、猫が1件えらびます。</p>
 <div id="gres" class="gres"><img src="cat-face-sm.png" alt="" class="gcat"><span class="muted">猫はまだ、えらんでいません</span></div>
 <button type="button" id="gbtn" class="gbtn">猫に選んでもらう</button></section>
+<section>{h2('もっと知る', 'More')}<div class="cards more"><a class="card" href="kore.html"><b>これから決まること</b><span>次の定例会に出される議案と日程</span></a><a class="card" href="area/index.html"><b>地区・地名から探す</b><span>自分の地区で決まったこと</span></a><a class="card" href="sanka.html"><b>自分も参加できる</b><span>傍聴・ネット中継・請願の出し方</span></a></div></section>
 <section id="find">{h2('分野・地域で探す', 'Find')}<div class="fbtns">{chips}</div><div class="chips" style="justify-content:flex-start">{achips}</div>
 <input id="q" class="search" type="search" placeholder="キーワードで探す（例：保育、補聴器、公民館）" aria-label="キーワードで探す">
 <label class="onlybox"><input type="checkbox" id="onlyq" checked>説明があるものだけ</label></section>
@@ -742,6 +749,214 @@ def render_reason() -> str:
     return page("このサイトを作った理由", body, path="riyuu.html", desc="平塚市議会の議決を、猫でもわかる言葉に直すサイトを作った理由", ld=ld)
 
 
+
+# ---- 市民1人あたり ----
+POP = 257320
+POP_DATE = "令和8年7月1日現在"
+POP_SRC = ("平塚市「人口速報ひらつか」", "https://www.city.hiratsuka.kanagawa.jp/common/200205503.pdf")
+
+
+def yen(s: str):
+    """「15億7,717万3,400円」「6万6千円」などを円の数にする。マイナスや読めないものは None。"""
+    if not s or "マイナス" in s or "△" in s:
+        return None
+    t = s.replace(",", "").replace("，", "").strip()
+    m = re.fullmatch(r"(?:(\d+)億)?(?:(\d+)万)?(?:(\d+)千)?(\d+)?円", t)
+    if not m or not any(m.groups()):
+        return None
+    oku, man, sen, rest = (int(x) if x else 0 for x in m.groups())
+    return oku * 10**8 + man * 10**4 + sen * 1000 + rest
+
+
+def per_capita(amount: str) -> str:
+    v = yen(amount)
+    if not v:
+        return ""
+    pc = v / POP
+    if pc >= 10:
+        return f"約{round(pc):,}円"
+    if pc >= 1:
+        return f"約{pc:.1f}円"
+    return ""
+
+
+PC_NOTE = f'<p class="muted pcnote">※「市民1人あたり」は、金額を平塚市の人口{POP:,}人（{POP_DATE}、<a href="{POP_SRC[1]}">{POP_SRC[0]}</a>）で割った目安です。</p>'
+
+
+# ---- 一覧の1行 ----
+def item_row(s: dict, it: dict, prefix: str = "../") -> str:
+    sm = load_json(summary_path(s["key"], it["id"]))
+    vf, v = votes_for(s["key"], it["id"])
+    vs = f'<span class="no">{e(vote_summary(vf, v))}</span>' if v else ""
+    return (f'<div class="item">{badge(it["result"])}<div><span class="no">{e(s["name"])} {e(it["label"])}</span>'
+            f'<a class="t" href="{prefix}b/{s["key"]}-{bill_slug(it["id"])}.html">{e(sm["headline"] if sm else it["title"])}</a>{vs}</div></div>')
+
+
+# ---- 地区ごとのページ ----
+def area_entries(sessions):
+    out = {}
+    for s in reversed(sessions):
+        for it in s["items"]:
+            for a in tags_for(item_text(it, load_json(summary_path(s["key"], it["id"]))))["areas"]:
+                out.setdefault(a, []).append((s, it))
+    return out
+
+
+def render_area(place: str, entries: list, upcoming_hits: list) -> str:
+    rows = "".join(item_row(s, it) for s, it in entries)
+    up = ""
+    if upcoming_hits:
+        up = f'<section>{h2("これから決まること", "Upcoming")}<ul>' + "".join(f'<li>{e(x.get("easy") or x["title"])}</li>' for x in upcoming_hits) + '</ul><p><a href="../kore.html">これから決まること（一覧）</a></p></section>'
+    body = f"""<h1>{e(place)}で決まったこと</h1>
+<p class="muted">議案や請願の件名・説明に「{e(place)}」という地名が出てくるものを集めています。地名が書かれていない議案（市全体の予算など）でも、{e(place)}に関係することがあります。</p>
+{up}<section>{h2(f'{len(entries)}件', 'Decided')}{rows}</section>
+<p><a href="index.html">ほかの地区・地名を見る</a></p>"""
+    return page(f"平塚市{place}で決まったこと（市議会）", body, depth=1, path=f"area/{place}.html",
+                desc=f"平塚市議会で決まったことのうち、「{place}」が出てくる議案・請願{len(entries)}件をわかりやすく。",
+                ld=[crumbs(("地区・地名から探す", "area/index.html"), (place, f"area/{place}.html"))])
+
+
+def render_area_index(areas: dict) -> str:
+    chips = "".join(f'<a class="chip area" href="{e(a)}.html">{e(a)}（{len(v)}）</a>' for a, v in sorted(areas.items(), key=lambda x: -len(x[1])))
+    body = f"""<h1>地区・地名から探す</h1>
+<p class="muted">議案や請願の件名・説明に出てくる地名ごとにまとめています。（ ）の数字は件数です。</p>
+<div class="chips" style="justify-content:flex-start">{chips}</div>"""
+    return page("地区・地名から探す", body, depth=1, path="area/index.html", desc="平塚市議会で決まったことを、真土・大神・四之宮など地区や地名ごとにまとめています。",
+                ld=[crumbs(("地区・地名から探す", "area/index.html"))])
+
+
+# ---- これから決まること ----
+def load_upcoming(sessions):
+    done = {s["key"] for s in sessions}
+    ups = sorted((load_json(p) for p in (DATA / "upcoming").glob("*.json")), key=lambda d: d["key"]) if (DATA / "upcoming").exists() else []
+    ups = [u for u in ups if u and u["key"] not in done]
+    return ups[-1] if ups else None
+
+
+def render_upcoming(up) -> str:
+    if not up:
+        body = """<h1>これから決まること</h1><p>次の定例会の予定が出たら、ここに載せます。</p>"""
+        return page("これから決まること", body, path="kore.html")
+    sched = "".join(f'<tr><td>{e(x["d"])}</td><td>{e(x["what"])}</td></tr>' for x in up.get("schedule", []))
+    items = ""
+    for x in up.get("items", []):
+        det = "".join(f"<li>{e(d)}</li>" for d in x.get("details", []))
+        easy = f'<p class="easy" style="display:block">{e(x["easy"])}</p>' if x.get("easy") else ""
+        items += f"""<div class="up"><h3>{e(x['title'])}</h3>{easy}<details><summary>市の説明（そのまま）</summary><p>{e(x['overview'])}</p>{f'<ul>{det}</ul>' if det else ''}</details></div>"""
+    if items:
+        lead = f'<p>市が発表した、{e(up["name"])}に出される予定の議案です。結果が出たら、ほかの議案と同じように説明ページを作ります。</p>'
+        if not any(x.get("easy") for x in up["items"]):
+            lead += '<p class="muted">やさしい説明は準備中です。いまは市の説明をそのまま載せています。</p>'
+        items = f'<section>{h2(f"出される予定の議案（{len(up["items"])}件）", "Bills")}{lead}{items}<p class="muted">出典：<a href="{e(up["press"])}">平塚市 記者発表「市議会定例会の提出案件」</a></p></section>'
+    else:
+        items = f'<section>{h2("出される予定の議案", "Bills")}<p>市が議案の一覧を発表したら、ここに載せます。ふだんは定例会が始まる1週間ほど前に、市長の記者会見で発表されています。</p></section>'
+    body = f"""<h1>これから決まること</h1>
+<p class="muted">次の定例会（{e(up['name'])}）で話し合われることです。{('会期は' + e(up['kaiki']) + 'です。') if up.get('kaiki') else ''}</p>
+{items}
+{f'<section>{h2("日程", "Schedule")}<table class="tbl">{sched}</table><p class="muted">日程は変わることがあります。出典：<a href="{e(up["schedule_source"])}">平塚市議会「会議の日程」と傍聴のご案内</a></p></section>' if sched else ''}
+<section>{h2('見に行く・意見を伝える', 'Join')}<p>本会議はだれでも傍聴でき、インターネットでも見られます。<a href="sanka.html">参加のしかた</a></p></section>"""
+    return page(f"これから決まること（{up['name']}）", body, path="kore.html",
+                desc=f"平塚市議会{up['name']}に出される予定の議案と日程を、結果が出る前にわかりやすく。")
+
+
+# ---- 参加ガイド ----
+GUIDE_SRC = {
+    "bocho": "https://www.city.hiratsuka.kanagawa.jp/gikai/page-c_02369.html",
+    "chukei": "https://www.city.hiratsuka.kanagawa.jp/gikai/page-c_02288.html",
+    "seigan": "https://www.city.hiratsuka.kanagawa.jp/gikai/page-c_02222.html",
+    "giin": "https://www.city.hiratsuka.kanagawa.jp/gikai/page-c_02299.html",
+}
+
+
+def render_guide() -> str:
+    g = GUIDE_SRC
+    body = f"""<h1>自分も参加できる</h1>
+<p class="muted">議会は、見ることも、意見を伝えることもできます。平塚市議会のページに書かれていることを、やさしい言葉でまとめました。くわしいことや最新の情報は、それぞれの「元のページ」で確かめてください。</p>
+<section>{h2('ネットやテレビで見る', 'Watch')}
+<ul><li>本会議は、インターネットで生中継されています。あとから録画も見られます（会議のおよそ7日後から、会議録が市のサイトに載るまで）。<a href="https://hiratsuka-city.stream.jfit.co.jp/">平塚市議会 インターネット中継</a></li>
+<li>ケーブルテレビ（湘南ケーブルネットワーク、デジタル002チャンネル）でも、本会議を生中継しています。</li></ul>
+<p class="muted">元のページ：<a href="{g['chukei']}">市議会のテレビ・インターネット中継</a></p></section>
+<section>{h2('傍聴する（会議を直接見に行く）', 'Visit')}
+<ul><li><b>本会議</b>：だれでも見に行けます。市役所本館8階の傍聴受付で、住所と名前を書きます。先着順で、席は97人分（車いす席5席をふくむ）です。</li>
+<li><b>小さい子どもと一緒でも大丈夫</b>：乳幼児を連れた人のための部屋が2つあります（1部屋3人くらい）。</li>
+<li><b>耳が聞こえにくい人</b>：聞こえを助ける機械を5台貸し出しています。受付で伝えてください。手話通訳は、見に行きたい日の3週間前までに申し込みます。</li>
+<li><b>議案の資料</b>：傍聴する人に貸し出しています。</li>
+<li><b>委員会</b>：委員長の許可があれば見られます。席は18人分です。</li>
+<li><b>守ること</b>：拍手やヤジはだめです。席での飲食・たばこはできません。携帯電話は音が出ないようにします。写真・録音・録画は原則できません。</li>
+<li>10人以上のグループで行くときは、前もって議会局議事担当（0463-21-8791）に連絡します。</li></ul>
+<p>次の定例会の日程は<a href="kore.html">これから決まること</a>にも載せています。</p>
+<p class="muted">元のページ：<a href="{g['bocho']}">平塚市議会「会議の日程」と傍聴のご案内</a></p></section>
+<section>{h2('請願・陳情を出す（お願いを議会に届ける）', 'Petition')}
+<p>市にしてほしいことを、文書にして議会に出せます。出し方は2つあります。</p>
+<ul><li><b>請願</b>：議員1人以上に「紹介議員」として名前を書いてもらう必要があります。委員会で話し合い、本会議で「採択（認める）」か「不採択（認めない）」かを決めます。結果は出した人（代表者）に知らされます。</li>
+<li><b>陳情</b>：紹介議員はいりません。多くは議会運営委員会で扱いを話し合います。その結果は、出した人には知らされません（市長の担当の内容は、市から回答が来ることがあります）。</li></ul>
+<p><b>書き方</b>：日付、住所、あて先（平塚市議会議長）を書き、署名するか、名前を書いてはんこを押します。団体のときは、団体名と代表者の名前を書きます。書き方の見本は元のページにあります。</p>
+<p><b>出す場所</b>：市役所本館8階の議会局。</p>
+<p><b>しめきり（午後5時まで）</b>：請願は、定例会の本会議2日目まで。陳情は、議会運営委員会の2日前（土・日・祝日をのぞく）まで。</p>
+<p><b>知っておくこと</b>：出した請願・陳情は、全部の議員に写しが配られます。請願書と陳情書は情報公開の対象です（いっしょに出した署名簿は公開されません）。請願を出した人は、本会議3日目の正午までに申し出れば、委員会で5分以内、意見を話せることがあります。</p>
+<p class="muted">元のページ：<a href="{g['seigan']}">請願・陳情の提出方法</a>　問い合わせ：議会局議事担当 0463-21-8791</p></section>
+<section>{h2('議員に連絡する', 'Contact')}
+<p>平塚市議会の「議員一覧」に、議員ごとの名前・会派・住所・電話番号が載っています（事務所の住所・電話のこともあります）。メールアドレスは載っていません。</p>
+<p>だれに相談すればいいか分からないときや、議会のしくみについての質問は、議会局（0463-21-8791）にも聞けます。</p>
+<p class="muted">元のページ：<a href="{g['giin']}">議員一覧</a></p></section>"""
+    return page("自分も参加できる（傍聴・中継・請願・議員への連絡）", body, path="sanka.html",
+                desc="平塚市議会を見に行く（傍聴）、ネットで見る、請願・陳情を出す、議員に連絡する方法を、やさしい言葉で。",
+                ld=[crumbs(("自分も参加できる", "sanka.html"))])
+
+
+# ---- 回覧板用の1枚まとめ ----
+def qr_svg(url: str) -> str:
+    try:
+        import io
+        import qrcode
+        import qrcode.image.svg
+        img = qrcode.make(url, image_factory=qrcode.image.svg.SvgPathImage, box_size=10, border=1)
+        b = io.BytesIO()
+        img.save(b)
+        svg = b.getvalue().decode()
+        return svg[svg.index("<svg"):]
+    except Exception:
+        return ""
+
+
+def render_print(s: dict) -> str:
+    rows = []
+    for kind in KIND_ORDER:
+        for it in s["items"]:
+            if it["kind"] != kind:
+                continue
+            sm = load_json(summary_path(s["key"], it["id"]))
+            if not sm:
+                continue
+            vf, v = votes_for(s["key"], it["id"])
+            res = vote_headline(vf, v, it["result"]) if v else (it["result"] or "報告")
+            amt = next((p["amount"] for p in sm.get("points", []) if p.get("amount")), "")
+            pc = per_capita(amt)
+            money = f'（市民1人あたり{pc}）' if pc else ""
+            rank = (0 if kind in ("議案", "請願") and amt else 1 if kind in ("議案", "請願", "陳情", "会議案") else 2)
+            rows.append((rank, f'<li><b>{e(sm["headline"])}</b>{e(money)}<span>{e(it["label"])}・{e(res)}</span></li>'))
+    n = len(rows)
+    keep = [r for _, r in sorted(rows, key=lambda x: x[0])][:14]
+    more = f'<p class="more">ほか{n - len(keep)}件は、右のQRコードから読めます。</p>' if n > len(keep) else ""
+    url = f"{SITE_URL}/s/{s['key']}.html"
+    return f"""<!DOCTYPE html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex">
+<title>{e(s['name'])}で決まったこと（印刷用）｜{SITE_NAME}</title>
+<style>@page{{size:A4;margin:12mm}}*{{box-sizing:border-box}}body{{font-family:"Hiragino Sans","Noto Sans JP","Yu Gothic",sans-serif;color:#111;margin:0;padding:12mm;max-width:210mm;margin:auto;font-size:10.5pt;line-height:1.55}}
+@media print{{body{{padding:0}}.noprint{{display:none}}}}
+header{{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid #111;padding-bottom:6px;margin-bottom:8px;gap:12px}}
+h1{{font-size:18pt;margin:0;line-height:1.3}}.sub{{font-size:9pt;margin:4px 0 0}}.qr{{text-align:center;font-size:8pt;flex:none}}.qr svg{{width:26mm;height:26mm;display:block}}
+ol{{margin:0;padding-left:1.4em}}li{{margin:0 0 5px;break-inside:avoid}}li span{{display:block;font-size:8.5pt;color:#444}}
+.more{{font-size:9pt;margin:6px 0}}footer{{border-top:1px solid #999;margin-top:8px;padding-top:4px;font-size:7.5pt;color:#333}}
+.noprint{{background:#fff4f4;border:1px solid #f0c0c0;border-radius:8px;padding:10px;margin-bottom:12px;font-size:11pt}}.noprint button{{font-size:12pt;padding:6px 16px}}</style></head><body>
+<div class="noprint">回覧板やお知らせ用に、A4で1枚に印刷できます。<button onclick="print()">印刷する</button>　<a href="../s/{e(s['key'])}.html">戻る</a></div>
+<header><div><h1>平塚市議会 {e(s['name'])}で決まったこと</h1><p class="sub">市議会で決まったことを、わかりやすい言葉にしました（説明がある{n}件のうち、主なもの）。</p></div>
+<div class="qr">{qr_svg(url)}全部はこちら</div></header>
+<ol>{''.join(keep)}</ol>{more}
+<footer>{SITE_NAME}（{SITE_URL.replace('https://', '')}）　市が公開している資料をもとに作っています。正確な内容は市の資料で確かめてください。
+会派ごとの賛否は、ひらつか議会だよりの記載のとおりです。{('「市民1人あたり」は人口' + f'{POP:,}人（{POP_DATE}）で割った目安です。') if any('1人あたり' in r for r in keep) else ''}運営：元島しん（平塚市議会議員）</footer>
+</body></html>"""
+
+
 def render_glossary() -> str:
     items = ""
     for t in glossary.TERMS:
@@ -771,13 +986,26 @@ def main():
     (OUT / "about.html").write_text(render_about(), encoding="utf-8")
     (OUT / "yogo.html").write_text(render_glossary(), encoding="utf-8")
     (OUT / "riyuu.html").write_text(render_reason(), encoding="utf-8")
+    up = load_upcoming(sessions)
+    (OUT / "kore.html").write_text(render_upcoming(up), encoding="utf-8")
+    (OUT / "sanka.html").write_text(render_guide(), encoding="utf-8")
+    (OUT / "area").mkdir(exist_ok=True)
+    areas = area_entries(sessions)
+    for a, ents in areas.items():
+        hits = [x for x in (up or {}).get("items", []) if a in x["title"] + x.get("overview", "") + " ".join(x.get("details", []))]
+        (OUT / "area" / f"{a}.html").write_text(render_area(a, ents, hits), encoding="utf-8")
+    (OUT / "area" / "index.html").write_text(render_area_index(areas), encoding="utf-8")
+    (OUT / "p").mkdir(exist_ok=True)
+    for s in sessions:
+        (OUT / "p" / f"{s['key']}.html").write_text(render_print(s), encoding="utf-8")
     if GC_CODE:
         (OUT / "access.html").write_text(render_access(sessions), encoding="utf-8")
     for f in (ROOT / "assets").glob("*.png"):
         shutil.copy(f, OUT / f.name)
     (OUT / "404.html").write_text(page("ページが見つかりません", '<h1>ページが見つかりません</h1><p>このページはなくなったか、URLが違うようです。</p><p><a href="/index.html">トップページへ</a></p>', path="404.html").replace('<meta charset="utf-8">', '<meta charset="utf-8"><meta name="robots" content="noindex">', 1), encoding="utf-8")
     PAGES.remove("404.html")
-    urls = "".join(f"<url><loc>{SITE_URL}/{u}</loc></url>" for u in PAGES)
+    from urllib.parse import quote as _q
+    urls = "".join(f"<url><loc>{SITE_URL}/{_q(u)}</loc></url>" for u in PAGES)
     (OUT / "sitemap.xml").write_text(f'<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{urls}</urlset>', encoding="utf-8")
     (OUT / "robots.txt").write_text(f"User-agent: *\nAllow: /\nSitemap: {SITE_URL}/sitemap.xml\n")
     (OUT / "feed.xml").write_text(render_feed(sessions), encoding="utf-8")

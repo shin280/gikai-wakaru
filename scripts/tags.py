@@ -15,9 +15,32 @@ FIELDS = {
 }
 
 
+# 平塚市内の地名。件名・説明にこの言葉がそのまま出てくるものだけを、その地名の議案とする（推測はしない）。
+# 25の地区公民館の名前（平塚市「地区公民館一覧」）と、議案によく出てくる地名。
+PLACES = [
+    "崇善", "須賀", "松原", "富士見", "花水", "なでしこ", "大野", "八幡", "四之宮", "中原", "松が丘", "大原",
+    "南原", "神田", "横内", "大神", "岡崎", "豊田", "城島", "金目", "金田", "土屋", "吉沢", "旭南", "旭北",
+    "真土", "田村", "夕陽ケ丘", "龍城ケ丘", "馬入", "徳延", "纒", "河内", "万田", "公所", "根坂間",
+    "袖ケ浜", "桃浜町", "天沼", "吉際", "ツインシティ", "湘南海岸",
+]
+# 地名ではない使われ方を外す（例：「八幡山の洋館」は施設名、「大野」は人名のことがある）
+NOT_PLACE = {"八幡": ["八幡山"], "金田": [], "中原": []}
+ALIAS = {"夕陽ヶ丘": "夕陽ケ丘", "龍城ヶ丘": "龍城ケ丘", "袖ヶ浜": "袖ケ浜"}
+
+
+def places_in(text: str) -> list:
+    for a, b in ALIAS.items():
+        text = text.replace(a, b)
+    out = []
+    for p in PLACES:
+        t = text
+        for ng in NOT_PLACE.get(p, []):
+            t = t.replace(ng, "")
+        if p in t:
+            out.append(p)
+    return out
+
+
 def tags_for(text: str) -> dict:
     fields = [f for f, words in FIELDS.items() if any(w in text for w in words)]
-    areas = sorted({m for m in re.findall(r"([一-龥ァ-ヶー]{1,4})公民館", text) if m not in ("中央", "新中央", "各", "地区", "平塚市立", "市立")})
-    if "夕陽ケ丘" in text:
-        areas.append("夕陽ケ丘")
-    return {"fields": fields, "areas": areas}
+    return {"fields": fields, "areas": places_in(text)}
