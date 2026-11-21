@@ -45,7 +45,7 @@ header.site .wrap{padding-top:14px;padding-bottom:14px;display:flex;align-items:
 .logo span{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
 .tagline{display:none}
 .grad{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
-h1{font-size:26px;line-height:1.5;margin:28px 0 12px;font-weight:700;letter-spacing:.06em}
+h1,.h1{font-size:26px;line-height:1.5;margin:28px 0 12px;font-weight:700;letter-spacing:.06em}
 h2{font-size:19px;margin:0 0 14px;line-height:1.45;font-weight:700;letter-spacing:.05em;position:relative;padding-top:14px}
 h2::before{content:"";position:absolute;top:0;left:2px;width:34px;height:5px;background:var(--grad);transform:skewX(-30deg);border-radius:1px}
 h2 small{display:none}
@@ -63,7 +63,7 @@ p{margin:0 0 10px}ul{margin:0 0 10px;padding-left:1.2em}li{margin-bottom:6px}
 .toggle{display:inline-flex;border:1px solid var(--line);background:#fff;border-radius:99px;padding:4px;gap:2px;margin:14px 0 4px}
 .toggle button{border:0;background:transparent;padding:8px 20px;border-radius:99px;font:inherit;font-size:13px;color:var(--sub);cursor:pointer;letter-spacing:.05em}
 .toggle button[aria-pressed=true]{background:var(--red);color:#fff;font-weight:700;box-shadow:0 4px 12px rgba(255,0,51,.25)}
-.detail{display:none}body.is-detail .detail{display:block}body.is-detail .easy{display:none}rt{display:none}body.kid rt{display:revert;font-size:.5em;font-weight:500;color:#555}body.kid main{font-size:118%;line-height:2.2}body.kid main h1{line-height:1.9}body.kid .kh,body.kid .detail,body.kid .toggle{display:none!important}body.kid .easy{display:block!important}.kidnote{display:none}body.kid .kidnote{display:block;background:#fff8e1;border-radius:10px;padding:10px 14px;margin:10px 0;font-size:14px}.kidwrap{text-align:center;margin:18px 0}#kidbtn{background:#fff;border:2px solid var(--red);border-radius:999px;font:inherit;font-size:15px;font-weight:700;color:var(--red);padding:10px 28px;cursor:pointer}body.kid #kidbtn{background:var(--red);color:#fff}
+.detail{display:none}body.is-detail .detail{display:block}body.is-detail .easy{display:none}rt{display:none}body.kid rt::before{content:attr(data-r)}body.kid rt{display:revert;font-size:.5em;font-weight:500;color:#555}body.kid main{font-size:118%;line-height:2.2}body.kid main h1{line-height:1.9}body.kid .kh,body.kid .detail,body.kid .toggle{display:none!important}body.kid .easy{display:block!important}.kidnote{display:none}body.kid .kidnote{display:block;background:#fff8e1;border-radius:10px;padding:10px 14px;margin:10px 0;font-size:14px}.kidwrap{text-align:center;margin:18px 0}#kidbtn{background:#fff;border:2px solid var(--red);border-radius:999px;font:inherit;font-size:15px;font-weight:700;color:var(--red);padding:10px 28px;cursor:pointer}body.kid #kidbtn{background:var(--red);color:#fff}
 .money{font-weight:700}.formal{font-size:13px;color:var(--sub);margin:0}
 .meta{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:20px}
 .tag{font-size:12px;padding:0 2px 2px;border-bottom:1.5px solid var(--ink);color:var(--ink);font-weight:500;margin-right:6px}
@@ -140,10 +140,20 @@ k.onclick=function(){var on=document.body.classList.toggle('kid');try{localStora
 </script>"""
 
 
+PAGES: list = []
+AUTHOR = {"@type": "Person", "name": "元島しん", "jobTitle": "平塚市議会議員", "url": f"{SITE_URL}/about.html"}
+
+
+def crumbs(*items) -> dict:
+    return {"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [
+        {"@type": "ListItem", "position": i, "name": n, "item": f"{SITE_URL}/{u}"} for i, (n, u) in enumerate([("ホーム", "")] + list(items), 1)]}
+
+
 KIDNOTE = '<p class="kidnote">小学生モード：漢字にふりがなを付けて、大事なところだけ見せています。ふりがなはコンピューターが自動で付けているので、読みがちがうことがあります。もとにもどすときは、ページの一番下のボタンをおしてください。</p>'
 
 
-def page(title: str, body: str, depth: int = 0, desc: str = "", path: str = "", og: str = "og/index.png") -> str:
+def page(title: str, body: str, depth: int = 0, desc: str = "", path: str = "", og: str = "og/index.png", ld: list | None = None, full_title: str = "") -> str:
+    PAGES.append(path)
     root = "../" * depth
     url = f"{SITE_URL}/{path}"
     meta = f"""<meta property="og:type" content="website"><meta property="og:site_name" content="{SITE_NAME}">
@@ -151,12 +161,15 @@ def page(title: str, body: str, depth: int = 0, desc: str = "", path: str = "", 
 <meta property="og:url" content="{e(url)}"><meta property="og:image" content="{SITE_URL}/{og}?v={OG_VER}"><meta name="twitter:image" content="{SITE_URL}/{og}?v={OG_VER}">
 <meta name="twitter:card" content="summary_large_image"><link rel="canonical" href="{e(url)}">
 <link rel="alternate" type="application/rss+xml" title="{SITE_NAME}" href="{SITE_URL}/feed.xml">"""
+    if ld:
+        meta += "".join('<script type="application/ld+json">' + json.dumps(x, ensure_ascii=False).replace("</", "<\\/") + "</script>" for x in ld)
     report = f"https://github.com/{REPO}/issues/new?title=" + e(f"間違いの報告：{title}")
     return f"""<!DOCTYPE html>
 <html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{e(title)}｜{SITE_NAME}</title><meta name="description" content="{e(desc or title)}">
+<title>{e(full_title or (title + "｜" + SITE_NAME))}</title><meta name="description" content="{e(desc or title)}">
 {meta}
 <link rel="icon" href="{root}favicon.png" type="image/png"><link rel="apple-touch-icon" href="{root}apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
 <style>{CSS}</style></head><body>
 <script>try{{if(localStorage.getItem('kid')==='1')document.body.classList.add('kid')}}catch(e){{}}</script>
@@ -431,7 +444,7 @@ def render_bill(s: dict, it: dict, sm: dict | None) -> str:
     body = f"""
 <div class="meta">{badge(it['result'])}<span class="tag">{e(s['name'])}</span><span class="tag">{e(KIND_LABEL.get(it['kind'], it['kind']))}</span>{tags}</div>
 <div class="kh">{ba_html(it, sm)}</div>
-<h1 class="easy" style="margin-top:6px">{e(headline)}</h1><h1 class="detail" style="margin-top:6px">{e(sm_.get('headline_detail') or headline)}</h1>
+<h1 class="easy" style="margin-top:6px">{e(headline)}</h1><p class="detail h1" style="margin-top:6px">{e(sm_.get('headline_detail') or headline)}</p>
 {glance_html(s, it, sm)}
 {explain}
 <section class="kh">{h2('審議のステータス','Status')}<div class="steps"><div class="step done">提出</div><div class="step done">委員会で審査</div><div class="step done">本会議で{e(it['result'] or '報告')}</div></div></section>
@@ -457,7 +470,14 @@ def render_bill(s: dict, it: dict, sm: dict | None) -> str:
     body += f"""<section>{h2('共有する', 'Share')}<div class="chips">
 <a class="chip" href="https://x.com/intent/post?text={quote(headline)}&url={quote(share_url)}">Xで共有</a>
 <a class="chip" href="https://social-plugins.line.me/lineit/share?url={quote(share_url)}">LINEで送る</a></div></section>"""
-    return page(headline, body, depth=1, desc=meta, path=f"b/{slug}.html", og=f"og/b/{slug}.png")
+    first = ((sm_.get("points") or [{}])[0].get("easy") or "").split("。")[0]
+    desc = (first + "。" if first else "") + f'平塚市議会{s["name"]}の{it["label"]}「{it["title"]}」。結果：{vote_headline(vf, v, it["result"]) if v else (it["result"] or "報告")}。'
+    ld = [crumbs((s["name"], f"s/{s['key']}.html"), (it["label"], f"b/{slug}.html")),
+          {"@context": "https://schema.org", "@type": "Article", "headline": headline[:110], "description": desc,
+           "image": f"{SITE_URL}/og/b/{slug}.png", "inLanguage": "ja", "author": AUTHOR,
+           "publisher": {"@type": "Organization", "name": SITE_NAME, "logo": {"@type": "ImageObject", "url": f"{SITE_URL}/apple-touch-icon.png"}},
+           "mainEntityOfPage": f"{SITE_URL}/b/{slug}.html", "about": f'{it["label"]} {it["title"]}'}]
+    return page(headline, body, depth=1, desc=desc, path=f"b/{slug}.html", og=f"og/b/{slug}.png", ld=ld)
 
 
 def render_session(s: dict) -> str:
@@ -490,7 +510,9 @@ def render_session(s: dict) -> str:
     against = sum(1 for i in s["items"] if (votes_for(s["key"], i["id"])[1] or {}) and vote_summary(*votes_for(s["key"], i["id"])) != "全会一致")
     meta = f'全{len(s["items"])}件' + (f'・反対があったもの{against}件' if load_json(DATA / "votes" / f"{s['key']}.json") else "")
     ogp.make(OUT / "og" / "s" / f"{s['key']}.png", s["name"] + "で決まったこと", meta)
-    return page(s["name"] + "で決まったこと", body, depth=1, desc=meta, path=f"s/{s['key']}.html", og=f"og/s/{s['key']}.png")
+    desc = f'平塚市議会{s["name"]}で決まったこと（{meta}）。議案・請願ごとに、何が決まったかをわかりやすい言葉で説明しています。'
+    return page(f'平塚市議会 {s["name"]}で決まったこと', body, depth=1, desc=desc, path=f"s/{s['key']}.html", og=f"og/s/{s['key']}.png",
+                ld=[crumbs((s["name"], f"s/{s['key']}.html"))])
 
 
 def build_search_index(sessions: list[dict]) -> list[dict]:
@@ -601,7 +623,10 @@ def render_index(sessions: list[dict], last_checked: str) -> str:
 <p class="muted">最終確認：{e(last_checked)}</p>{SEARCH_JS}{GACHA_JS}"""
     (OUT / "search.json").write_text(json.dumps(idx, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
     ogp.make(OUT / "og" / "index.png", "議会って難しい言葉ばかり。だから、猫でもわかる言葉に直しました。", "平塚市議会で決まったこと・会派ごとの賛否")
-    return page("議会って難しい言葉ばかり。だから、猫でもわかる言葉に直しました", body, desc="平塚市議会で可決・否決されたことと会派ごとの賛否を、市の資料をもとにわかりやすくまとめています。")
+    ld = [{"@context": "https://schema.org", "@type": "WebSite", "name": SITE_NAME, "url": f"{SITE_URL}/", "inLanguage": "ja",
+           "description": "平塚市議会で決まったことを、わかりやすい言葉で説明するサイト", "author": AUTHOR}]
+    return page(SITE_NAME, body, desc="平塚市議会の議案・予算・条例・請願で何が決まったかを、わかりやすい言葉で説明。会派ごとの賛否、議員の討論、市の資料へのリンクも。令和4年12月からの定例会を掲載。",
+                ld=ld, full_title=f"{SITE_NAME}｜平塚市議会で決まったことを、わかりやすく")
 
 
 def render_feed(sessions: list[dict]) -> str:
@@ -635,7 +660,7 @@ def render_about() -> str:
 <p>説明を書くときの決まりと、プログラムはすべて公開しています。<a href="https://github.com/{REPO}">GitHub</a></p></section>
 <section>{h2('間違いを見つけたら', 'Report')}
 <p><a href="https://github.com/{REPO}/issues/new">こちらから報告</a>してください。</p></section>"""
-    return page("このサイトについて", body, path="about.html")
+    return page("このサイトについて", body, path="about.html", desc="猫でもわかる平塚市議会の運営者・しくみ・掲載の決まり", ld=[crumbs(("このサイトについて", "about.html"))])
 
 
 def render_reason() -> str:
@@ -671,7 +696,10 @@ def render_reason() -> str:
 <p>議会のことを全部理解しなくても大丈夫です。気になる議案をひとつ、約3行だけ読んでみてください。</p>
 <p>「この説明、分かりにくい」「ここ、間違ってない？」という声も大歓迎です。もらった声で、どんどん直していきます。</p>
 <p><a href="index.html">トップページへ</a></p></section>"""
-    return page("このサイトを作った理由", body, path="riyuu.html", desc="平塚市議会の議決を、猫でもわかる言葉に直すサイトを作った理由")
+    ld = [crumbs(("このサイトを作った理由", "riyuu.html")),
+          {"@context": "https://schema.org", "@type": "Article", "headline": "猫でもわかる平塚市議会を作った理由", "inLanguage": "ja",
+           "author": AUTHOR, "image": f"{SITE_URL}/og/index.png", "mainEntityOfPage": f"{SITE_URL}/riyuu.html"}]
+    return page("このサイトを作った理由", body, path="riyuu.html", desc="平塚市議会の議決を、猫でもわかる言葉に直すサイトを作った理由", ld=ld)
 
 
 def render_glossary() -> str:
@@ -681,7 +709,7 @@ def render_glossary() -> str:
     body = f"""<h1>議会の言葉の説明</h1>
 <p class="muted">議案や結果によく出てくる言葉を、市議会や市役所が公開している用語解説をもとに、短く言い直しています。言葉の使い方は議会によって違うことがあるので、出典もあわせて見てください。</p>
 <section>{h2('用語集', 'Glossary')}<dl class="terms">{items}</dl></section>"""
-    return page("議会の言葉の説明（用語集）", body, path="yogo.html", desc="専決処分、継続費、趣旨採択など、議会でよく出てくる言葉の説明")
+    return page("議会の言葉の説明（用語集）", body, path="yogo.html", desc="専決処分、継続費、趣旨採択など、議会でよく出てくる言葉の説明", ld=[crumbs(("用語集", "yogo.html"))])
 
 
 def main():
@@ -705,6 +733,11 @@ def main():
     (OUT / "riyuu.html").write_text(render_reason(), encoding="utf-8")
     for f in (ROOT / "assets").glob("*.png"):
         shutil.copy(f, OUT / f.name)
+    (OUT / "404.html").write_text(page("ページが見つかりません", '<h1>ページが見つかりません</h1><p>このページはなくなったか、URLが違うようです。</p><p><a href="/index.html">トップページへ</a></p>', path="404.html").replace('<meta charset="utf-8">', '<meta charset="utf-8"><meta name="robots" content="noindex">', 1), encoding="utf-8")
+    PAGES.remove("404.html")
+    urls = "".join(f"<url><loc>{SITE_URL}/{u}</loc></url>" for u in PAGES)
+    (OUT / "sitemap.xml").write_text(f'<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{urls}</urlset>', encoding="utf-8")
+    (OUT / "robots.txt").write_text(f"User-agent: *\nAllow: /\nSitemap: {SITE_URL}/sitemap.xml\n")
     (OUT / "feed.xml").write_text(render_feed(sessions), encoding="utf-8")
     (OUT / "CNAME").write_text(DOMAIN + "\n")
     (OUT / ".nojekyll").write_text("")

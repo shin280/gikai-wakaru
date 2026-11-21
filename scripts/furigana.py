@@ -1,5 +1,7 @@
 """漢字にふりがな（ruby）を付ける。小学生モードで表示する。
 
+読みは rt の data-r に入れ、CSS で表示する（検索エンジンが本文を「機能きのう」のように読まないため）。
+
 読みは形態素解析（fugashi + unidic-lite）で自動で付けるので、
 地名・人名などで読みが違うことがある。
 """
@@ -51,7 +53,7 @@ def _ruby(surface: str, reading: str) -> str:
         s, r = s[1:], r[1:]
     if not s or not r or s == r:
         return surface
-    return f"{pre}<ruby>{s}<rt>{r}</rt></ruby>{suf}"
+    return f'{pre}<ruby>{s}<rt data-r="{r}"></rt></ruby>{suf}'
 
 
 def _tok(t: str) -> str:
@@ -77,7 +79,7 @@ def _text(t: str) -> str:
     out = []
     for i, seg in enumerate(_FIXRE.split(t)):
         if i % 2:
-            out.append(f"<ruby>{seg}<rt>{FIX[seg]}</rt></ruby>")
+            out.append(f'<ruby>{seg}<rt data-r="{FIX[seg]}"></rt></ruby>')
         elif seg:
             out.append(_tok(seg) if KANJI.search(seg) else seg)
     return "".join(out)
