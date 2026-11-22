@@ -471,6 +471,9 @@ def prevnext_html(s, it):
     return f'<div class="pn">{a(pv, "← " + (pv["label"] if pv else ""))}{a(nx, (nx["label"] if nx else "") + " →")}</div>'
 
 
+DUP_HEADLINES: set = set()
+
+
 def render_bill(s: dict, it: dict, sm: dict | None) -> str:
     sm_ = sm or {}
     headline = sm_.get("headline") or it["title"]
@@ -521,13 +524,18 @@ def render_bill(s: dict, it: dict, sm: dict | None) -> str:
     meta = f'{s["name"]}・{it["label"]}' + (f'・{vote_headline(vf, v, it["result"])}' if v else f'・{it["result"] or ""}')
     ogp.make(OUT / "og" / "b" / f"{slug}.png", headline, meta, it["result"] or "")
     first = ((sm_.get("points") or [{}])[0].get("easy") or "").split("。")[0]
-    desc = (first + "。" if first else "") + f'平塚市議会{s["name"]}の{it["label"]}「{it["title"]}」。結果：{vote_headline(vf, v, it["result"]) if v else (it["result"] or "報告")}。'
+    res = vote_headline(vf, v, it["result"]) if v else (it["result"] or "報告")
+    desc = (first + "。" if first else "") + f'平塚市議会{s["name"]}の{it["label"]}「{it["title"]}」。結果：{res}。'
+    if len(desc) > 120:  # 長すぎるときは正式な件名を省く（件名は本文と構造化データに残る）
+        desc = (first + "。" if first else "") + f'平塚市議会{s["name"]}の{it["label"]}。結果：{res}。'
     ld = [crumbs((s["name"], f"s/{s['key']}.html"), (it["label"], f"b/{slug}.html")),
           {"@context": "https://schema.org", "@type": "Article", "headline": headline[:110], "description": desc,
            "image": f"{SITE_URL}/og/b/{slug}.png", "inLanguage": "ja", "author": AUTHOR,
            "publisher": {"@type": "Organization", "name": SITE_NAME, "logo": {"@type": "ImageObject", "url": f"{SITE_URL}/apple-touch-icon.png"}},
            "mainEntityOfPage": f"{SITE_URL}/b/{slug}.html", "about": f'{it["label"]} {it["title"]}'}]
-    return page(headline, body, depth=1, desc=desc, path=f"b/{slug}.html", og=f"og/b/{slug}.png", ld=ld)
+    # 同じ見出しの議案がほかにもあるときは、title に定例会と番号を足して区別する
+    full = f'{headline}（{s["name"]}・{it["label"]}）' if headline in DUP_HEADLINES else ""
+    return page(headline, body, depth=1, desc=desc, path=f"b/{slug}.html", og=f"og/b/{slug}.png", ld=ld, full_title=full)
 
 
 def render_session(s: dict) -> str:
@@ -929,6 +937,9 @@ def main():
     last = lc.read_text().strip() if lc.exists() else ""
     if last:
         last = datetime.fromisoformat(last).strftime("%Y年%-m月%-d日 %H:%M")
+    from collections import Counter
+    hc = Counter((load_json(summary_path(s["key"], it["id"])) or {}).get("headline") or it["title"] for s in sessions for it in s["items"])
+    DUP_HEADLINES.update(h for h, n in hc.items() if n > 1)
     for s in sessions:
         (OUT / "s" / f"{s['key']}.html").write_text(render_session(s), encoding="utf-8")
         for it in s["items"]:
