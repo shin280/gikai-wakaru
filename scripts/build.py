@@ -555,7 +555,6 @@ def render_session(s: dict) -> str:
     body = f"""<h1>{e(s['name'])}で決まったこと</h1>
 <p class="muted">全{len(s['items'])}件のうち、わかりやすい説明があるのは{nsm}件です。</p>
 {'<label class="onlybox"><input type="checkbox" id="only" checked>説明があるものだけ表示</label>' if 0 < nsm < len(s['items']) else ''}
-<p><a class="chip" href="../p/{e(s['key'])}.html">回覧板用に印刷する（A4・1枚）</a></p>
 {groups}
 <section>{h2('元の資料','Sources')}<ul><li><a href="{e(s['source'])}">平塚市議会 議決結果のページ</a></li>{pdfs}{dayori}</ul></section>"""
     against = sum(1 for i in s["items"] if (votes_for(s["key"], i["id"])[1] or {}) and vote_summary(*votes_for(s["key"], i["id"])) != "全会一致")
@@ -909,58 +908,6 @@ def render_guide() -> str:
                 ld=[crumbs(("議会に参加する", "sanka.html"))])
 
 
-# ---- 回覧板用の1枚まとめ ----
-def qr_svg(url: str) -> str:
-    try:
-        import io
-        import qrcode
-        import qrcode.image.svg
-        img = qrcode.make(url, image_factory=qrcode.image.svg.SvgPathImage, box_size=10, border=1)
-        b = io.BytesIO()
-        img.save(b)
-        svg = b.getvalue().decode()
-        return svg[svg.index("<svg"):]
-    except Exception:
-        return ""
-
-
-def render_print(s: dict) -> str:
-    rows = []
-    for kind in KIND_ORDER:
-        for it in s["items"]:
-            if it["kind"] != kind:
-                continue
-            sm = load_json(summary_path(s["key"], it["id"]))
-            if not sm:
-                continue
-            vf, v = votes_for(s["key"], it["id"])
-            res = vote_headline(vf, v, it["result"]) if v else (it["result"] or "報告")
-            amt = next((p["amount"] for p in sm.get("points", []) if p.get("amount")), "")
-            pc = per_capita(amt)
-            money = f'（市民1人あたり{pc}）' if pc else ""
-            rank = (0 if kind in ("議案", "請願") and amt else 1 if kind in ("議案", "請願", "陳情", "会議案") else 2)
-            rows.append((rank, f'<li><b>{e(sm["headline"])}</b>{e(money)}<span>{e(it["label"])}・{e(res)}</span></li>'))
-    n = len(rows)
-    keep = [r for _, r in sorted(rows, key=lambda x: x[0])][:14]
-    more = f'<p class="more">ほか{n - len(keep)}件は、右のQRコードから読めます。</p>' if n > len(keep) else ""
-    url = f"{SITE_URL}/s/{s['key']}.html"
-    return f"""<!DOCTYPE html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex">
-<title>{e(s['name'])}で決まったこと（印刷用）｜{SITE_NAME}</title>
-<style>@page{{size:A4;margin:12mm}}*{{box-sizing:border-box}}body{{font-family:"Hiragino Sans","Noto Sans JP","Yu Gothic",sans-serif;color:#111;margin:0;padding:12mm;max-width:210mm;margin:auto;font-size:10.5pt;line-height:1.55}}
-@media print{{body{{padding:0}}.noprint{{display:none}}}}
-header{{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid #111;padding-bottom:6px;margin-bottom:8px;gap:12px}}
-h1{{font-size:18pt;margin:0;line-height:1.3}}.sub{{font-size:9pt;margin:4px 0 0}}.qr{{text-align:center;font-size:8pt;flex:none}}.qr svg{{width:26mm;height:26mm;display:block}}
-ol{{margin:0;padding-left:1.4em}}li{{margin:0 0 5px;break-inside:avoid}}li span{{display:block;font-size:8.5pt;color:#444}}
-.more{{font-size:9pt;margin:6px 0}}footer{{border-top:1px solid #999;margin-top:8px;padding-top:4px;font-size:7.5pt;color:#333}}
-.noprint{{background:#fff4f4;border:1px solid #f0c0c0;border-radius:8px;padding:10px;margin-bottom:12px;font-size:11pt}}.noprint button{{font-size:12pt;padding:6px 16px}}</style></head><body>
-<div class="noprint">回覧板やお知らせ用に、A4で1枚に印刷できます。<button onclick="print()">印刷する</button>　<a href="../s/{e(s['key'])}.html">戻る</a></div>
-<header><div><h1>平塚市議会 {e(s['name'])}で決まったこと</h1><p class="sub">市議会で決まったことを、わかりやすい言葉にしました（説明がある{n}件のうち、主なもの）。</p></div>
-<div class="qr">{qr_svg(url)}全部はこちら</div></header>
-<ol>{''.join(keep)}</ol>{more}
-<footer>{SITE_NAME}（{SITE_URL.replace('https://', '')}）　市が公開している資料をもとに作っています。正確な内容は市の資料で確かめてください。
-会派ごとの賛否は、ひらつか議会だよりの記載のとおりです。{('「市民1人あたり」は人口' + f'{POP:,}人（{POP_DATE}）で割った目安です。') if any('1人あたり' in r for r in keep) else ''}運営：元島しん（平塚市議会議員）</footer>
-</body></html>"""
-
 
 def render_glossary() -> str:
     items = ""
@@ -1000,9 +947,7 @@ def main():
         hits = [x for x in (up or {}).get("items", []) if a in x["title"] + x.get("overview", "") + " ".join(x.get("details", []))]
         (OUT / "area" / f"{a}.html").write_text(render_area(a, ents, hits), encoding="utf-8")
     (OUT / "area" / "index.html").write_text(render_area_index(areas), encoding="utf-8")
-    (OUT / "p").mkdir(exist_ok=True)
-    for s in sessions:
-        (OUT / "p" / f"{s['key']}.html").write_text(render_print(s), encoding="utf-8")
+
     if GC_CODE:
         (OUT / "access.html").write_text(render_access(sessions), encoding="utf-8")
     for f in (ROOT / "assets").glob("*.png"):

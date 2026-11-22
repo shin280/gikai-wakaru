@@ -89,7 +89,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - run: pip install requests beautifulsoup4 pillow fugashi unidic-lite qrcode
+      - run: pip install requests beautifulsoup4 pillow fugashi unidic-lite
       - name: 日本語フォント（SNS用画像に使う）
         run: sudo apt-get install -y -qq fonts-noto-cjk >/dev/null
 
