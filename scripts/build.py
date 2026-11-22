@@ -142,6 +142,7 @@ TOGGLE_JS = """<script>
 (function(){var b=document.body,E=document.getElementById('b-easy'),D=document.getElementById('b-detail');if(!E)return;
 function s(d){b.classList.toggle('is-detail',d);E.setAttribute('aria-pressed',!d);D.setAttribute('aria-pressed',d)}
 E.onclick=function(){s(false)};D.onclick=function(){s(true)}})();
+[].forEach.call(document.querySelectorAll('.copyurl'),function(b){b.onclick=function(){var u=b.getAttribute('data-url');function ok(){b.textContent='コピーしました'}if(navigator.clipboard){navigator.clipboard.writeText(u).then(ok,function(){prompt('このリンクをコピーしてください',u)})}else{prompt('このリンクをコピーしてください',u)}}});
 (function(){var k=document.getElementById('kidbtn');if(!k)return;function u(){var on=document.body.classList.contains('kid');var m=document.querySelector('main'),n=document.querySelector('.kidnote');if(on&&!n&&m&&window.KIDNOTE){m.insertAdjacentHTML('afterbegin',KIDNOTE)}k.textContent=on?'小学生モードをやめる':'小学生モード';k.setAttribute('aria-pressed',on)}
 k.onclick=function(){var on=document.body.classList.toggle('kid');try{localStorage.setItem('kid',on?'1':'0')}catch(e){}u();window.scrollTo(0,0)};u()})();
 (function(){var o=document.getElementById('only');if(!o)return;function f(){document.body.classList.toggle('onlysm',o.checked)}o.onchange=f;f()})();
@@ -189,6 +190,16 @@ document.getElementById('c-top').innerHTML+=d.top.map(function(x){{var u=x.p==='
     return page("アクセス数", body, path="access.html", desc="猫でもわかる平塚市議会のアクセス数", ld=[crumbs(("アクセス数", "access.html"))])
 
 
+def share_html(text: str, url: str) -> str:
+    from urllib.parse import quote
+    t = text if SITE_NAME in text else f"{text}｜{SITE_NAME}"
+    return f"""<section class="share">{h2('共有する', 'Share')}<div class="chips" style="justify-content:flex-start">
+<a class="chip" href="https://x.com/intent/post?text={quote(t)}&url={quote(url)}">Xで共有</a>
+<a class="chip" href="https://social-plugins.line.me/lineit/share?url={quote(url)}">LINEで送る</a>
+<a class="chip" href="https://www.facebook.com/sharer/sharer.php?u={quote(url)}">Facebookで共有</a>
+<button type="button" class="chip copyurl" data-url="{e(url)}">リンクをコピー</button></div></section>"""
+
+
 KIDNOTE = '<p class="kidnote">小学生モード：漢字にふりがなを付けて、大事なところだけ見せています。ふりがなはコンピューターが自動で付けているので、読みがちがうことがあります。もとにもどすときは、ページの一番下のボタンをおしてください。</p>'
 
 
@@ -216,7 +227,7 @@ def page(title: str, body: str, depth: int = 0, desc: str = "", path: str = "", 
 <style>{CSS}</style>{GC_TAG if GC_CODE else ''}</head><body>
 <script>try{{if(localStorage.getItem('kid')==='1')document.body.classList.add('kid')}}catch(e){{}}</script>
 <header class="site"><div class="wrap"><a class="logo" href="{root}index.html">{CAT_SVG.replace("{root}", root)}<span>猫でもわかる</span>平塚市議会</a><span class="tagline">HIRATSUKA CITY COUNCIL, MADE EASY</span></div></header>
-<main class="wrap">{furigana.add(body)}
+<main class="wrap">{furigana.add(body)}{share_html(title if path else SITE_NAME, url) if path != "404.html" else ""}
 <footer><img class="footcat" src="{root}cat-sit-sm.png" alt=""><p><b>運営：元島しん</b>（平塚市議会議員・しらさぎ・無所属クラブ所属）。会派ごとの賛否は、すべての会派を同じ形で、議会だよりの記載のとおりに載せています。<a href="{root}about.html">このサイトについて</a>・<a href="{root}riyuu.html">このサイトを作った理由</a></p><p><a href="{root}kore.html">これから決まること</a>・<a href="{root}area/index.html">地区・地名から探す</a>・<a href="{root}sanka.html">議会に参加する</a></p><p>このサイトは、平塚市が公開している資料をもとに、プログラムとAIが自動で作っています。大事な判断の前には、各ページの「元の資料」で必ず確かめてください。</p>
 <p class="kidwrap"><button type="button" id="kidbtn" aria-pressed="false">小学生モード</button></p>
 <p><a href="{report}">間違いを報告する</a>{(' ・ <a href="' + root + 'access.html">アクセス数</a>') if GC_CODE else ''} ・ <a href="https://github.com/{REPO}">このサイトのしくみ（GitHub）</a></p></footer>
@@ -509,11 +520,6 @@ def render_bill(s: dict, it: dict, sm: dict | None) -> str:
     vf, v = votes_for(s["key"], it["id"])
     meta = f'{s["name"]}・{it["label"]}' + (f'・{vote_headline(vf, v, it["result"])}' if v else f'・{it["result"] or ""}')
     ogp.make(OUT / "og" / "b" / f"{slug}.png", headline, meta, it["result"] or "")
-    share_url = f"{SITE_URL}/b/{slug}.html"
-    from urllib.parse import quote
-    body += f"""<section>{h2('共有する', 'Share')}<div class="chips">
-<a class="chip" href="https://x.com/intent/post?text={quote(headline)}&url={quote(share_url)}">Xで共有</a>
-<a class="chip" href="https://social-plugins.line.me/lineit/share?url={quote(share_url)}">LINEで送る</a></div></section>"""
     first = ((sm_.get("points") or [{}])[0].get("easy") or "").split("。")[0]
     desc = (first + "。" if first else "") + f'平塚市議会{s["name"]}の{it["label"]}「{it["title"]}」。結果：{vote_headline(vf, v, it["result"]) if v else (it["result"] or "報告")}。'
     ld = [crumbs((s["name"], f"s/{s['key']}.html"), (it["label"], f"b/{slug}.html")),
