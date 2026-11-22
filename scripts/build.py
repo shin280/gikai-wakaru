@@ -217,7 +217,7 @@ def page(title: str, body: str, depth: int = 0, desc: str = "", path: str = "", 
 <script>try{{if(localStorage.getItem('kid')==='1')document.body.classList.add('kid')}}catch(e){{}}</script>
 <header class="site"><div class="wrap"><a class="logo" href="{root}index.html">{CAT_SVG.replace("{root}", root)}<span>猫でもわかる</span>平塚市議会</a><span class="tagline">HIRATSUKA CITY COUNCIL, MADE EASY</span></div></header>
 <main class="wrap">{furigana.add(body)}
-<footer><img class="footcat" src="{root}cat-sit-sm.png" alt=""><p><b>運営：元島しん</b>（平塚市議会議員・しらさぎ・無所属クラブ所属）。会派ごとの賛否は、すべての会派を同じ形で、議会だよりの記載のとおりに載せています。<a href="{root}about.html">このサイトについて</a>・<a href="{root}riyuu.html">このサイトを作った理由</a></p><p><a href="{root}kore.html">これから決まること</a>・<a href="{root}area/index.html">地区・地名から探す</a>・<a href="{root}sanka.html">自分も参加できる</a></p><p>このサイトは、平塚市が公開している資料をもとに、プログラムとAIが自動で作っています。大事な判断の前には、各ページの「元の資料」で必ず確かめてください。</p>
+<footer><img class="footcat" src="{root}cat-sit-sm.png" alt=""><p><b>運営：元島しん</b>（平塚市議会議員・しらさぎ・無所属クラブ所属）。会派ごとの賛否は、すべての会派を同じ形で、議会だよりの記載のとおりに載せています。<a href="{root}about.html">このサイトについて</a>・<a href="{root}riyuu.html">このサイトを作った理由</a></p><p><a href="{root}kore.html">これから決まること</a>・<a href="{root}area/index.html">地区・地名から探す</a>・<a href="{root}sanka.html">議会に参加する</a></p><p>このサイトは、平塚市が公開している資料をもとに、プログラムとAIが自動で作っています。大事な判断の前には、各ページの「元の資料」で必ず確かめてください。</p>
 <p class="kidwrap"><button type="button" id="kidbtn" aria-pressed="false">小学生モード</button></p>
 <p><a href="{report}">間違いを報告する</a>{(' ・ <a href="' + root + 'access.html">アクセス数</a>') if GC_CODE else ''} ・ <a href="https://github.com/{REPO}">このサイトのしくみ（GitHub）</a></p></footer>
 </main>
@@ -656,7 +656,7 @@ def render_index(sessions: list[dict], last_checked: str) -> str:
 <p class="muted">どれから読めばいいか分からない人へ。これまでの議案から、猫が1件えらびます。</p>
 <div id="gres" class="gres"><img src="cat-face-sm.png" alt="" class="gcat"><span class="muted">猫はまだ、えらんでいません</span></div>
 <button type="button" id="gbtn" class="gbtn">猫に選んでもらう</button></section>
-<section>{h2('もっと知る', 'More')}<div class="cards more"><a class="card" href="kore.html"><b>これから決まること</b><span>次の定例会に出される議案と日程</span></a><a class="card" href="area/index.html"><b>地区・地名から探す</b><span>自分の地区で決まったこと</span></a><a class="card" href="sanka.html"><b>自分も参加できる</b><span>傍聴・ネット中継・請願の出し方</span></a></div></section>
+<section>{h2('もっと知る', 'More')}<div class="cards more"><a class="card" href="kore.html"><b>これから決まること</b><span>次の定例会に出される議案と日程</span></a><a class="card" href="area/index.html"><b>地区・地名から探す</b><span>自分の地区で決まったこと</span></a><a class="card" href="sanka.html"><b>議会に参加する</b><span>傍聴・ネット中継・請願の出し方</span></a></div></section>
 <section id="find">{h2('分野・地域で探す', 'Find')}<div class="fbtns">{chips}</div><div class="chips" style="justify-content:flex-start">{achips}</div>
 <input id="q" class="search" type="search" placeholder="キーワードで探す（例：保育、補聴器、公民館）" aria-label="キーワードで探す">
 <label class="onlybox"><input type="checkbox" id="onlyq" checked>説明があるものだけ</label></section>
@@ -870,7 +870,7 @@ GUIDE_SRC = {
 
 def render_guide() -> str:
     g = GUIDE_SRC
-    body = f"""<h1>自分も参加できる</h1>
+    body = f"""<h1>議会に参加する</h1>
 <p class="muted">議会は、見ることも、意見を伝えることもできます。平塚市議会のページに書かれていることを、やさしい言葉でまとめました。くわしいことや最新の情報は、それぞれの「元のページ」で確かめてください。</p>
 <section>{h2('ネットやテレビで見る', 'Watch')}
 <ul><li>本会議は、インターネットで生中継されています。あとから録画も見られます（会議のおよそ7日後から、会議録が市のサイトに載るまで）。<a href="https://hiratsuka-city.stream.jfit.co.jp/">平塚市議会 インターネット中継</a></li>
@@ -899,9 +899,9 @@ def render_guide() -> str:
 <p>平塚市議会の「議員一覧」に、議員ごとの名前・会派・住所・電話番号が載っています（事務所の住所・電話のこともあります）。メールアドレスは載っていません。</p>
 <p>だれに相談すればいいか分からないときや、議会のしくみについての質問は、議会局（0463-21-8791）にも聞けます。</p>
 <p class="muted">元のページ：<a href="{g['giin']}">議員一覧</a></p></section>"""
-    return page("自分も参加できる（傍聴・中継・請願・議員への連絡）", body, path="sanka.html",
+    return page("議会に参加する（傍聴・中継・請願・議員への連絡）", body, path="sanka.html",
                 desc="平塚市議会を見に行く（傍聴）、ネットで見る、請願・陳情を出す、議員に連絡する方法を、やさしい言葉で。",
-                ld=[crumbs(("自分も参加できる", "sanka.html"))])
+                ld=[crumbs(("議会に参加する", "sanka.html"))])
 
 
 # ---- 回覧板用の1枚まとめ ----
