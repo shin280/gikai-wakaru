@@ -92,6 +92,7 @@ footer{font-size:12px;color:var(--sub);margin-top:36px;padding-top:20px;border-t
 .hero p{color:var(--sub);font-size:14px}
 .daily .drow{display:grid;grid-template-columns:44px 1fr 48px;gap:8px;align-items:center;font-size:12px;margin:3px 0}.daily i{display:block;height:10px;background:var(--grad);border-radius:3px}.daily b{text-align:right}
 .more .card b{display:block;font-size:16px}.more .card span{display:block;font-size:13px;color:var(--sub);margin-top:4px}.pc{display:inline-block;margin-left:10px;font-size:13px;color:#555}.pcnote{font-size:12px}.up{background:#fff;border-radius:10px;padding:12px 16px;margin:10px 0;box-shadow:0 2px 14px rgba(0,0,0,.04)}.up h3{margin:0 0 6px;font-size:16px}.up summary{font-size:13px;color:#555;cursor:pointer}
+.author{display:flex;gap:20px;align-items:center;flex-wrap:wrap;margin-top:20px}.author img{width:160px;height:160px;border-radius:50%;object-fit:cover;flex:none}.author h1{margin:0 0 6px}.author .name{font-size:22px;font-weight:700;margin:0 0 8px}.author .name small{font-size:12px;font-weight:400;color:var(--sub);margin-left:8px}
 .tbl{width:100%;border-collapse:collapse;font-size:14px}.tbl th,.tbl td{padding:10px 6px;border-bottom:1px solid #eee;text-align:left}.tbl td.num,.tbl th:last-child{text-align:right;white-space:nowrap;font-weight:700}
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:22px 0 8px}
 .stat{background:#fff;border-radius:10px;padding:16px 8px;text-align:center;box-shadow:0 2px 14px rgba(0,0,0,.04)}
@@ -151,7 +152,8 @@ k.onclick=function(){var on=document.body.classList.toggle('kid');try{localStora
 
 PAGES: list = []
 TITLES: dict = {}
-AUTHOR = {"@type": "Person", "name": "元島しん", "jobTitle": "平塚市議会議員", "url": f"{SITE_URL}/about.html"}
+AUTHOR = {"@type": "Person", "name": "元島しん", "jobTitle": "平塚市議会議員", "url": f"{SITE_URL}/author.html", "image": f"{SITE_URL}/shin.jpg",
+          "affiliation": {"@type": "GovernmentOrganization", "name": "平塚市議会"}, "sameAs": ["https://tubehira.jp/"]}
 
 
 def crumbs(*items) -> dict:
@@ -216,7 +218,7 @@ def write_llms(sessions):
 - [地区・地名から探す]({SITE_URL}/area/index.html)
 - [議会に参加する（傍聴・中継・請願）]({SITE_URL}/sanka.html)
 - [議会の言葉の説明（用語集）]({SITE_URL}/yogo.html)
-- [このサイトについて]({SITE_URL}/about.html)
+- [このサイトについて]({SITE_URL}/about.html)\n- [作った人（元島しん、平塚市議会議員）]({SITE_URL}/author.html)
 - [全議案の説明（テキスト）]({SITE_URL}/llms-full.txt)
 
 ## 定例会
@@ -268,7 +270,7 @@ def page(title: str, body: str, depth: int = 0, desc: str = "", path: str = "", 
 <script>try{{if(localStorage.getItem('kid')==='1')document.body.classList.add('kid')}}catch(e){{}}</script>
 <header class="site"><div class="wrap"><a class="logo" href="{root}index.html">{CAT_SVG.replace("{root}", root)}<span>猫でもわかる</span>平塚市議会</a><span class="tagline">HIRATSUKA CITY COUNCIL, MADE EASY</span></div></header>
 <main class="wrap">{furigana.add(body)}{share_html(title if path else SITE_NAME, url) if path != "404.html" else ""}
-<footer><img class="footcat" src="{root}cat-sit-sm.png" alt=""><p><b>運営：元島しん</b>（平塚市議会議員・しらさぎ・無所属クラブ所属）。会派ごとの賛否は、すべての会派を同じ形で、議会だよりの記載のとおりに載せています。<a href="{root}about.html">このサイトについて</a>・<a href="{root}riyuu.html">このサイトを作った理由</a></p><p><a href="{root}kore.html">これから決まること</a>・<a href="{root}area/index.html">地区・地名から探す</a>・<a href="{root}sanka.html">議会に参加する</a></p><p>このサイトは、平塚市が公開している資料をもとに、プログラムとAIが自動で作っています。大事な判断の前には、各ページの「元の資料」で必ず確かめてください。</p>
+<footer><img class="footcat" src="{root}cat-sit-sm.png" alt=""><p><b>運営：<a href="{root}author.html">元島しん</a></b>（平塚市議会議員・しらさぎ・無所属クラブ所属）。会派ごとの賛否は、すべての会派を同じ形で、議会だよりの記載のとおりに載せています。<a href="{root}about.html">このサイトについて</a>・<a href="{root}riyuu.html">このサイトを作った理由</a>・<a href="{root}author.html">作った人</a></p><p><a href="{root}kore.html">これから決まること</a>・<a href="{root}area/index.html">地区・地名から探す</a>・<a href="{root}sanka.html">議会に参加する</a></p><p>このサイトは、平塚市が公開している資料をもとに、プログラムとAIが自動で作っています。大事な判断の前には、各ページの「元の資料」で必ず確かめてください。</p>
 <p class="kidwrap"><button type="button" id="kidbtn" aria-pressed="false">小学生モード</button></p>
 <p><a href="{report}">間違いを報告する</a>{(' ・ <a href="' + root + 'access.html">アクセス数</a>') if GC_CODE else ''} ・ <a href="https://github.com/{REPO}">このサイトのしくみ（GitHub）</a></p></footer>
 </main>
@@ -966,6 +968,26 @@ def render_guide() -> str:
 
 
 
+def render_author() -> str:
+    body = f"""<div class="author"><img src="shin.jpg" alt="元島しんの写真" width="240" height="240">
+<div><h1>作った人</h1><p class="name">元島しん<small>もとしま しん</small></p>
+<p>平塚市議会議員（会派：しらさぎ・無所属クラブ）。YouTubeの「平塚ユーチューバーしん」として、平塚のお店や市の話題を動画で伝えています。</p></div></div>
+<section>{h2('なぜ作ったか', 'Why')}
+<p>みんなが払った税金が何に使われているのかを、市民の方に知ってほしいからです。議会の資料は言葉が難しすぎて、暮らしに関係する話なのに届いていない。だったら、入り口の言葉のほうを変えようと思いました。</p>
+<p><a href="riyuu.html">このサイトを作った理由（くわしく）</a></p></section>
+<section>{h2('このサイトで守っていること', 'Promise')}
+<ul><li>市の資料にないことは書きません。</li>
+<li>会派ごとの賛否は、すべての会派を同じ形で載せています。自分の会派も、ほかと同じ扱いです。</li>
+<li>誰かを良い・悪いと評価するサイトにはしません。</li></ul></section>
+<section>{h2('連絡', 'Contact')}
+<p>「ここが分かりにくい」「間違っている」という声は、ページの一番下の「間違いを報告する」から送れます。</p>
+<p><a href="https://tubehira.jp/">元島しんのホームページ</a></p></section>"""
+    person = {"@context": "https://schema.org", "@type": "ProfilePage", "mainEntity": {**AUTHOR, "alternateName": "平塚ユーチューバーしん",
+              "memberOf": {"@type": "Organization", "name": "しらさぎ・無所属クラブ"}}}
+    return page("作った人（元島しん）", body, path="author.html", desc="猫でもわかる平塚市議会を作った、平塚市議会議員・元島しんのページ",
+                ld=[crumbs(("作った人", "author.html")), person])
+
+
 def render_glossary() -> str:
     items = ""
     for t in glossary.TERMS:
@@ -1000,6 +1022,7 @@ def main():
     (OUT / "about.html").write_text(render_about(), encoding="utf-8")
     (OUT / "yogo.html").write_text(render_glossary(), encoding="utf-8")
     (OUT / "riyuu.html").write_text(render_reason(), encoding="utf-8")
+    (OUT / "author.html").write_text(render_author(), encoding="utf-8")
     up = load_upcoming(sessions)
     (OUT / "kore.html").write_text(render_upcoming(up), encoding="utf-8")
     (OUT / "sanka.html").write_text(render_guide(), encoding="utf-8")
@@ -1012,7 +1035,7 @@ def main():
 
     if GC_CODE:
         (OUT / "access.html").write_text(render_access(sessions), encoding="utf-8")
-    for f in (ROOT / "assets").glob("*.png"):
+    for f in list((ROOT / "assets").glob("*.png")) + list((ROOT / "assets").glob("*.jpg")):
         shutil.copy(f, OUT / f.name)
     (OUT / "404.html").write_text(page("ページが見つかりません", '<h1>ページが見つかりません</h1><p>このページはなくなったか、URLが違うようです。</p><p><a href="/index.html">トップページへ</a></p>', path="404.html").replace('<meta charset="utf-8">', '<meta charset="utf-8"><meta name="robots" content="noindex">', 1), encoding="utf-8")
     PAGES.remove("404.html")
