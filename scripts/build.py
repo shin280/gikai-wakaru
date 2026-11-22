@@ -200,6 +200,46 @@ def share_html(text: str, url: str) -> str:
 <button type="button" class="chip copyurl" data-url="{e(url)}">リンクをコピー</button></div></section>"""
 
 
+def write_llms(sessions):
+    """AI（ChatGPT、Claude、Perplexity など）が読みやすいように、サイトの中身をテキストでまとめる。"""
+    head = f"""# {SITE_NAME}
+
+> 平塚市議会（神奈川県平塚市）で可決・否決されたこと、会派ごとの賛否を、市の公開資料をもとに、中学生にもわかる言葉で説明しているサイトです。運営は元島しん（平塚市議会議員）。説明はプログラムとAIで市の資料から作っています。正確な内容は各ページの「元の資料」（平塚市の公式資料）で確かめてください。
+
+- 掲載範囲：{sessions[-1]['name'] if sessions else ''}から{sessions[0]['name'] if sessions else ''}まで、{len(sessions)}回の定例会、{sum(len(x['items']) for x in sessions)}件
+- 会派ごとの賛否は、すべての会派を同じ形で、「ひらつか議会だより」の記載のとおりに載せています
+- 更新：毎日、平塚市議会の「議決結果」のページを確かめて自動で更新
+
+## 主なページ
+- [トップ]({SITE_URL}/)
+- [これから決まること（次の定例会）]({SITE_URL}/kore.html)
+- [地区・地名から探す]({SITE_URL}/area/index.html)
+- [議会に参加する（傍聴・中継・請願）]({SITE_URL}/sanka.html)
+- [議会の言葉の説明（用語集）]({SITE_URL}/yogo.html)
+- [このサイトについて]({SITE_URL}/about.html)
+- [全議案の説明（テキスト）]({SITE_URL}/llms-full.txt)
+
+## 定例会
+"""
+    head += "".join(f"- [{x['name']}で決まったこと]({SITE_URL}/s/{x['key']}.html)：{len(x['items'])}件\n" for x in sessions)
+    (OUT / "llms.txt").write_text(head, encoding="utf-8")
+    full = [head.split("## 主なページ")[0]]
+    for x in sessions:
+        full.append(f"\n## {x['name']}\n出典：{x.get('source', '')}\n")
+        for it in x["items"]:
+            sm = load_json(summary_path(x["key"], it["id"]))
+            vf, v = votes_for(x["key"], it["id"])
+            res = vote_headline(vf, v, it["result"]) if v else (it["result"] or "報告")
+            url = f"{SITE_URL}/b/{x['key']}-{bill_slug(it['id'])}.html"
+            full.append(f"\n### {sm['headline'] if sm else it['title']}\n- 正式な件名：{it['label']} {it['title']}\n- 結果：{res}\n")
+            if sm:
+                for p in sm.get("points", []):
+                    if p.get("easy"):
+                        full.append(f"- {p.get('title', '')}：{p['easy']}" + (f"（金額：{p['amount']}）" if p.get("amount") else "") + "\n")
+            full.append(f"- くわしく：{url}\n")
+    (OUT / "llms-full.txt").write_text("".join(full), encoding="utf-8")
+
+
 KIDNOTE = '<p class="kidnote">小学生モード：漢字にふりがなを付けて、大事なところだけ見せています。ふりがなはコンピューターが自動で付けているので、読みがちがうことがあります。もとにもどすときは、ページの一番下のボタンをおしてください。</p>'
 
 
@@ -516,7 +556,7 @@ def render_bill(s: dict, it: dict, sm: dict | None) -> str:
 {f'<section class="kh" style="position:relative"><img class="minicat" src="../cat-sit-sm.png" alt="">{h2('資料からは分からないこと','Not in the documents')}<ul>{unk}</ul></section>' if unk else ''}
 <div class="kh">{terms_html(it, sm)}
 {related_html(s, it)}</div>
-<section class="kh">{h2('元の資料','Sources')}<ul>{src}<li><a href="{e(s['source'])}">平塚市議会のページ</a></li></ul></section>
+<section class="kh">{h2('元の資料','Sources')}<ul>{src}<li><a href="{e(s['source'])}">平塚市議会のページ</a></li></ul>{('<p class="muted">このページの更新：<time datetime="' + s['updated'][:10] + '">' + str(int(s['updated'][:4])) + '年' + str(int(s['updated'][5:7])) + '月' + str(int(s['updated'][8:10])) + '日</time></p>') if s.get('updated') else ''}</section>
 {prevnext_html(s, it)}
 <p style="margin-top:14px"><a href="../s/{e(s['key'])}.html">← {e(s['name'])}の一覧に戻る</a></p>"""
     slug = f'{s["key"]}-{bill_slug(it["id"])}'
@@ -532,7 +572,16 @@ def render_bill(s: dict, it: dict, sm: dict | None) -> str:
           {"@context": "https://schema.org", "@type": "Article", "headline": headline[:110], "description": desc,
            "image": f"{SITE_URL}/og/b/{slug}.png", "inLanguage": "ja", "author": AUTHOR,
            "publisher": {"@type": "Organization", "name": SITE_NAME, "logo": {"@type": "ImageObject", "url": f"{SITE_URL}/apple-touch-icon.png"}},
-           "mainEntityOfPage": f"{SITE_URL}/b/{slug}.html", "about": f'{it["label"]} {it["title"]}'}]
+           "mainEntityOfPage": f"{SITE_URL}/b/{slug}.html", "about": f'{it["label"]} {it["title"]}',
+           "datePublished": s.get("first_seen", ""), "dateModified": s.get("updated", ""),
+           "isBasedOn": [x for x in [s.get("source")] + [d.get("url") for d in s.get("pdfs", [])] if x],
+           "sourceOrganization": {"@type": "GovernmentOrganization", "name": "平塚市議会", "url": "https://www.city.hiratsuka.kanagawa.jp/gikai/"}}]
+    qa = [(f"{it['label']}「{it['title']}」で何が決まった？", " ".join(p.get("easy", "") for p in sm_.get("points", []) if p.get("easy"))),
+          (f"{it['label']}「{it['title']}」の結果は？", f"{s['name']}で{res}。")]
+    qa = [(q, a) for q, a in qa if a.strip()]
+    if qa:
+        ld.append({"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [
+            {"@type": "Question", "name": q, "acceptedAnswer": {"@type": "Answer", "text": a}} for q, a in qa]})
     # 同じ見出しの議案がほかにもあるときは、title に定例会と番号を足して区別する
     full = f'{headline}（{s["name"]}・{it["label"]}）' if headline in DUP_HEADLINES else ""
     return page(headline, body, depth=1, desc=desc, path=f"b/{slug}.html", og=f"og/b/{slug}.png", ld=ld, full_title=full)
@@ -924,7 +973,9 @@ def render_glossary() -> str:
     body = f"""<h1>議会の言葉の説明</h1>
 <p class="muted">議案や結果によく出てくる言葉を、市議会や市役所が公開している用語解説をもとに、短く言い直しています。言葉の使い方は議会によって違うことがあるので、出典もあわせて見てください。</p>
 <section>{h2('用語集', 'Glossary')}<dl class="terms">{items}</dl></section>"""
-    return page("議会の言葉の説明（用語集）", body, path="yogo.html", desc="専決処分、継続費、趣旨採択など、議会でよく出てくる言葉の説明", ld=[crumbs(("用語集", "yogo.html"))])
+    dts = {"@context": "https://schema.org", "@type": "DefinedTermSet", "name": "議会の言葉の説明（用語集）", "url": f"{SITE_URL}/yogo.html",
+           "hasDefinedTerm": [{"@type": "DefinedTerm", "name": t[0], "description": t[2], "url": f"{SITE_URL}/yogo.html#{glossary.slug(t[0])}"} for t in glossary.TERMS]}
+    return page("議会の言葉の説明（用語集）", body, path="yogo.html", desc="専決処分、継続費、趣旨採択など、議会でよく出てくる言葉の説明", ld=[crumbs(("用語集", "yogo.html")), dts])
 
 
 def main():
@@ -968,7 +1019,9 @@ def main():
     from urllib.parse import quote as _q
     urls = "".join(f"<url><loc>{SITE_URL}/{_q(u)}</loc></url>" for u in PAGES)
     (OUT / "sitemap.xml").write_text(f'<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{urls}</urlset>', encoding="utf-8")
-    (OUT / "robots.txt").write_text(f"User-agent: *\nAllow: /\nSitemap: {SITE_URL}/sitemap.xml\n")
+    bots = ["GPTBot", "OAI-SearchBot", "ChatGPT-User", "ClaudeBot", "Claude-SearchBot", "Claude-User", "PerplexityBot", "Perplexity-User", "Google-Extended", "Applebot-Extended", "Bingbot"]
+    (OUT / "robots.txt").write_text("".join(f"User-agent: {b}\nAllow: /\n\n" for b in bots) + f"User-agent: *\nAllow: /\n\nSitemap: {SITE_URL}/sitemap.xml\n")
+    write_llms(sessions)
     (OUT / "feed.xml").write_text(render_feed(sessions), encoding="utf-8")
     (OUT / "CNAME").write_text(DOMAIN + "\n")
     (OUT / ".nojekyll").write_text("")
