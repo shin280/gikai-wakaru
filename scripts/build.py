@@ -93,6 +93,7 @@ footer{font-size:12px;color:var(--sub);margin-top:36px;padding-top:20px;border-t
 .daily .drow{display:grid;grid-template-columns:44px 1fr 48px;gap:8px;align-items:center;font-size:12px;margin:3px 0}.daily i{display:block;height:10px;background:var(--grad);border-radius:3px}.daily b{text-align:right}
 .more .card b{display:block;font-size:16px}.more .card span{display:block;font-size:13px;color:var(--sub);margin-top:4px}.pc{display:inline-block;margin-left:10px;font-size:13px;color:#555}.pcnote{font-size:12px}.up{background:#fff;border-radius:10px;padding:12px 16px;margin:10px 0;box-shadow:0 2px 14px rgba(0,0,0,.04)}.up h3{margin:0 0 6px;font-size:16px}.up summary{font-size:13px;color:#555;cursor:pointer}
 .author{display:flex;gap:20px;align-items:center;flex-wrap:wrap;margin-top:20px}.author img{width:160px;height:160px;border-radius:50%;object-fit:cover;flex:none}.author h1{margin:0 0 6px}.author .name{font-size:22px;font-weight:700;margin:0 0 8px}.author .name small{font-size:12px;font-weight:400;color:var(--sub);margin-left:8px}
+.prof th{width:6.5em;color:var(--sub);font-weight:500;vertical-align:top}.tl{list-style:none;padding:0;margin:0;border-left:3px solid var(--red);padding-left:14px}.tl li{margin:0 0 12px}.tl b{display:block;font-size:13px;color:var(--red)}.tl span{font-size:15px}
 .tbl{width:100%;border-collapse:collapse;font-size:14px}.tbl th,.tbl td{padding:10px 6px;border-bottom:1px solid #eee;text-align:left}.tbl td.num,.tbl th:last-child{text-align:right;white-space:nowrap;font-weight:700}
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:22px 0 8px}
 .stat{background:#fff;border-radius:10px;padding:16px 8px;text-align:center;box-shadow:0 2px 14px rgba(0,0,0,.04)}
@@ -153,7 +154,7 @@ k.onclick=function(){var on=document.body.classList.toggle('kid');try{localStora
 PAGES: list = []
 TITLES: dict = {}
 AUTHOR = {"@type": "Person", "name": "元島しん", "jobTitle": "平塚市議会議員", "url": f"{SITE_URL}/author.html", "image": f"{SITE_URL}/shin.jpg",
-          "affiliation": {"@type": "GovernmentOrganization", "name": "平塚市議会"}, "sameAs": ["https://tubehira.jp/"]}
+          "affiliation": {"@type": "GovernmentOrganization", "name": "平塚市議会"}, "sameAs": ["https://tubehira.jp/", "https://www.youtube.com/channel/UC3cnDK33dOxD3wBxF7PZrJw"]}
 
 
 def crumbs(*items) -> dict:
@@ -971,11 +972,31 @@ def render_guide() -> str:
 
 
 def render_author() -> str:
+    YT = "https://www.youtube.com/channel/UC3cnDK33dOxD3wBxF7PZrJw"
+    rows = [("名前", "元島しん（もとしま しん）"), ("活動名", "平塚ユーチューバーしん"), ("生まれ", "1997年、埼玉県行田市"),
+            ("住まい", "平塚市（2018年から）"), ("学歴", "日本電子専門学校 卒業"), ("家族", "息子と2人暮らしのシングルファザー"),
+            ("仕事", "平塚市議会議員（2023年に初当選、1期目）"), ("会派", "しらさぎ・無所属クラブ"),
+            ("委員会", "総務経済常任委員会 副委員長、ICT推進委員会（2026年9月現在）"), ("好きなこと", "ポケモンカード、動画づくり")]
+    tbl = "".join(f"<tr><th>{e(a)}</th><td>{e(b)}</td></tr>" for a, b in rows)
+    hist = [("2018年", "平塚市に引っ越してきて、起業"), ("2019年", "YouTubeチャンネル「平塚ユーチューバーしん」を始める"),
+            ("2020年", "テイクアウト専門の惣菜店「おそうざいのGEKIRIN」を市内に開く"), ("2022年", "ポケモンカード専門店「GEKIRIN湘南平塚店」を開く"),
+            ("2023年", "平塚市議会議員に初当選"), ("2025年7月", "株式会社GEKIRINを退職し、議員の仕事に専念"),
+            ("2026年11月", "「猫でもわかる平塚市議会」を公開")]
+    tl = "".join(f'<li><b>{e(a)}</b><span>{e(b)}</span></li>' for a, b in hist)
     body = f"""<div class="author"><img src="shin.jpg" alt="元島しんの写真" width="240" height="240">
 <div><h1>作った人</h1><p class="name">元島しん<small>もとしま しん</small></p>
-<p>平塚市議会議員（会派：しらさぎ・無所属クラブ）。YouTubeの「平塚ユーチューバーしん」として、平塚のお店や市の話題を動画で伝えています。</p></div></div>
-<section>{h2('なぜ作ったか', 'Why')}
+<p>平塚市議会議員。YouTubeの「平塚ユーチューバーしん」として、平塚のお店や街の変化を動画で伝えています。</p></div></div>
+<section>{h2('プロフィール', 'Profile')}<table class="tbl prof">{tbl}</table></section>
+<section>{h2('これまで', 'History')}<ol class="tl">{tl}</ol></section>
+<section>{h2('議会で取り組んでいること', 'Work')}
+<ul><li>子育て・教育</li><li>ひとり親の支え</li><li>まちづくり</li><li>市の情報の伝え方をよくすること</li></ul>
+<p>議会での質問や市への確認を通して、市民の声と市政をつなぐことを大事にしています。</p></section>
+<section>{h2('YouTube', 'YouTube')}
+<p>2019年から「平塚ユーチューバーしん」として、平塚のお店の開店・閉店や街の話題を動画にしています。</p>
+<p><a class="chip" href="{YT}">YouTubeチャンネルを見る</a></p></section>
+<section>{h2('なぜこのサイトを作ったか', 'Why')}
 <p>みんなが払った税金が何に使われているのかを、市民の方に知ってほしいからです。議会の資料は言葉が難しすぎて、暮らしに関係する話なのに届いていない。だったら、入り口の言葉のほうを変えようと思いました。</p>
+<p>お店をやっていたときも、YouTubeでも、「平塚のことを、平塚の人に、わかる言葉で伝える」ことをずっとやってきました。このサイトは、それを議会でもやってみたものです。</p>
 <p><a href="riyuu.html">このサイトを作った理由（くわしく）</a></p></section>
 <section>{h2('このサイトで守っていること', 'Promise')}
 <ul><li>市の資料にないことは書きません。</li>
@@ -983,9 +1004,10 @@ def render_author() -> str:
 <li>誰かを良い・悪いと評価するサイトにはしません。</li></ul></section>
 <section>{h2('連絡', 'Contact')}
 <p>「ここが分かりにくい」「間違っている」という声は、ページの一番下の「間違いを報告する」から送れます。</p>
-<p><a href="https://tubehira.jp/">元島しんのホームページ</a></p></section>"""
+<p><a href="https://tubehira.jp/">元島しんの公式サイト</a></p>
+<p class="muted">プロフィールは、本人の公式サイトに載せている内容をもとにしています。</p></section>"""
     person = {"@context": "https://schema.org", "@type": "ProfilePage", "mainEntity": {**AUTHOR, "alternateName": "平塚ユーチューバーしん",
-              "memberOf": {"@type": "Organization", "name": "しらさぎ・無所属クラブ"}}}
+              "memberOf": {"@type": "Organization", "name": "しらさぎ・無所属クラブ"}, "birthDate": "1997", "birthPlace": "埼玉県行田市", "alumniOf": "日本電子専門学校", "homeLocation": "神奈川県平塚市"}}
     return page("作った人（元島しん）", body, path="author.html", desc="猫でもわかる平塚市議会を作った、平塚市議会議員・元島しんのページ",
                 ld=[crumbs(("作った人", "author.html")), person])
 
