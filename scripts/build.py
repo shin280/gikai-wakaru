@@ -586,6 +586,8 @@ def render_bill(s: dict, it: dict, sm: dict | None) -> str:
             {"@type": "Question", "name": q, "acceptedAnswer": {"@type": "Answer", "text": a}} for q, a in qa]})
     # 同じ見出しの議案がほかにもあるときは、title に定例会と番号を足して区別する
     full = f'{headline}（{s["name"]}・{it["label"]}）' if headline in DUP_HEADLINES else ""
+    if not full and len(headline) > 48:  # 長い見出しは、サイト名を付けずに title にする（検索結果で途中で切れないように）
+        full = headline
     return page(headline, body, depth=1, desc=desc, path=f"b/{slug}.html", og=f"og/b/{slug}.png", ld=ld, full_title=full)
 
 

@@ -73,7 +73,12 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add data
           git diff --cached --quiet || git commit -m "データ更新 $(date +%F)"
-          git push
+          # 取得中にほかの変更が push されていたら、取り込んでからもう一度 push する
+          for i in 1 2 3; do
+            git push && exit 0
+            git pull --rebase origin main || exit 1
+          done
+          exit 1
 
   deploy:
     needs: fetch
