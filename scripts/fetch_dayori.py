@@ -40,20 +40,25 @@ def main() -> int:
     print("見つけた号:", [i["no"] for i in issues[:MAX_ISSUES]])
 
     index = []
+    old_path = OUT / "index.json"
+    old_index = json.loads(old_path.read_text(encoding="utf-8")) if old_path.exists() else []
     for iss in issues[:MAX_ISSUES]:
         page = BeautifulSoup(get(iss["url"]).content, "html.parser")
         title = page.find("h1").get_text(strip=True) if page.find("h1") else iss["label"]
+        # 「議案等の審議結果」（ふつうは8面）を優先する。「5月臨時会の審議結果」など別の面を先に拾わないため
         pdf = None
-        for a in page.find_all("a", href=True):
-            t = a.get_text(" ", strip=True)
-            if a["href"].lower().endswith(".pdf") and "審議結果" in t:
-                pdf = requests.compat.urljoin(iss["url"], a["href"])
+        links = [(a.get_text(" ", strip=True), a["href"]) for a in page.find_all("a", href=True) if a["href"].lower().endswith(".pdf")]
+        for want in ("議案等の審議結果", "審議結果"):
+            hit = next((h for t, h in links if want in t and "一括" not in t), None)
+            if hit:
+                pdf = requests.compat.urljoin(iss["url"], hit)
                 break
         if not pdf:
             print(f"第{iss['no']}号: 審議結果のPDFが見つかりません", file=sys.stderr)
             continue
         dest = OUT / f"{iss['no']}.pdf"
-        if not dest.exists():
+        prev = {i["no"]: i.get("pdf") for i in old_index}.get(iss["no"])
+        if not dest.exists() or (prev and prev != pdf):
             dest.write_bytes(get(pdf).content)
         with pdfplumber.open(dest) as doc:
             text = "\n\n".join((p.extract_text(layout=True) or "") for p in doc.pages)

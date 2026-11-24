@@ -55,7 +55,8 @@ def legend(text: str) -> list[dict]:
 
 
 SYM = r"[○〇×欠退][0-9０-９]*"
-ROW_RE = re.compile(r"第\s*([0-9０-９]+)\s*号(?:\s*[ー－-]\s*([0-9０-９]+))?\s*(.*?)\s*(" + "|".join(RESULTS) + r")((?:\s+" + SYM + r")*)")
+# 結果の語の前は空白か番号の直後（件名の中の「認定」などを結果と読まないため）
+ROW_RE = re.compile(r"第\s*([0-9０-９]+)\s*号(?:\s*[ー－-]\s*([0-9０-９]+))?(?:\s+(.*?))?\s+(" + "|".join(RESULTS) + r")(?=\s|$)((?:\s+" + SYM + r")*)")
 TITLE_END = ("条例", "〕", "について", "予算", "意見書", "請願", "決議", "決算")
 
 
@@ -66,20 +67,66 @@ def parse_text(text: str, abbrs: list[str]) -> tuple[list[dict], dict]:
     件名が複数行にわたるときは、前後の行をつなぐ。件名の終わり方（条例、〕など）で区切る。
     """
     lines = text.split("\n")  # 列の位置を保つため、ここでは正規化しない
+
+    def fill_split(i, m, syms):
+        """会派の票が「○４」「欠１」のように上下の行に分かれた行は、記号が1つ足りない。
+        見出し行の略称の位置と比べて、空いている列を上下の行から埋める。"""
+        if len(syms) != len(abbrs) - 1:
+            return syms
+        hpos = None
+        for j in range(i - 1, max(-1, i - 40), -1):
+            hm = re.search(r"結果((?:\s+\S){%d,})" % len(abbrs), lines[j])
+            if hm and all(a in lines[j][hm.start():] for a in abbrs[:3]):
+                seg = lines[j][hm.start():]
+                pos, k = [], 0
+                for a in abbrs:
+                    k = seg.find(a, k + 1 if pos else len("結果"))
+                    pos.append(hm.start() + k)
+                hpos = pos
+                break
+        if not hpos:
+            return syms
+        spos = [m.start(5) + mm.start() for mm in re.finditer(SYM, m.group(5))]
+        used = {min(range(len(hpos)), key=lambda c: abs(hpos[c] - p)) for p in spos}
+        miss = [c for c in range(len(hpos)) if c not in used]
+        if len(miss) != 1:
+            return syms
+        c = miss[0]
+        parts = []
+        for j in (i - 1, i + 1):
+            if 0 <= j < len(lines):
+                for mm in re.finditer(r"[○〇×欠退][0-9０-９]+", lines[j]):
+                    if abs(mm.start() - hpos[c]) <= 3:
+                        parts.append(mm.group(0))
+        if not parts:
+            return syms
+        out = list(syms)
+        out.insert(c, " ".join(parts))
+        return out
+
     split = 50  # 件名の左の列はここまで
     right = 45  # 番号がここより右にあれば右の列
     items, votes = [], {}
     left_rows = []  # (行番号, 番号, 件名, 結果, 賛否)
+    left_kind = "議案"  # 左の列が今どの表か（「会議案番号」の見出しのあとは会議案）
     for i, l in enumerate(lines):
+        hk = re.search(r"(会議案番号|議案番号)", l)
+        if hk and hk.start() < right:
+            left_kind = "会議案" if hk.group(1) == "会議案番号" else "議案"
         for m in ROW_RE.finditer(l):
-            syms = re.findall(SYM, m.group(5))
+            syms = fill_split(i, m, re.findall(SYM, m.group(5)))
             num = int(nz(m.group(1)))
-            if m.start() < right and len(syms) == len(abbrs):
-                left_rows.append([i, num, nz(m.group(3)), m.group(4), syms])
+            if m.start() < right and len(syms) == len(abbrs) and left_kind == "会議案":
+                iid = f"会議案{num}"
+                items.append({"id": iid, "kind": "会議案", "number": num, "sub": None,
+                              "label": f"会議案第{num}号", "title": nz(m.group(3) or ""), "result": m.group(4)})
+                votes[iid] = {a: parse_vote(x) for a, x in zip(abbrs, syms)}
+            elif m.start() < right and len(syms) == len(abbrs):
+                left_rows.append([i, num, nz(m.group(3) or ""), m.group(4), syms])
             elif m.start() >= right and len(syms) == len(abbrs):
                 iid = f"会議案{num}"
                 items.append({"id": iid, "kind": "会議案", "number": num, "sub": None,
-                              "label": f"会議案第{num}号", "title": nz(m.group(3)), "result": m.group(4)})
+                              "label": f"会議案第{num}号", "title": nz(m.group(3) or ""), "result": m.group(4)})
                 votes[iid] = {a: parse_vote(x) for a, x in zip(abbrs, syms)}
     # 左の列の件名を前後の行から組み立てる
     def frag(i):
@@ -155,6 +202,9 @@ def main():
                 broken = True
                 continue
             abbrs = [h for h in head[3:] if h]
+            if any(h.startswith("結果") and len(h) > 2 for h in head):
+                broken = True  # 見出しの「結果」と会派の略称がくっついて、列がずれている
+                continue
             for row in tb[1:]:
                 got = item_id(kind, row[0] or "")
                 if not got:
@@ -167,7 +217,7 @@ def main():
                               "label": f"{k}第{num}号" + (f"ー{sub}" if sub else ""), "title": title, "result": res})
                 if abbrs and kind != "請願":
                     votes[iid] = {a: parse_vote(row[3 + i] or "") for i, a in enumerate(abbrs) if 3 + i < len(row)}
-        if not abbrs_seen:
+        if not abbrs_seen or (leg and len(abbrs_seen) != len(leg)):
             abbrs_seen = abbrs_from_text(text)
         if (broken or not votes) and abbrs_seen:
             t_items, t_votes = parse_text(text, abbrs_seen)
