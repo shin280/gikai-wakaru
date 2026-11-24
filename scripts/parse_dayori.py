@@ -77,7 +77,7 @@ def parse_text(text: str, abbrs: list[str]) -> tuple[list[dict], dict]:
         for j in range(i - 1, max(-1, i - 40), -1):
             hm = re.search(r"結果((?:\s+\S){%d,})" % len(abbrs), lines[j])
             if hm and all(a in lines[j][hm.start():] for a in abbrs[:3]):
-                seg = lines[j][hm.start():]
+                seg = "".join((unicodedata.normalize("NFKC", ch) or ch)[0] for ch in lines[j][hm.start():])
                 pos, k = [], 0
                 for a in abbrs:
                     k = seg.find(a, k + 1 if pos else len("結果"))
@@ -146,9 +146,11 @@ def parse_text(text: str, abbrs: list[str]) -> tuple[list[dict], dict]:
                     if after[-1].endswith(TITLE_END):
                         break
             title = "".join(before + after)
-        iid = f"議案{num}"
+        pre = lines[i][:lines[i].find("第")].strip()[-1:] if "第" in lines[i] else ""
+        kind_l = "認" if pre == "認" else "議案"
+        iid = f"{kind_l}{num}"
         items.insert(0 if not items else len([x for x in items if x["kind"] == "議案"]),
-                     {"id": iid, "kind": "議案", "number": num, "sub": None, "label": f"議案第{num}号",
+                     {"id": iid, "kind": kind_l, "number": num, "sub": None, "label": f"{kind_l}第{num}号",
                       "title": title, "result": res})
         votes[iid] = {a: parse_vote(x) for a, x in zip(abbrs, syms)}
     return items, votes
