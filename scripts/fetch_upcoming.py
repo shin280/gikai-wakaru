@@ -89,10 +89,12 @@ def save(key, m, items, kaiki, url):
     OUT.mkdir(parents=True, exist_ok=True)
     path = OUT / f"{key}.json"
     old = json.loads(path.read_text(encoding="utf-8")) if path.exists() else {}
-    easy = {i["title"]: i for i in old.get("items", []) if i.get("easy")}
+    # 同じ件名（「工事請負変更契約の締結について」など）が複数あるので、件名と市の説明の組で引き継ぐ
+    easy = {(i["title"], i.get("overview", "")): i["easy"] for i in old.get("items", []) if i.get("easy")}
+    items = [it for it in items if it["overview"].strip()]  # 説明のない小見出し（会計ごとの見出しなど）は載せない
     for it in items:
-        if it["title"] in easy:
-            it["easy"] = easy[it["title"]]["easy"]
+        if (it["title"], it["overview"]) in easy:
+            it["easy"] = easy[(it["title"], it["overview"])]
     data = {**old, "key": key, "name": f"令和{m.group(1)}年{m.group(2)}月定例会", "press": url,
             "kaiki": kaiki or old.get("kaiki", ""), "items": items}
     path.write_text(json.dumps(data, ensure_ascii=False, indent=1), encoding="utf-8")
