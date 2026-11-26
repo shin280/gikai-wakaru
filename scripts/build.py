@@ -261,7 +261,7 @@ def page(title: str, body: str, depth: int = 0, desc: str = "", path: str = "", 
         meta += "".join('<script type="application/ld+json">' + json.dumps(x, ensure_ascii=False).replace("</", "<\\/") + "</script>" for x in ld)
     report = f"https://github.com/{REPO}/issues/new?title=" + e(f"間違いの報告：{title}")
     return f"""<!DOCTYPE html>
-<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<html lang="ja"><head><meta charset="utf-8"><meta name="google-site-verification" content="bX9xuzsDUPqjxCF-ETKBHsdZ_Mbf1htSMfB1A8gvwQc"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{e(full_title or (title + "｜" + SITE_NAME))}</title><meta name="description" content="{e(desc or title)}">
 {meta}
 <link rel="icon" href="{root}favicon.png" type="image/png"><link rel="apple-touch-icon" href="{root}apple-touch-icon.png">
