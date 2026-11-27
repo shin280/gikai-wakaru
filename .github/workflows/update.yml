@@ -105,5 +105,18 @@ jobs:
       - uses: actions/upload-pages-artifact@v3
         with:
           path: site
+      # 公開の手続きは、GitHub側の一時的なエラー（Fetching artifact metadata failed）でよく失敗するので、待って2回までやり直す
       - id: deploy
+        continue-on-error: true
+        uses: actions/deploy-pages@v4
+      - if: steps.deploy.outcome == 'failure'
+        run: sleep 60
+      - id: deploy2
+        if: steps.deploy.outcome == 'failure'
+        continue-on-error: true
+        uses: actions/deploy-pages@v4
+      - if: steps.deploy.outcome == 'failure' && steps.deploy2.outcome == 'failure'
+        run: sleep 120
+      - id: deploy3
+        if: steps.deploy.outcome == 'failure' && steps.deploy2.outcome == 'failure'
         uses: actions/deploy-pages@v4
