@@ -80,6 +80,7 @@ p{margin:0 0 10px}ul{margin:0 0 10px;padding-left:1.2em}li{margin-bottom:6px}
 .step.done{color:var(--ink);font-weight:700}.step.done::before{background:var(--red)}.step.done::after{background:var(--red)}
 details{border-top:1px solid var(--line);padding:12px 0}details:first-of-type{border-top:0}summary{cursor:pointer;font-weight:700}
 footer{font-size:12px;color:var(--sub);margin-top:36px;padding-top:20px;border-top:1px solid var(--line)}
+.fnav{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:4px 20px;margin:8px 0 20px}.fnav b{display:block;font-size:12px;color:var(--sub);margin:10px 0 2px;letter-spacing:.05em}.fnav a{display:block;font-size:14px;color:var(--ink,#222);text-decoration:none;padding:7px 0}.fnav a:hover{color:var(--red)}.gt{width:100%;border-collapse:collapse;background:#fff;border-radius:10px;overflow:hidden;font-size:14px}.gt th,.gt td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}.gt th{font-size:12px;color:var(--sub)}.fnote{font-size:12px;line-height:1.8;margin:8px 0}
 .chips{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0;justify-content:center}.chip{font:inherit;font-size:12px;padding:5px 14px;border-radius:99px;background:#fff;border:1px solid var(--line);color:var(--ink);cursor:pointer;text-decoration:none}
 .chip.on{background:var(--red);border-color:var(--red);color:#fff}.chip.area{border-style:dashed}
 .search{width:100%;font:inherit;font-size:16px;padding:15px 22px;border:1px solid var(--line);border-radius:99px;background:#fff;margin:6px 0 12px;box-shadow:0 2px 10px rgba(0,0,0,.04)}
@@ -271,9 +272,13 @@ def page(title: str, body: str, depth: int = 0, desc: str = "", path: str = "", 
 <script>try{{if(localStorage.getItem('kid')==='1')document.body.classList.add('kid')}}catch(e){{}}</script>
 <header class="site"><div class="wrap"><a class="logo" href="{root}index.html">{CAT_SVG.replace("{root}", root)}<span>猫でもわかる</span>平塚市議会</a><span class="tagline">HIRATSUKA CITY COUNCIL, MADE EASY</span></div></header>
 <main class="wrap">{furigana.add(body)}{share_html(title if path else SITE_NAME, url) if path != "404.html" else ""}
-<footer><img class="footcat" src="{root}cat-sit-sm.png" alt=""><p><b>運営：<a href="{root}author.html">元島しん</a></b>（平塚市議会議員・しらさぎ・無所属クラブ所属）。会派ごとの賛否は、すべての会派を同じ形で、議会だよりの記載のとおりに載せています。<a href="{root}about.html">このサイトについて</a>・<a href="{root}riyuu.html">このサイトを作った理由</a>・<a href="{root}author.html">作った人</a></p><p><a href="{root}kore.html">これから決まること</a>・<a href="{root}area/index.html">地区・地名から探す</a>・<a href="{root}sanka.html">議会に参加する</a></p><p>このサイトは、平塚市が公開している資料をもとに、プログラムとAIが自動で作っています。大事な判断の前には、各ページの「元の資料」で必ず確かめてください。</p>
+<footer><img class="footcat" src="{root}cat-sit-sm.png" alt="">
 <p class="kidwrap"><button type="button" id="kidbtn" aria-pressed="false">小学生モード</button></p>
-<p><a href="{report}">間違いを報告する</a>{(' ・ <a href="' + root + 'access.html">アクセス数</a>') if GC_CODE else ''} ・ <a href="https://github.com/{REPO}">このサイトのしくみ（GitHub）</a></p></footer>
+<nav class="fnav" aria-label="サイトの案内"><div><b>調べる</b><a href="{root}index.html">最近決まったこと</a><a href="{root}kore.html">これから決まること</a><a href="{root}area/index.html">地区・地名から探す</a><a href="{root}giin.html">議員と会派</a><a href="{root}yogo.html">議会の言葉の説明</a></div>
+<div><b>参加する</b><a href="{root}sanka.html">議会に参加する</a><a href="{report}">間違いを報告する</a></div>
+<div><b>このサイト</b><a href="{root}about.html">このサイトについて</a><a href="{root}riyuu.html">作った理由</a><a href="{root}author.html">作った人</a>{('<a href="' + root + 'access.html">アクセス数</a>') if GC_CODE else ''}<a href="https://github.com/{REPO}">しくみ（GitHub）</a></div></nav>
+<p class="fnote">運営：<a href="{root}author.html">元島しん</a>（平塚市議会議員・しらさぎ・無所属クラブ所属）。会派ごとの賛否は、すべての会派を同じ形で、議会だよりの記載のとおりに載せています。</p>
+<p class="fnote">このサイトは、平塚市が公開している資料をもとに、プログラムとAIが自動で作っています。大事な判断の前には、各ページの「元の資料」で必ず確かめてください。</p></footer>
 </main>
 <nav class="bn"><a href="{root}index.html">ホーム</a><a href="{root}index.html#find">探す</a><a href="{root}index.html#sessions">定例会</a><a href="{root}yogo.html">用語</a></nav><script>var KIDNOTE={json.dumps(furigana.add(KIDNOTE), ensure_ascii=False).replace('</', '<\\/')};</script>{TOGGLE_JS}</body></html>
 """
@@ -376,6 +381,13 @@ def render_votes(s: dict, it: dict) -> str:
 
 def load_sessions() -> list[dict]:
     ss = [json.loads(p.read_text(encoding="utf-8")) for p in (DATA / "sessions").glob("*.json")]
+    # 提出予定議案だけ出ていて、まだ何も採決されていない定例会は「これから決まること」に出す
+    def decided(s):
+        if (DATA / "votes" / f'{s["key"]}.json').exists():
+            return True
+        target = [i for i in s["items"] if i["kind"] != "報告"] or s["items"]
+        return sum(1 for i in target if i.get("result")) * 2 >= len(target)
+    ss = [s for s in ss if decided(s)]
     return sorted(ss, key=lambda s: s["key"], reverse=True)
 
 
@@ -714,11 +726,19 @@ def render_index(sessions: list[dict], last_checked: str) -> str:
     achips = "".join(f'<a class="chip area" href="area/{e(a)}.html">{e(a)}</a>' for a in areas) + '<a class="chip area" href="area/index.html">地区・地名の一覧</a>'
     total = sum(len(x["items"]) for x in sessions)
     explained = sum(1 for x in sessions for i in x["items"] if summary_path(x["key"], i["id"]).exists())
+    gf = gikai_facts(sessions); up = gf["up"]
+    nxt = f'次は<a href="kore.html">{e(up["name"])}</a>（{e(up.get("kaiki",""))}）です。' if up and up.get("kaiki") else ""
+    about_sec = f"""<section>{h2('平塚市議会とは', 'About')}
+<p>平塚市議会は、平塚市の予算や条例を決めるところです。市長が出した案に、議員が質問をして、最後に賛成か反対かを決めます。</p>
+<div class="role"><div><b>{gf['total']}人</b>議員の数</div><div><b>{gf['kaiha']}つ</b>会派の数</div><div><b>年4回</b>定例会</div></div>
+<p>定例会は3月・6月・9月・12月の年4回ひらかれます。{nxt}</p>
+<p><a href="giin.html">議員と会派の一覧</a>・<a href="sanka.html">傍聴やネット中継で見る</a>・<a href="https://www.city.hiratsuka.kanagawa.jp/gikai/">平塚市議会の公式ページ</a></p></section>"""
     body = f"""<div class="hero"><div class="kw"><span>予算</span><span>条例</span><span>請願</span><span>会派ごとの賛否</span></div>
 <h1><span class="grad">猫でもわかる</span><br>平塚市議会</h1>
 <p>議会って難しい言葉ばかり。<br>だから、猫でもわかる言葉に直しました。</p></div>
 <div class="stats"><div class="stat"><b class="grad">{len(sessions)}<small>回</small></b><span>定例会</span></div><div class="stat"><b class="grad">{total}<small>件</small></b><span>議決・報告</span></div><div class="stat"><b class="grad">{explained}<small>件</small></b><span>説明ページ</span></div></div>
 {ex}
+{about_sec}
 <section id="gacha" class="gacha">{h2('猫がえらんだ議案', 'Random')}
 <p class="muted">どれから読めばいいか分からない人へ。これまでの議案から、猫が1件えらびます。</p>
 <div id="gres" class="gres"><img src="cat-face-sm.png" alt="" class="gcat"><span class="muted">猫はまだ、えらんでいません</span></div>
@@ -737,9 +757,33 @@ def render_index(sessions: list[dict], last_checked: str) -> str:
     (OUT / "search.json").write_text(json.dumps(idx, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
     ogp.make(OUT / "og" / "index.png", "議会って難しい言葉ばかり。だから、猫でもわかる言葉に直しました。", "平塚市議会で決まったこと・会派ごとの賛否")
     ld = [{"@context": "https://schema.org", "@type": "WebSite", "name": SITE_NAME, "url": f"{SITE_URL}/", "inLanguage": "ja",
-           "description": "平塚市議会で決まったことを、わかりやすい言葉で説明するサイト", "author": AUTHOR}]
+           "description": "平塚市議会で決まったことを、わかりやすい言葉で説明するサイト", "author": AUTHOR,
+           "about": {"@type": "GovernmentOrganization", "name": "平塚市議会", "url": "https://www.city.hiratsuka.kanagawa.jp/gikai/"}}]
     return page(SITE_NAME, body, desc="平塚市議会の議案・予算・条例・請願で何が決まったかを、わかりやすい言葉で説明。会派ごとの賛否、議員の討論、市の資料へのリンクも。令和4年12月からの定例会を掲載。",
-                ld=ld, full_title=f"{SITE_NAME}｜平塚市議会で決まったことを、わかりやすく")
+                ld=ld, full_title=f"平塚市議会をわかりやすく｜決まったこと・会派の賛否・日程｜{SITE_NAME}")
+
+
+def gikai_facts(sessions=None) -> dict:
+    m = load_json(DATA / "members.json") or {"groups": []}
+    total = sum(g["count"] for g in m["groups"])
+    kaiha = [g for g in m["groups"] if not g.get("independent")]
+    up = load_upcoming(sessions) if sessions is not None else None
+    return {"m": m, "total": total, "kaiha": len(kaiha), "indep": sum(g["count"] for g in m["groups"] if g.get("independent")), "up": up}
+
+
+def render_giin() -> str:
+    f = gikai_facts(); m = f["m"]
+    blocks = ""
+    for g in m["groups"]:
+        rows = "".join(f'<tr><td><b>{e(x["name"])}</b><br><small class="muted">{e(x.get("kana",""))}</small></td><td>{e(x.get("roles",""))}</td></tr>' for x in g["members"])
+        blocks += f'<section><h2>{e(g["name"])}<small>{g["count"]}人</small></h2><table class="gt"><tr><th>名前</th><th>役割・委員会</th></tr>{rows}</table></section>'
+    body = f"""<h1>平塚市議会の議員と会派</h1>
+<p>平塚市議会には、いま{f['total']}人の議員がいます。考え方の近い議員どうしで「会派」というグループを作っていて、会派は{f['kaiha']}つ、どの会派にも入っていない議員が{f['indep']}人です。</p>
+<p class="muted">市のページ「<a href="{e(m.get('source',''))}">会派・委員会の構成一覧</a>」をもとに、会派の人数が多い順に、すべて同じ形で並べています（{e(m.get('updated',''))}時点）。名前のあとの役割は、市のページの記載のとおりです。</p>
+{blocks}
+<section>{h2('会派ごとの賛成・反対', 'Votes')}<p>どの会派が賛成し、どの会派が反対したかは、議案ごとのページに載せています。<a href="index.html#sessions">定例会ごとの一覧</a>から見られます。</p></section>"""
+    ld = [crumbs(("議員と会派", "giin.html"))]
+    return page("平塚市議会の議員と会派", body, path="giin.html", desc=f"平塚市議会の議員{f['total']}人と、会派ごとの所属議員の一覧。市の会派・委員会の構成一覧をもとに、すべての会派を同じ形で掲載。", ld=ld, full_title="平塚市議会の議員一覧と会派｜猫でもわかる平塚市議会")
 
 
 def render_feed(sessions: list[dict]) -> str:
@@ -1046,6 +1090,7 @@ def main():
     (OUT / "about.html").write_text(render_about(), encoding="utf-8")
     (OUT / "yogo.html").write_text(render_glossary(), encoding="utf-8")
     (OUT / "riyuu.html").write_text(render_reason(), encoding="utf-8")
+    (OUT / "giin.html").write_text(render_giin(), encoding="utf-8")
     (OUT / "author.html").write_text(render_author(), encoding="utf-8")
     up = load_upcoming(sessions)
     (OUT / "kore.html").write_text(render_upcoming(up), encoding="utf-8")
