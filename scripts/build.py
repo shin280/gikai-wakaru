@@ -529,6 +529,40 @@ def prevnext_html(s, it):
 DUP_HEADLINES: set = set()
 
 
+IDX: list = []
+
+
+def also_read_html(u: str) -> str:
+    """読み終わった人が次に読む議案。同じ地区、同じ分野の順に、説明のある新しいものから4件。"""
+    me = next((d for d in IDX if d["u"] == u), None)
+    if not me:
+        return ""
+    pool = [d for d in IDX if d["u"] != u and d["h"]]
+    picked, why = [], {}
+    for d in pool:
+        if len(picked) >= 4:
+            break
+        a = set(d["a"]) & set(me["a"])
+        if a:
+            picked.append(d); why[d["u"]] = "同じ地区：" + "・".join(sorted(a))
+    for d in pool:
+        if len(picked) >= 4:
+            break
+        f = set(d["f"]) & set(me["f"])
+        if f and d not in picked:
+            picked.append(d); why[d["u"]] = "同じ分野：" + "・".join(sorted(f))
+    if len(picked) < 4:
+        for d in pool:
+            if len(picked) >= 4:
+                break
+            if d not in picked and d["k"] == me["k"]:
+                picked.append(d); why[d["u"]] = "同じ定例会"
+    if not picked:
+        return ""
+    cards = "".join(f'<a class="card" href="../{e(d["u"])}"><span class="no">{e(why[d["u"]])}</span><span class="h">{e(d["h"])}</span><span class="no">{e(d["s"])} {e(d["l"])}</span></a>' for d in picked)
+    return f'<section>{h2("あわせて読みたい", "Related")}<div class="cards">{cards}</div><p style="margin-top:12px"><a href="../index.html">ほかに決まったことを見る →</a></p></section>'
+
+
 def render_bill(s: dict, it: dict, sm: dict | None) -> str:
     sm_ = sm or {}
     headline = sm_.get("headline") or it["title"]
@@ -601,6 +635,7 @@ def render_bill(s: dict, it: dict, sm: dict | None) -> str:
     full = f'{headline}（{s["name"]}・{it["label"]}）' if headline in DUP_HEADLINES else ""
     if not full and len(headline) > 48:  # 長い見出しは、サイト名を付けずに title にする（検索結果で途中で切れないように）
         full = headline
+    body += also_read_html(f"b/{slug}.html")
     return page(headline, body, depth=1, desc=desc, path=f"b/{slug}.html", og=f"og/b/{slug}.png", ld=ld, full_title=full)
 
 
@@ -733,25 +768,30 @@ def render_index(sessions: list[dict], last_checked: str) -> str:
 <div class="role"><div><b>{gf['total']}人</b>議員の数</div><div><b>{gf['kaiha']}つ</b>会派の数</div><div><b>年4回</b>定例会</div></div>
 <p>定例会は3月・6月・9月・12月の年4回ひらかれます。{nxt}</p>
 <p><a href="giin.html">議員と会派の一覧</a>・<a href="sanka.html">傍聴やネット中継で見る</a>・<a href="https://www.city.hiratsuka.kanagawa.jp/gikai/">平塚市議会の公式ページ</a></p></section>"""
+    upc = ""
+    if up:
+        picks = [x for x in up["items"] if x.get("easy") and not x["title"].startswith(("専決処分", "報告"))][:3]
+        ucards = "".join(f'<a class="card" href="kore.html"><span class="no">{e(up["name"])}</span><span class="h">{e(x["easy"] if len(x["easy"]) <= 70 else x["easy"][:68] + "…")}</span></a>' for x in picks)
+        upc = f"""<section>{h2('これから決まること', 'Coming up')}<p>{e(up["name"])}が{e(up.get("kaiki",""))}にひらかれます。出される予定の議案は{len(up["items"])}件です。</p><div class="cards">{ucards}</div><p style="margin-top:12px"><a href="kore.html">{len(up["items"])}件すべてと日程を見る →</a></p></section>"""
     body = f"""<div class="hero"><div class="kw"><span>予算</span><span>条例</span><span>請願</span><span>会派ごとの賛否</span></div>
 <h1><span class="grad">猫でもわかる</span><br>平塚市議会</h1>
 <p>議会って難しい言葉ばかり。<br>だから、猫でもわかる言葉に直しました。</p></div>
 <div class="stats"><div class="stat"><b class="grad">{len(sessions)}<small>回</small></b><span>定例会</span></div><div class="stat"><b class="grad">{total}<small>件</small></b><span>議決・報告</span></div><div class="stat"><b class="grad">{explained}<small>件</small></b><span>説明ページ</span></div></div>
-{ex}
-{about_sec}
+{f'<section>{h2('最近決まったこと','Latest')}<div class="cards">{cards}</div>{more}</section>' if cards else ''}
+{upc}
+<section id="find">{h2('自分に関係あることを探す', 'Find')}<p class="muted">住んでいる地区や、気になる分野をえらんでください。</p><div class="chips" style="justify-content:flex-start">{achips}</div><div class="fbtns">{chips}</div>
+<input id="q" class="search" type="search" placeholder="キーワードで探す（例：保育、補聴器、公民館）" aria-label="キーワードで探す">
+<label class="onlybox"><input type="checkbox" id="onlyq" checked>説明があるものだけ</label></section>
+<div id="results"></div>
 <section id="gacha" class="gacha">{h2('猫がえらんだ議案', 'Random')}
 <p class="muted">どれから読めばいいか分からない人へ。これまでの議案から、猫が1件えらびます。</p>
 <div id="gres" class="gres"><img src="cat-face-sm.png" alt="" class="gcat"><span class="muted">猫はまだ、えらんでいません</span></div>
 <button type="button" id="gbtn" class="gbtn">猫に選んでもらう</button></section>
-<section>{h2('もっと知る', 'More')}<div class="cards more"><a class="card" href="kore.html"><b>これから決まること</b><span>次の定例会に出される議案と日程</span></a><a class="card" href="area/index.html"><b>地区・地名から探す</b><span>自分の地区で決まったこと</span></a><a class="card" href="sanka.html"><b>議会に参加する</b><span>傍聴・ネット中継・請願の出し方</span></a></div></section>
-<section id="find">{h2('分野・地域で探す', 'Find')}<div class="fbtns">{chips}</div><div class="chips" style="justify-content:flex-start">{achips}</div>
-<input id="q" class="search" type="search" placeholder="キーワードで探す（例：保育、補聴器、公民館）" aria-label="キーワードで探す">
-<label class="onlybox"><input type="checkbox" id="onlyq" checked>説明があるものだけ</label></section>
-<div id="results"></div>
 <div id="latest">
-{f'<section>{h2('最近決まったこと','Latest')}<div class="cards">{cards}</div>{more}</section>' if cards else ''}
+{about_sec}
+{ex}
 <section id="sessions">{h2('定例会ごとの一覧','Sessions')}{rows or '<p>まだデータがありません。</p>'}</section>
-<p class="muted"><a href="yogo.html">議会の言葉の説明（用語集）</a></p>
+<section>{h2('もっと知る', 'More')}<div class="cards more"><a class="card" href="giin.html"><b>議員と会派</b><span>{gf['total']}人の議員と、会派ごとの顔ぶれ</span></a><a class="card" href="sanka.html"><b>議会に参加する</b><span>傍聴・ネット中継・請願の出し方</span></a><a class="card" href="yogo.html"><b>議会の言葉の説明</b><span>専決処分、補正予算などの意味</span></a></div></section>
 </div>
 <p class="muted">最終確認：{e(last_checked)}</p>{SEARCH_JS}{GACHA_JS}"""
     (OUT / "search.json").write_text(json.dumps(idx, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
@@ -1081,6 +1121,7 @@ def main():
     from collections import Counter
     hc = Counter((load_json(summary_path(s["key"], it["id"])) or {}).get("headline") or it["title"] for s in sessions for it in s["items"])
     DUP_HEADLINES.update(h for h, n in hc.items() if n > 1)
+    IDX[:] = build_search_index(sessions)
     for s in sessions:
         (OUT / "s" / f"{s['key']}.html").write_text(render_session(s), encoding="utf-8")
         for it in s["items"]:
